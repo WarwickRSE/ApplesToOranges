@@ -10,14 +10,14 @@ int main(){
   std::cout<< (a==b)<<std::endl;
 
 
-  ABC c{1,2,3}, d{1,2,3};
+  ABC c{1,2,3}, d{2,3,4};
 
   auto e = c*d;
 
-  std::cout<< "a is "<<c.units()<<std::endl;
-  std::cout<< "b is "<<d.units()<<std::endl;
+  std::cout<< "a is "<<c<<c.units()<<std::endl;
+  std::cout<< "b is "<<d<<d.units()<<std::endl;
   
-  std::cout<<"a*b is "<<e.units()<<std::endl;
+  std::cout<<"a*b is "<<e<<e.units()<<std::endl;
 
   return 0;
 };

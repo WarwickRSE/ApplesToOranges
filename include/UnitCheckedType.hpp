@@ -12,7 +12,7 @@ using dblscalar = STScalar<double>;
 using dbl3vec = ST3Vector<double>;
 //using dbl3vec = ST3VectorDouble;
 
-template <SF L, SF M, SF T, class ST>
+template <SF L, SF M, SF T, typename ST>
 class UnitCheckedType{
 
     // Verify anything necessary about fractions
@@ -31,21 +31,23 @@ class UnitCheckedType{
   public:
     UnitCheckedType():val(0){};
 
-    template<typename Td>
-    explicit UnitCheckedType(Td x):val(x){}
+    explicit UnitCheckedType(core_type x):val(x){}
 
-    template<typename Td>
-    UnitCheckedType(Td x, Td y, Td z):val(x,y,z){}
+    UnitCheckedType(std::initializer_list<core_type> l):val(l){}
 
     // Accessors
     core_type& operator[](size_t i){
         return val[i];
-      //return i<val.size()? val[i]: val[0];
     }
     core_type operator[](size_t i)const{
         return val[i];
-      //return i<val.size()?val[i]:0;
     }
+
+    std::string to_string()const{
+      std::stringstream ss;
+      ss<<val;
+      return ss.str();
+    };
 
     std::string units()const{
       std::stringstream ss;
@@ -72,6 +74,13 @@ class UnitCheckedType{
     }
 
 };
+
+template <SF L, SF M, SF T, typename ST>
+std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& val_in){
+  os << val_in.to_string();
+  return os;
+}
+
 
 //\TODO any way to make this more readable?
 using UCDouble     = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dblscalar>;
