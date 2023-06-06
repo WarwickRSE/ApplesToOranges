@@ -10,8 +10,7 @@ int main(){
   std::cout<< (a==b)<<std::endl;
 
 
-  UnitCheckedType<SF{1,1},SF{1,1},SF{1,1},1> c{1};
-  UnitCheckedType<SF{1,2},SF{1,1},SF{1,1},1> d{1};
+  ABC c{1,2,3}, d{1,2,3};
 
   auto e = c*d;
 

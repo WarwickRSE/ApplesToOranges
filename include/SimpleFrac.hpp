@@ -31,7 +31,7 @@ constexpr bool simplifiable(const SimpleFrac & a){
 };
 constexpr SimpleFrac simplify(const SimpleFrac & a){
   const f_int g = std::gcd(a.num, a.denom);
-  return SimpleFrac(a.num/g, a.denom/g);
+  return g != 0 ? SimpleFrac(a.num/g, a.denom/g): SimpleFrac(a.num, a.denom);
 };
 constexpr bool operator==(const SimpleFrac & a, const SimpleFrac & b){
     return a.num*b.denom == b.num*a.denom;

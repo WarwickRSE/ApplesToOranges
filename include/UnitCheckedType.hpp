@@ -3,41 +3,48 @@
 
 #include <sstream>
 
+#include <helper.hpp>
 #include <SimpleFrac.hpp>
+#include <StorageTypes.hpp>
 
 using SF = SimpleFrac;
+using dblscalar = STScalar<double>;
+using dbl3vec = ST3Vector<double>;
+//using dbl3vec = ST3VectorDouble;
 
-template <SF L, SF M, SF T, int dim>
+template <SF L, SF M, SF T, class ST>
 class UnitCheckedType{
-  static_assert(dim == 1 || dim == 3, "Checking only supports scalar or 3D vector types"); // Not necessary but do this for now
-  private:
 
-    static const size_t dims=dim;
-    double val[dims];
+    // Verify anything necessary about fractions
+    static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
+
+    // Verify that ST is a valid storage type
+    // \TODO
+
+    // Extract its core type
+    typedef typename extract_value_type<ST>::value_type core_type;
+
+    ST val;
+
     SF ids[3] = {L,M,T};
 
-
   public:
-    UnitCheckedType(){
-      for(size_t i=0;i<dim;++i){
-        val[i]=0;
-      }
-    }
-    explicit UnitCheckedType(double x){
-      static_assert(dims == 1, "Cannot construct vector from single value"); 
-      val[0]=x;
-    }
-    UnitCheckedType(double x, double y, double z){
-      static_assert(dims == 3, "Scalar type cannot be constructed from 3 elements"); 
-      val[0]=x;val[1]=y;val[2]=z;
-    }
+    UnitCheckedType():val(0){};
+
+    template<typename Td>
+    explicit UnitCheckedType(Td x):val(x){}
+
+    template<typename Td>
+    UnitCheckedType(Td x, Td y, Td z):val(x,y,z){}
 
     // Accessors
-    double& operator[](size_t i){
-      return i<dims? val[i]: val[0];
+    core_type& operator[](size_t i){
+        return val[i];
+      //return i<val.size()? val[i]: val[0];
     }
-    double operator[](size_t i)const{
-      return i<dims?val[i]:0;
+    core_type operator[](size_t i)const{
+        return val[i];
+      //return i<val.size()?val[i]:0;
     }
 
     std::string units()const{
@@ -56,15 +63,20 @@ class UnitCheckedType{
 
   
   template<SF Li, SF Mi, SF Ti>
-    UnitCheckedType<L+Li, M+Mi, T+Ti, dim> operator*(const UnitCheckedType<Li, Mi, Ti, dim> &other)const{
-      UnitCheckedType<L+Li, M+Mi, T+Ti, dim> tval;
-      for(size_t i=0;i<dim;++i){
-        tval[i]=this->val[i]*other[i];
+    UnitCheckedType<L+Li, M+Mi, T+Ti, ST> operator*(const UnitCheckedType<Li, Mi, Ti, ST> &other)const{
+      UnitCheckedType<L+Li, M+Mi, T+Ti, ST> tval;
+      for(size_t i=0;i<val.size();++i){
+        tval[i]=val[i]*other[i];
       }
       return tval;
     }
 
 };
 
+//\TODO any way to make this more readable?
+using UCDouble     = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dblscalar>;
+using UCDouble3Vec = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dbl3vec>;
+
+using ABC          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dbl3vec>;
 
 #endif

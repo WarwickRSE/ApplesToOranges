@@ -8,6 +8,7 @@ DEBUG = -W -Wall -O0 -pedantic -D_GLIBCXX_DEBUG
 #DEBUG+= -Wno-sign-compare
 DEBUG+= -Wno-unused-parameter
 
+EXENAME = Test
 DEPS = -MM
 
 ifeq ($(strip $(MODE)),debug)
@@ -23,7 +24,7 @@ SOURCE += test.cpp
 OBJS := $(SOURCE:.cpp=.o)
 
 #header files only (no .cpp)
-INCLS += SimpleFrac.hpp UnitCheckedType.hpp
+INCLS += helper.hpp SimpleFrac.hpp UnitCheckedType.hpp StorageTypes.hpp
 
 #add directory prefixes
 SOURCE := $(addprefix $(SRCDIR)/, $(SOURCE))
@@ -33,7 +34,7 @@ INCLS := $(addprefix include/, $(INCLS))
 VPATH = include/
 
 default : $(OBJS)
-	$(CC) $(OBJS) -o Test
+	$(CC) $(OBJS) -o $(EXENAME)
 
 .PHONY: deps
 deps: clean
@@ -53,12 +54,12 @@ obj/%.o:./src/%.cpp
 .PHONY : tar clean veryclean
 
 clean:
-	$(RM) CellSim $(OBJS)
+	$(RM) $(EXENAME) $(OBJS)
 
 veryclean:
-	$(RM) CellSim
+	$(RM) $(EXENAME) $(OBJS)
 	$(RM) -r $(OBJDIR)
 
 tar:
-	tar -cvf CellSim.tar $(SOURCE) $(INCLS) Makefile vis.py
+	tar -cvf $(EXENAME).tar $(SOURCE) $(INCLS) Makefile
 
