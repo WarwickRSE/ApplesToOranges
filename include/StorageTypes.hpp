@@ -1,8 +1,23 @@
 #ifndef __STORAGE_TYPES_HPP__
 #define __STORAGE_TYPES_HPP__
 
-// To be valid storage types for the UnitChecked class, these must implement the following:
-//
+#include <algorithm>
+
+// Valid Storage Types probably implement (UnitChecking will attempt to use if a user does)
+// As many of the following as make sense:
+  // Default constructor
+  // One element constructor (all values set)
+  // Initializer list constructor handling any depth of nesting required
+// Copy, move etc constructors
+// 'get' function taking as many arguments as wanted, returning a reference to value, and const variant returning copy
+// Optional [] operator if 1D access makes sense and is desired
+// << stream operator
+// Standard arithmetic operators for self binary ops
+// Comparison ops as desired
+// Optional arithmetic operators for scalar ops
+// Heterogenous ops for any desired interactions (such as scalar-vector or vector-tensor)
+
+ 
 
 template <typename T>
 class STScalar{
@@ -11,15 +26,18 @@ class STScalar{
 
     public:
         STScalar(T val_in):val(val_in){};
-        STScalar(std::initializer_list<T> l):val(l){};
+        STScalar(std::initializer_list<T> l){l.size()>0? val=*(l.begin()):val=0;};
 
-        int size()const{
-            return 1;
-        }
         T& operator[](size_t i){
             return val;
         }// Dumb but required
         T operator[](size_t i)const{
+            return val;
+        }
+        T& get(){
+            return val;
+        }
+        T get()const{
             return val;
         }
 };
@@ -29,34 +47,136 @@ std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
   return os;
 };
 
-template <typename T>
-class ST3Vector{
+template <typename T, int dim>
+class STVector{
     private:
-        T val[3];
+        T val[dim];
 
     public:
-        ST3Vector(){};
-        ST3Vector(T val_in):val{val_in,val_in,val_in}{};
-        ST3Vector(std::initializer_list<T> l){l.size() ==3? (val[0]=*(l.begin()),val[1]=*(l.begin()+1),val[2]=*(l.begin()+2)) : (val[0]=0,val[1]=0,val[2]=0);};
-
-        int size()const{
-            return 3;
+        STVector(){};
+        STVector(T val_in){for(size_t i = 0; i<dim; i++){val[i]=val_in;}};
+        STVector(std::initializer_list<T> l){
+            memset(val, 0, sizeof(T)*dim);
+            const int ct=std::min((int)l.size(), dim);
+            for(size_t i = 0; i<ct; i++){val[i]=*(l.begin()+i);}
         }
-
         T& operator[](size_t i){
             return val[i];
         }
         T operator[](size_t i)const{
             return val[i];
         }
+        T& get(int i){
+            return val[i];
+        }
+        T get(int i)const{
+            return val[i];
+        }
+
+        STVector operator=(const STVector &a){
+          for(size_t i = 0; i<dim; i++){
+            val[i]=a[i];
+          }
+          return *this;
+        }
 };
 
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const ST3Vector<T>& val_in){
-  os << "("<<val_in[0]<<','<<val_in[1]<<','<<val_in[2]<<")";
+template <typename T, int dim>
+std::ostream& operator<<(std::ostream& os, const STVector<T, dim>& val_in){
+  os << "(";
+  for(size_t i = 0; i<dim; i++){
+    os << val_in[i];
+    if(i<dim-1) os << ',';
+  }
+  os<<")";
   return os;
 };
 
+template <typename T, int dim>
+class STTensor{
+    private:
+        T val[dim*dim];
+
+    public:
+        STTensor(){};
+        STTensor(T val_in){for(size_t i = 0; i<dim*dim; i++){val[i]=val_in;}};
+        
+        // Allow initialisation from single element, or from doubly nested list
+        template<typename Tl>
+        STTensor(std::initializer_list<Tl> l){
+            // Force everything to zero
+            memset(val, 0, sizeof(T)*dim*dim);
+            const int ct=std::min((int)l.size(), dim);
+            if constexpr (std::is_same_v<Tl, std::initializer_list<T>>){
+                for(size_t i = 0; i<ct; i++){
+                    auto l2 = *(l.begin()+i);
+                    const int ct2=std::min((int)l2.size(), dim);
+                    for(size_t j=0; j<ct2; j++){
+                      // Assign as many elements as are given
+                      val[i*dim+j]= *(l2.begin()+j);
+                    }
+                }
+            }else if constexpr(std::is_same_v<Tl, T>){
+                // Single layer - assume single element
+                for(size_t i = 0; i<dim*dim; i++){val[i]=*(l.begin());}
+            }
+        }
+        T& operator[](size_t i){
+            return val[i];
+        }
+        T operator[](size_t i)const{
+            return val[i];
+        }
+        T& get(size_t i, size_t j){
+            return val[i*dim+j];
+        }
+        T get(size_t i, size_t j)const{
+            return val[i*dim+j];
+        }
+        STTensor operator=(const STTensor &a){
+          for(size_t i = 0; i<dim*dim; i++){
+            val[i]=a[i];
+          }
+          return *this;
+        }
+};
+
+template <typename T, int dim>
+std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
+  os << "(";
+  for(size_t i = 0; i<dim*dim; i++){
+    os << val_in[i];
+    if(i<dim-1) os << ',';
+  }
+  os<<")";
+  return os;
+};
+
+// Scalar value multiply
+template <typename T>
+STScalar<T> operator*(const STScalar<T> &a, const STScalar<T> &b){
+  return STScalar<T>{a[0]*b[0]};
+}
+
+// Element wise vector multiply - same length only
+template <typename T, int dim>
+STVector<T, dim> operator*(const STVector<T, dim> &a, const STVector<T, dim> &b){
+  STVector<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    out[i] = a[i]*b[i];
+  }
+  return out;
+}
+
+// Scalar-vector multiply
+template <typename T, int dim>
+STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
+  STVector<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    out[i] = a[0]*b[i];
+  }
+  return out;
+}
 
 
 #endif

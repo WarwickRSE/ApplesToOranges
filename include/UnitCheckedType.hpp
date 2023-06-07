@@ -9,8 +9,8 @@
 
 using SF = SimpleFrac;
 using dblscalar = STScalar<double>;
-using dbl3vec = ST3Vector<double>;
-//using dbl3vec = ST3VectorDouble;
+using dbl3vec = STVector<double, 3>;
+using dbl3tens = STTensor<double, 3>;
 
 template <SF L, SF M, SF T, typename ST>
 class UnitCheckedType{
@@ -21,26 +21,43 @@ class UnitCheckedType{
     // Verify that ST is a valid storage type
     // \TODO
 
-    // Extract its core type
-    typedef typename extract_value_type<ST>::value_type core_type;
-
-    ST val;
-
     SF ids[3] = {L,M,T};
 
   public:
+    ST val; //\TODO Should we try to protect val from direct modification?
+
     UnitCheckedType():val(0){};
 
-    explicit UnitCheckedType(core_type x):val(x){}
+    // Constructors are very permissive - expect ST to restrict to valid values if necessary
+    template <typename Tl>
+    explicit UnitCheckedType(Tl x):val(x){}
 
-    UnitCheckedType(std::initializer_list<core_type> l):val(l){}
+    // Initializer list type deduction requires that we have
+    // a constructor for each layer of nesting we want to accept
+    // After 2-3 layers the syntax is so ugly and error prone that
+    // there it little point going further
+    template <typename Tl>
+    UnitCheckedType(std::initializer_list<Tl> l):val(l){}
+    template <typename Tl>
+    UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
+    template <typename Tl>
+    UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
 
     // Accessors
-    core_type& operator[](size_t i){
+    auto& operator[](size_t i){
         return val[i];
     }
-    core_type operator[](size_t i)const{
+    auto operator[](size_t i)const{
         return val[i];
+    }
+
+    template <typename... Args>
+    auto& get(Args ... args_in){
+        return val.get(args_in...);
+    }
+    template <typename... Args>
+    auto get(Args ... args_in)const{
+        return val.get(args_in...);
     }
 
     std::string to_string()const{
@@ -63,16 +80,14 @@ class UnitCheckedType{
       return ss.str();
     };
 
-  
-  template<SF Li, SF Mi, SF Ti>
-    UnitCheckedType<L+Li, M+Mi, T+Ti, ST> operator*(const UnitCheckedType<Li, Mi, Ti, ST> &other)const{
-      UnitCheckedType<L+Li, M+Mi, T+Ti, ST> tval;
-      for(size_t i=0;i<val.size();++i){
-        tval[i]=val[i]*other[i];
-      }
+  template<typename... Ts>
+  using WrapTypeMultiply = decltype(operator*(std::declval<Ts>()...))(Ts...);
+  template<SF Li, SF Mi, SF Ti, typename STi>
+    UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > operator*(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+      UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > tval;
+      tval.val = this->val*other.val;
       return tval;
     }
-
 };
 
 template <SF L, SF M, SF T, typename ST>
@@ -86,6 +101,9 @@ std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& v
 using UCDouble     = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dblscalar>;
 using UCDouble3Vec = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dbl3vec>;
 
+
+using ABCs          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dblscalar>;
 using ABC          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dbl3vec>;
+using ABCt          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dbl3tens>;
 
 #endif
