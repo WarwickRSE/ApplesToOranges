@@ -85,6 +85,16 @@ class STVector{
         T get(int i)const{
             return val[i];
         }
+        
+        STVector operator +=(const STVector & other){
+          for(size_t i = 0; i<dim; i++){
+            val[i]+=other[i];
+          }
+          return *this;
+        }
+        friend STVector operator+(STVector lhs, const STVector & other){
+          return lhs+=other;
+        }
 
 };
 
@@ -176,12 +186,20 @@ STVector<T, dim> operator*(const STVector<T, dim> &a, const STVector<T, dim> &b)
   return out;
 }
 
-// Scalar-vector multiply
+// Scalar-vector multiply, both ways round
 template <typename T, int dim>
 STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
   STVector<T, dim> out;
   for(size_t i = 0; i<dim; i++){
     out[i] = a[0]*b[i];
+  }
+  return out;
+}
+template <typename T, int dim>
+STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
+  STVector<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    out[i] = a[i]*b[0];
   }
   return out;
 }

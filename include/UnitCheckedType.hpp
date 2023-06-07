@@ -80,6 +80,18 @@ class UnitCheckedType{
       return ss.str();
     };
 
+
+  // Operators
+  
+  // Addition for same type and dims only
+  UnitCheckedType operator+=(const UnitCheckedType & other){
+    val += other.val;
+    return *this;
+  }
+  friend UnitCheckedType operator+(UnitCheckedType lhs, const UnitCheckedType & other){
+      return lhs+=other;
+  }
+
   template<typename... Ts>
   using WrapTypeMultiply = decltype(operator*(std::declval<Ts>()...))(Ts...);
   template<SF Li, SF Mi, SF Ti, typename STi>
