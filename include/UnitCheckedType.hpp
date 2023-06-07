@@ -21,8 +21,6 @@ class UnitCheckedType{
     // Verify that ST is a valid storage type
     // \TODO
 
-    SF ids[3] = {L,M,T};
-
   public:
     ST val; //\TODO Should we try to protect val from direct modification?
 
