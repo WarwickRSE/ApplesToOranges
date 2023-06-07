@@ -28,6 +28,11 @@ class STScalar{
         STScalar(T val_in):val(val_in){};
         STScalar(std::initializer_list<T> l){l.size()>0? val=*(l.begin()):val=0;};
 
+        STScalar(const STScalar &a) = default;
+        STScalar operator=(const STScalar &a){
+          val=a.val;
+          return *this;
+        }
         T& operator[](size_t i){
             return val;
         }// Dumb but required
@@ -57,9 +62,17 @@ class STVector{
         STVector(T val_in){for(size_t i = 0; i<dim; i++){val[i]=val_in;}};
         STVector(std::initializer_list<T> l){
             memset(val, 0, sizeof(T)*dim);
-            const int ct=std::min((int)l.size(), dim);
+            const size_t ct=std::min((int)l.size(), dim);
             for(size_t i = 0; i<ct; i++){val[i]=*(l.begin()+i);}
         }
+        STVector(const STVector &a) = default;
+        STVector operator=(const STVector &a){
+          for(size_t i = 0; i<dim; i++){
+            val[i]=a[i];
+          }
+          return *this;
+        }
+
         T& operator[](size_t i){
             return val[i];
         }
@@ -73,12 +86,6 @@ class STVector{
             return val[i];
         }
 
-        STVector operator=(const STVector &a){
-          for(size_t i = 0; i<dim; i++){
-            val[i]=a[i];
-          }
-          return *this;
-        }
 };
 
 template <typename T, int dim>
@@ -100,13 +107,20 @@ class STTensor{
     public:
         STTensor(){};
         STTensor(T val_in){for(size_t i = 0; i<dim*dim; i++){val[i]=val_in;}};
-        
+        STTensor(const STTensor &a) = default;
+        STTensor operator=(const STTensor &a){
+          for(size_t i = 0; i<dim*dim; i++){
+            val[i]=a[i];
+          }
+          return *this;
+        }
+
         // Allow initialisation from single element, or from doubly nested list
         template<typename Tl>
         STTensor(std::initializer_list<Tl> l){
             // Force everything to zero
             memset(val, 0, sizeof(T)*dim*dim);
-            const int ct=std::min((int)l.size(), dim);
+            const size_t ct=std::min((int)l.size(), dim);
             if constexpr (std::is_same_v<Tl, std::initializer_list<T>>){
                 for(size_t i = 0; i<ct; i++){
                     auto l2 = *(l.begin()+i);
@@ -132,12 +146,6 @@ class STTensor{
         }
         T get(size_t i, size_t j)const{
             return val[i*dim+j];
-        }
-        STTensor operator=(const STTensor &a){
-          for(size_t i = 0; i<dim*dim; i++){
-            val[i]=a[i];
-          }
-          return *this;
         }
 };
 
