@@ -8,9 +8,6 @@
 #include <StorageTypes.hpp>
 
 using SF = SimpleFrac;
-using dblscalar = STScalar<double>;
-using dbl3vec = STVector<double, 3>;
-using dbl3tens = STTensor<double, 3>;
 
 template <SF L, SF M, SF T, typename ST>
 class UnitCheckedType{
@@ -105,15 +102,5 @@ std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& v
   os << val_in.to_string();
   return os;
 }
-
-
-//\TODO any way to make this more readable?
-using UCDouble     = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dblscalar>;
-using UCDouble3Vec = UnitCheckedType<SF{0,1}, SF{0,1}, SF{0,1}, dbl3vec>;
-
-
-using ABCs          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dblscalar>;
-using ABC          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dbl3vec>;
-using ABCt          = UnitCheckedType<SF{1,1}, SF{1,1}, SF{1,1}, dbl3tens>;
 
 #endif
