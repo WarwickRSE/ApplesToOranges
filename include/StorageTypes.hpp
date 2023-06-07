@@ -2,6 +2,7 @@
 #define __STORAGE_TYPES_HPP__
 
 #include <algorithm>
+#include <cstring>
 
 // Valid Storage Types probably implement (UnitChecking will attempt to use if a user does)
 // As many of the following as make sense:
@@ -124,7 +125,7 @@ class STTensor{
             if constexpr (std::is_same_v<Tl, std::initializer_list<T>>){
                 for(size_t i = 0; i<ct; i++){
                     auto l2 = *(l.begin()+i);
-                    const int ct2=std::min((int)l2.size(), dim);
+                    const size_t ct2=std::min((int)l2.size(), dim);
                     for(size_t j=0; j<ct2; j++){
                       // Assign as many elements as are given
                       val[i*dim+j]= *(l2.begin()+j);
