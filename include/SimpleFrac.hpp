@@ -5,25 +5,21 @@
 #include <numeric>
 
 typedef long long f_int;
-typedef unsigned int f_pow;
 
-constexpr f_int pow(f_int num, f_pow pwr){
-
-  f_int val=1, base=num;
-  f_pow i = pwr;
-  for(;;){
-    if(i & 1) val *= base;
-    if(!i) break;
-    i /= 2;
-    base *= base;
-  }
-  return val;
-};
-
+//Simple fraction is a bare-bones fraction class intended for use as a template
+// parameter (C++20) value (not a type).
+// Because of this, comparison operators MUST be a strong order, where
+// 1/2 != 2/4 (even though they are arithmetically equal)
+// IF one only every constructs fractions in their simplest terms, and
+// uses arithmetic to combine them, they remain simple and this will not
+// make any difference for equality. 
+// For simplicity, use the arithmetic functions is_equal, is_less and is_greater which
+// behave as expected. Note also implements these for comparison to integers
 struct SimpleFrac
 {
   const f_int num, denom;  
   constexpr SimpleFrac(f_int inum, f_int idenom): num(inum), denom(idenom) {};
+  constexpr auto operator<=>(const SimpleFrac &)const = default;
 };
 
 constexpr bool simplifiable(const SimpleFrac & a){
@@ -33,8 +29,16 @@ constexpr SimpleFrac simplify(const SimpleFrac & a){
   const f_int g = std::gcd(a.num, a.denom);
   return g != 0 ? SimpleFrac(a.num/g, a.denom/g): SimpleFrac(a.num, a.denom);
 };
-constexpr bool operator==(const SimpleFrac & a, const SimpleFrac & b){
+// More general is_equal checks if arithmetically equal
+// For fully simplified fractions, these are the same operation
+constexpr bool is_equal(const SimpleFrac & a, const SimpleFrac & b){
     return a.num*b.denom == b.num*a.denom;
+};
+constexpr bool is_greater(const SimpleFrac & a, const SimpleFrac & b){
+    return a.num*b.denom > b.num*a.denom;
+};
+constexpr bool is_less(const SimpleFrac & a, const SimpleFrac & b){
+    return a.num*b.denom < b.num*a.denom;
 };
 constexpr SimpleFrac operator+(const SimpleFrac& a, const SimpleFrac& b){
   return simplify(SimpleFrac(a.num*b.denom + b.num*a.denom, a.denom*b.denom));
