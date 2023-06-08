@@ -232,18 +232,17 @@ class STVector{
         }
 
         // Implement the rest in terms of < for easy tweaking/ expansion
-        // \TODO can we use friend idiom without these overloading everything?
         template<typename T2>
-        bool operator<=(const T2 & other)const{
-          return *this < other || *this == other;
+        friend bool operator>(const STVector & first, const T2 & other){
+          return other < first;
         }
         template<typename T2>
-        bool operator>(const T2 & other)const{
-          return other < *this;
+        friend bool operator<=(const STVector & first, const T2 & other){
+          return !(first > other);
         }
         template<typename T2>
-        bool operator>=(const T2 & other)const{
-          return other <= *this;
+        friend bool operator>=(const STVector & first, const T2 & other){
+          return !(first < other);
         }
 
 };
