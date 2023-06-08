@@ -119,7 +119,42 @@ class UnitCheckedType{
 
     // Other products - dot, cross, etc \TODO implement
 
-    // Comparison operators \TODO implement
+    // Magnitude/ norm
+
+    auto magnitude()const{
+        return val.magnitude();
+    }
+
+    // Comparison operators
+    // Implement these for matching units only, but allow different
+    // storage types providing they implement a comparison
+    // Equality
+    template<typename STi>
+    friend bool operator==(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
+        return first.val == other.val;
+    }
+    template<typename STi>
+    friend bool operator!=(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
+        return first.val != other.val;
+    }
+    // Comparisons
+    template<typename STi>
+    friend bool operator<(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
+        return first.val < other.val;
+    }
+    template<typename STi>
+    friend bool operator<=(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
+        return first.val <= other.val;
+    }
+    template<typename STi>
+    friend bool operator>(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
+        return first.val > other.val;
+    }
+    template<typename STi>
+    friend bool operator>=(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
+        return first.val >= other.val;
+    }
+
 
 };
 

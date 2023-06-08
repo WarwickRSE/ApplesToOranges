@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cmath>
 
 // Valid Storage Types probably implement (UnitChecking will attempt to use if a user does)
 // As many of the following as make sense:
@@ -46,6 +47,9 @@ class STScalar{
         T get()const{
             return val;
         }
+        T magnitude()const{
+          return std::abs(val);
+        }
 
         STScalar operator-()const{
           return -val;
@@ -79,6 +83,26 @@ class STScalar{
             return lhs/=other;
         }
 
+        //Comparisons
+        friend bool operator==(const STScalar & first, const STScalar & other){
+          return first.val==other.val;
+        }
+        friend bool operator!=(const STScalar & first, const STScalar & other){
+          return first.val!=other.val;
+        }
+        friend bool operator<(const STScalar & first, const STScalar & other){
+          return first.val<other.val;
+        }
+        friend bool operator>(const STScalar & first, const STScalar & other){
+          return first.val>other.val;
+        }
+        friend bool operator<=(const STScalar & first, const STScalar & other){
+          return first.val<=other.val;
+        }
+        friend bool operator>=(const STScalar & first, const STScalar & other){
+          return first.val>=other.val;
+        }
+
 };
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
@@ -91,6 +115,13 @@ class STVector{
     private:
         T val[dim];
 
+        T normSq()const{
+          T sum=0;
+          for(size_t i = 0; i<dim; i++){
+            sum+=val[i]*val[i];
+          }
+          return sum;
+        }
     public:
         STVector(){};
         STVector(T val_in){for(size_t i = 0; i<dim; i++){val[i]=val_in;}};
@@ -120,6 +151,10 @@ class STVector{
             return val[i];
         }
         
+        T magnitude()const{
+          return std::sqrt(normSq());
+        }
+
         STVector operator-()const{
           STVector out;
           for(size_t i = 0; i<dim; i++){
@@ -163,6 +198,52 @@ class STVector{
         }
         friend STVector operator/(STVector lhs, const STVector & other){
             return lhs/=other;
+        }
+
+        // Comparisons - in terms of ordering of the norm only
+        friend bool operator==(const STVector & first, const STVector & other){
+          for(size_t i = 0; i<dim; i++){
+            if(first.val[i]!=other.val[i]) return false;
+          }
+          return true;
+        }
+        friend bool operator!=(const STVector & first, const STVector & other){
+          for(size_t i = 0; i<dim; i++){
+            if(first.val[i]!=other.val[i]) return true;
+          }
+          return false;
+        }
+        friend bool operator<(const STVector & first, const STVector & other){
+          return first.normSq()<other.normSq();
+        }
+
+        // Compare with Scalars
+        friend bool operator==(const STVector & a, const STScalar<T> & b){
+          return a.normSq()==b.magnitude()*b.magnitude();
+        }
+        friend bool operator==(const STScalar<T> & a, const STVector & b){
+          return b==a;
+        }
+        friend bool operator<(const STVector & a, const STScalar<T> & b){
+          return a.normSq()<b.magnitude()*b.magnitude();
+        }
+        friend bool operator<(const STScalar<T> & a, const STVector & b){
+          return a.magnitude()*a.magnitude() < b.normSq();
+        }
+
+        // Implement the rest in terms of < for easy tweaking/ expansion
+        // \TODO can we use friend idiom without these overloading everything?
+        template<typename T2>
+        bool operator<=(const T2 & other)const{
+          return *this < other || *this == other;
+        }
+        template<typename T2>
+        bool operator>(const T2 & other)const{
+          return other < *this;
+        }
+        template<typename T2>
+        bool operator>=(const T2 & other)const{
+          return other <= *this;
         }
 
 };

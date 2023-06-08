@@ -22,6 +22,13 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+  Length l{1.0};
+  // Demo of comparison operators
+  std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
+  std::cout<<"x == x? "<< (x == x)<<std::endl;
+
+  std::cout<< "x > l? "<< (x.magnitude() > l.magnitude())<<std::endl;
+  std::cout<< "x > l? "<< (x > l)<<std::endl;
 
   // Try gridded operations and show how to initialise
   UCScalar Arr[3][3];
