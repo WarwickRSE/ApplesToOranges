@@ -76,25 +76,51 @@ class UnitCheckedType{
     };
 
 
-  // Operators
-  
-  // Addition for same type and dims only
-  UnitCheckedType operator+=(const UnitCheckedType & other){
-    val += other.val;
-    return *this;
-  }
-  friend UnitCheckedType operator+(UnitCheckedType lhs, const UnitCheckedType & other){
-      return lhs+=other;
-  }
-
-  template<typename... Ts>
-  using WrapTypeMultiply = decltype(operator*(std::declval<Ts>()...))(Ts...);
-  template<SF Li, SF Mi, SF Ti, typename STi>
-    UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > operator*(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-      UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > tval;
-      tval.val = this->val*other.val;
-      return tval;
+    // Operators
+    // Unary minus
+    UnitCheckedType operator-()const{
+        UnitCheckedType tval;
+        tval.val = -val;
+        return tval;
     }
+
+    // Addition/subtraction for same type and dims only
+    UnitCheckedType operator+=(const UnitCheckedType & other){
+        val += other.val;
+        return *this;
+    }
+    friend UnitCheckedType operator+(UnitCheckedType lhs, const UnitCheckedType & other){
+        return lhs+=other;
+    }
+    UnitCheckedType operator-=(const UnitCheckedType & other){
+        val -= other.val;
+        return *this;
+    }
+    friend UnitCheckedType operator-(UnitCheckedType lhs, const UnitCheckedType & other){
+        return lhs-=other;
+    }
+
+    template<typename... Ts>
+    using WrapTypeMultiply = decltype(operator*(std::declval<Ts>()...))(Ts...);
+    template<SF Li, SF Mi, SF Ti, typename STi>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > operator*(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > tval;
+        tval.val = this->val*other.val;
+        return tval;
+    }
+    template<typename... Ts>
+    using WrapTypeDivide = decltype(operator/(std::declval<Ts>()...))(Ts...);
+    template<SF Li, SF Mi, SF Ti, typename STi>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeDivide<ST, STi>, ST, STi> > operator/(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > tval;
+        tval.val = this->val/other.val;
+        return tval;
+    }
+
+    // Other products - dot, cross, etc \TODO implement
+
+    // Comparison operators \TODO implement
+
 };
 
 template <SF L, SF M, SF T, typename ST>

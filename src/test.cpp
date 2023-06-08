@@ -22,6 +22,8 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+
+  // Try gridded operations and show how to initialise
   UCScalar Arr[3][3];
   Arr[0][0] = UCScalar{1.0, 2.0, 3.0};
   Arr[1][1] = UCScalar{1.0, 2.0, 3.0};

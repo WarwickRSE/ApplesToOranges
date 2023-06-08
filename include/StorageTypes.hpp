@@ -46,6 +46,39 @@ class STScalar{
         T get()const{
             return val;
         }
+
+        STScalar operator-()const{
+          return -val;
+        }
+        STScalar operator +=(const STScalar & other){
+          val+=other.val;
+          return *this;
+        }
+        friend STScalar operator+(const STScalar & a, const STScalar & b){
+          return a.val+b.val;
+        }
+        STScalar operator-=(const STScalar & other){
+          val-=other.val;
+          return *this;
+        }
+        friend STScalar operator-(const STScalar & a, const STScalar & b){
+          return a.val-b.val;
+        }
+        STScalar operator *=(const STScalar & other){
+            val *= other.val;
+            return *this;
+        }
+        friend STScalar operator*(STScalar lhs, const STScalar & other){
+            return lhs*=other;
+        }
+        STScalar operator/=(const STScalar & other){
+            val /= other.val;
+            return *this;
+        }
+        friend STScalar operator/(STScalar lhs, const STScalar & other){
+            return lhs/=other;
+        }
+
 };
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
@@ -87,6 +120,13 @@ class STVector{
             return val[i];
         }
         
+        STVector operator-()const{
+          STVector out;
+          for(size_t i = 0; i<dim; i++){
+            out[i]=-val[i];
+          }
+          return out;
+        }
         STVector operator +=(const STVector & other){
           for(size_t i = 0; i<dim; i++){
             val[i]+=other[i];
@@ -95,6 +135,34 @@ class STVector{
         }
         friend STVector operator+(STVector lhs, const STVector & other){
           return lhs+=other;
+        }
+        STVector operator -=(const STVector & other){
+          for(size_t i = 0; i<dim; i++){
+            val[i]-=other[i];
+          }
+          return *this;
+        }
+        friend STVector operator-(STVector lhs, const STVector & other){
+          return lhs-=other;
+        }
+
+        STVector operator *=(const STVector & other){
+            for(size_t i = 0; i<dim; i++){
+                val[i] *= other.val[i];
+            }
+            return *this;
+        }
+        friend STVector operator*(STVector lhs, const STVector & other){
+            return lhs*=other;
+        }
+        STVector operator/=(const STVector & other){
+            for(size_t i = 0; i<dim; i++){
+                val[i] /= other.val[i];
+            }
+            return *this;
+        }
+        friend STVector operator/(STVector lhs, const STVector & other){
+            return lhs/=other;
         }
 
 };
@@ -158,6 +226,51 @@ class STTensor{
         T get(size_t i, size_t j)const{
             return val[i*dim+j];
         }
+
+        STTensor operator-()const{
+          STTensor out;
+          for(size_t i = 0; i<dim*dim; i++){
+            out[i]=-val[i];
+          }
+          return out;
+        }
+        STTensor operator +=(const STTensor & other){
+          for(size_t i = 0; i<dim*dim; i++){
+            val[i]+=other[i];
+          }
+          return *this;
+        }
+        friend STTensor operator+(STTensor lhs, const STTensor & other){
+          return lhs+=other;
+        }
+        STTensor operator -=(const STTensor & other){
+          for(size_t i = 0; i<dim*dim; i++){
+            val[i]-=other[i];
+          }
+          return *this;
+        }
+        friend STTensor operator-(STTensor lhs, const STTensor & other){
+          return lhs-=other;
+        }
+
+        STTensor operator *=(const STTensor & other){
+            for(size_t i = 0; i<dim*dim; i++){
+                val[i] *= other.val[i];
+            }
+            return *this;
+        }
+        friend STTensor operator*(STTensor lhs, const STTensor & other){
+            return lhs*=other;
+        }
+        STTensor operator/=(const STTensor & other){
+            for(size_t i = 0; i<dim*dim; i++){
+                val[i] /= other.val[i];
+            }
+            return *this;
+        }
+        friend STTensor operator/(STTensor lhs, const STTensor & other){
+            return lhs/=other;
+        }
 };
 
 template <typename T, int dim>
@@ -171,21 +284,6 @@ std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
   return os;
 };
 
-// Scalar value multiply
-template <typename T>
-STScalar<T> operator*(const STScalar<T> &a, const STScalar<T> &b){
-  return STScalar<T>{a[0]*b[0]};
-}
-
-// Element wise vector multiply - same length only
-template <typename T, int dim>
-STVector<T, dim> operator*(const STVector<T, dim> &a, const STVector<T, dim> &b){
-  STVector<T, dim> out;
-  for(size_t i = 0; i<dim; i++){
-    out[i] = a[i]*b[i];
-  }
-  return out;
-}
 
 // Scalar-vector multiply, both ways round
 template <typename T, int dim>
@@ -204,6 +302,44 @@ STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   }
   return out;
 }
+// Scalar-Tensor multiply, both ways round
+template <typename T, int dim>
+STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
+  STTensor<T, dim> out;
+  for(size_t i = 0; i<dim*dim; i++){
+    out[i] = a[0]*b[i];
+  }
+  return out;
+}
+template <typename T, int dim>
+STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STScalar<T> &b){
+  STTensor<T, dim> out;
+  for(size_t i = 0; i<dim*dim; i++){
+    out[i] = a[i]*b[0];
+  }
+  return out;
+}
 
+// Vector-Tensor multiply, both ways round
+template <typename T, int dim>
+STTensor<T, dim> operator*(const STVector<T, dim> &a, const STTensor<T, dim> &b){
+  STTensor<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    for(size_t j = 0; j<dim; j++){
+      out[j*dim + i] += a[j]*b[j*dim+i]; // Is this the right way round???
+    }
+  }
+  return out;
+}
+template <typename T, int dim>
+STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STVector<T, dim> &b){
+  STTensor<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    for(size_t j = 0; j<dim; j++){
+      out[j*dim + i] += a[j*dim+i]*b[j]; // Is this the right way round???
+    }
+  }
+  return out;
+}
 
 #endif
