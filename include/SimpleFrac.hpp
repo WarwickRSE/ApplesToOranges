@@ -44,6 +44,9 @@ constexpr bool is_greater(const SimpleFrac & a, const SimpleFrac & b){
 constexpr bool is_less(const SimpleFrac & a, const SimpleFrac & b){
     return a.num*b.denom < b.num*a.denom;
 };
+constexpr SimpleFrac operator-(const SimpleFrac& a){
+  return SimpleFrac(-a.num, a.denom);
+};
 constexpr SimpleFrac operator+(const SimpleFrac& a, const SimpleFrac& b){
   return simplify(SimpleFrac(a.num*b.denom + b.num*a.denom, a.denom*b.denom));
 };
