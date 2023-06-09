@@ -127,6 +127,34 @@ class UnitCheckedType{
         return tval;
     }
 
+    // Numeric multiply/divide
+    template<typename num>
+    UnitCheckedType operator*=(const num & other){
+        val *= other;
+        return *this;
+    }
+    // Only arithmetic types for this
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    friend UnitCheckedType operator*(const num & lhs, UnitCheckedType rhs){
+        static_assert(std::is_arithmetic_v<num>, "Can only multiply by arithmetic types");
+        return rhs*=lhs;
+    }
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    friend UnitCheckedType operator*(UnitCheckedType lhs, const num & rhs){
+        static_assert(std::is_arithmetic_v<num>, "Can only multiply by arithmetic types");
+        return lhs*=rhs;
+    }
+    template<typename num>
+    UnitCheckedType operator/=(const num & other){
+        val /= other;
+        return *this;
+    }
+    // Only arithmetic types for this
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    friend UnitCheckedType operator/(UnitCheckedType lhs, const num & rhs){
+        return lhs/=rhs;
+    }
+
     // Other products - dot, cross, etc \TODO implement
 
     // Magnitude/ norm
