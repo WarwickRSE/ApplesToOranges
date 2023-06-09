@@ -1,4 +1,7 @@
 
+#ifdef USE_FRACTIONAL_POWERS
+  // Omit this whole file if we can't use it as Template params
+  // We don't have to do this, but they are NOT a generally useable fraction type
 #ifndef  __SIMPLEFRAC_HPP__
 #define  __SIMPLEFRAC_HPP__
 
@@ -75,5 +78,5 @@ std::ostream& operator<<(std::ostream& os, const SimpleFrac& val_in){
 };
 
 
-
+#endif
 #endif

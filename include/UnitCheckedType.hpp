@@ -7,13 +7,23 @@
 #include <SimpleFrac.hpp>
 #include <StorageTypes.hpp>
 
-using SF = SimpleFrac;
+#ifdef USE_FRACTIONAL_POWERS
+ using SF = SimpleFrac;
+#else
+ using SF = int;
+ inline constexpr bool is_equal(int a, int b){return a==b;}
+ inline constexpr bool is_less(int a, int b){return a<b;}
+ inline constexpr bool is_greater(int a, int b){return a>b;}
+#endif
+
 
 template <SF L, SF M, SF T, typename ST>
 class UnitCheckedType{
 
     // Verify anything necessary about fractions
-    static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
+#ifdef USE_FRACTIONAL_POWERS
+ static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
+#endif
 
     // Verify that ST is a valid storage type
     // \TODO

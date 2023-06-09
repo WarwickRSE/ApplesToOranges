@@ -1,9 +1,25 @@
 
 CC = g++
+# Set this next flag to enable fractional powers for Units
+# This needs a compiler with C++20 support AND MAY INCREASE compilation time
+# If you don't need fractional powers but want other c++20 support, set to 0
+# but set DEFAULT_STD to c++20
+USE_FRACTIONAL_POWERS = 1
+DEFAULT_STD = c++17
+
 INCLUDE = -I ./include/
 SRCDIR = src
 OBJDIR = obj
-CFLAGS = -g -c $(INCLUDE) -std=c++20 -O0
+
+CFLAGS = -g -c $(INCLUDE) -O3
+ifeq ($(strip $(USE_FRACTIONAL_POWERS)),1)
+  CFLAGS += -std=c++20 -DUSE_FRACTIONAL_POWERS
+  $(info *****Enabled fractional powers*****)
+else
+  CFLAGS += -std=$(DEFAULT_STD)
+  $(info *****Disabled fractional powers*****)
+endif
+
 DEBUG = -W -Wall -O0 -pedantic -D_GLIBCXX_DEBUG
 #DEBUG+= -Wno-sign-compare
 DEBUG+= -Wno-unused-parameter
