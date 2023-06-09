@@ -38,6 +38,17 @@ int main(){
 
   auto Arr2 = Arr;
   auto Arr3 = Arr2;
+  std::cout<<"Arr3[0][0] = "<<Arr3[0][0]<<std::endl;
+
+#ifdef USE_FRACTIONAL_POWERS
+
+  // Creating your own custom physical type to use elsewhere
+  using UnsquareM = UnitCheckedType<SF{1,2}, 0, 0, dblscalar>;
+  UnsquareM lu{0.3};
+  std::cout<<" lu = "<<lu<<lu.units()<<std::endl;
+  std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
+
+#endif
 
   return 0;
 };

@@ -6,7 +6,9 @@
 // For clarity
 using dblscalar = STScalar<double>;
 using dbl3vec = STVector<double, 3>;
+using dbl4vec = STVector<double, 4>;
 using dbl3tens = STTensor<double, 3>;
+using dbl4tens = STTensor<double, 4>;
 
 // No physical units
 using UCScalar = UnitCheckedType<0, 0, 0, dblscalar>;
