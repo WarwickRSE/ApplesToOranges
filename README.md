@@ -25,10 +25,10 @@ Created June 2023 by Warwick RSE
 ## How to use this code
 EITHER copy the 5 header files from the include directory into an appropriate place, or copy and unpack the tarball and add to your build. 
 
-The PhysicalTypes.hpp header provides common Physical named units, such as Position (a double precision 3-element vector with units of m) or Force (a double precision 3-element vector with units of kgms^-2)
+The PhysicalTypes.hpp header provides common Physical named units, such as Position (a double precision 3-element vector with units of m) or Force (a double precision 3-element vector with units of kgms<sup>-2</sup>)
 After including the header you can also instantiate a type of arbitrary units; create a UnitCheckedType\<L, M, T, Storage\> where L is the exponent of length (m), M of mass (kg) and T of time (s). Storage is the data storage type, which can be one of the built ins, scalar (dblscalar), 3-component or 4-component vector (dbl3vec or dbl4vec) or 3x3 or 4x4 tensor (dbl3tens or dbl4tens) all double precision; or can be ay other suitable storage type (see below). 
 
-The code supports either Integral exponents for units (m^2 but not m^(1/2)) for C++17 or newer. Fractional exponent support requires C++20 and is enabled by setting -DUSE\_FRACTIONAL\_POWERS at the compile step. 
+The code supports either Integral exponents for units (m<sup>2</sup> but not <m<sup>1/2</sup>) for C++17 or newer. Fractional exponent support requires C++20 and is enabled by setting -DUSE\_FRACTIONAL\_POWERS at the compile step. 
 
 The provided src/test.cpp and Makefile builds an example code showing how to use the code and demonstrating some of the features.
 
@@ -38,9 +38,9 @@ A storage type is a class handling data storage, which must implement any functi
 
 Functions that the UnitChecked type will wrap if available:
 * Any of the following constructors
-  ** Default constructor
-  ** One element constructor (all values set)
-  ** Initializer list constructor handling any depth of nesting required
+    * Default constructor
+    * One element constructor (all values set)
+    * Initializer list constructor handling any depth of nesting required
 * Copy, move etc constructors
 * 'get' function taking as many arguments as wanted, returning a reference to value, and const variant returning copy
 * Optional [] operator if 1D access makes sense and is desired
