@@ -18,7 +18,8 @@ typedef long long f_int;
 struct SimpleFrac
 {
   const f_int num, denom;  
-  constexpr SimpleFrac(f_int inum, f_int idenom): num(inum), denom(idenom) {};
+  explicit constexpr SimpleFrac(f_int inum): num(inum), denom(1) {};
+  explicit constexpr SimpleFrac(f_int inum, f_int idenom): num(inum), denom(idenom) {};
   constexpr auto operator<=>(const SimpleFrac &)const = default;
 };
 
