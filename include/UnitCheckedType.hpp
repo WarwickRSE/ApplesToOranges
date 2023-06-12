@@ -123,19 +123,19 @@ class UnitCheckedType{
         return lhs-=other;
     }
 
-    template<typename... Ts>
-    using WrapTypeMultiply = decltype(operator*(std::declval<Ts>()...))(Ts...);
+    template<typename Ts>
+    using ReturnTypeMultiply = decltype(operator*(std::declval<ST>(), std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, typename STi>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > operator*(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > tval;
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeMultiply<STi> > operator*(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeMultiply<STi> > tval;
         tval.val = this->val*other.val;
         return tval;
     }
-    template<typename... Ts>
-    using WrapTypeDivide = decltype(operator/(std::declval<Ts>()...))(Ts...);
+    template<typename Ts>
+    using ReturnTypeDivide = decltype(operator/(std::declval<ST>(), std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, typename STi>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeDivide<ST, STi>, ST, STi> > operator/(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, typename std::invoke_result_t<WrapTypeMultiply<ST, STi>, ST, STi> > tval;
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDivide<STi> > operator/(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDivide<STi> > tval;
         tval.val = this->val/other.val;
         return tval;
     }
@@ -178,11 +178,11 @@ class UnitCheckedType{
     // Other products - dot, cross, etc \TODO implement
 
     // Magnitude/ norm
-    template<typename... Ts>
-    using WrapTypeMag = decltype(magnitude(std::declval<Ts>()...))(Ts...);
-        UnitCheckedType<L, M, T, typename std::invoke_result_t<WrapTypeMag<ST>, ST> > magnitude()const{
-        UnitCheckedType<L, M, T, typename std::invoke_result_t<WrapTypeMag<ST>, ST> > tval;
-        tval.val = val.magnitude(); // TODO remove use of val on LHS?
+    
+    using ReturnTypeMagnitude = decltype((std::declval<ST>()).magnitude());
+    UnitCheckedType<L, M, T, ReturnTypeMagnitude > magnitude()const{
+        UnitCheckedType<L, M, T, ReturnTypeMagnitude > tval;
+        tval.val = val.magnitude();
         return tval;
     }
 
