@@ -37,6 +37,19 @@ class UnitCheckedType{
     template <typename Tl>
     explicit UnitCheckedType(Tl x):val(x){}
 
+    UnitCheckedType& operator=(const UnitCheckedType& src){
+        val=src.val;
+        return *this;
+    }
+
+    // Only arithmetic types for this
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    UnitCheckedType& operator=(const num& src){
+        val=src;
+        return *this;
+    }// Scalar equals for arithmetic types
+
+
     // Initializer list type deduction requires that we have
     // a constructor for each layer of nesting we want to accept
     // After 2-3 layers the syntax is so ugly and error prone that

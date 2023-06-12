@@ -130,6 +130,13 @@ class STVector{
             const size_t ct=std::min((int)l.size(), dim);
             for(size_t i = 0; i<ct; i++){val[i]=*(l.begin()+i);}
         }
+        //Allow for initialisation from any other type which offers a get() method, such as an STScalar, but potentially wrapped in Units etc
+        template <typename U>
+        STVector(std::initializer_list<U> l){
+            memset(val, 0, sizeof(T)*dim);
+            const size_t ct=std::min((int)l.size(), dim);
+            for(size_t i = 0; i<ct; i++){val[i]=(l.begin()+i)->get();}
+        }
         STVector(const STVector &a) = default;
         STVector operator=(const STVector &a){
           for(size_t i = 0; i<dim; i++){
