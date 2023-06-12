@@ -171,9 +171,12 @@ class UnitCheckedType{
     // Other products - dot, cross, etc \TODO implement
 
     // Magnitude/ norm
-
-    auto magnitude()const{
-        return val.magnitude();
+    template<typename... Ts>
+    using WrapTypeMag = decltype(magnitude(std::declval<Ts>()...))(Ts...);
+        UnitCheckedType<L, M, T, typename std::invoke_result_t<WrapTypeMag<ST>, ST> > magnitude()const{
+        UnitCheckedType<L, M, T, typename std::invoke_result_t<WrapTypeMag<ST>, ST> > tval;
+        tval.val = val.magnitude(); // TODO remove use of val on LHS?
+        return tval;
     }
 
     // Comparison operators

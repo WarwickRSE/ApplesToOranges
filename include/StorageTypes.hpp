@@ -50,6 +50,9 @@ class STScalar{
         T magnitude()const{
           return std::abs(val);
         }
+        friend STScalar<T> magnitude(STScalar<T> in){
+          return std::abs(in.val);
+        }
 
         STScalar operator-()const{
           return -val;
@@ -157,9 +160,11 @@ class STVector{
         T get(int i)const{
             return val[i];
         }
-        
-        T magnitude()const{
-          return std::sqrt(normSq());
+        STScalar<T> magnitude()const{
+          return STScalar<T>{std::sqrt(normSq())};
+        }
+        friend STScalar<T> magnitude(STVector<T, dim> in){
+          return STScalar<T>{std::sqrt(in.normSq())};
         }
 
         STVector operator-()const{
