@@ -71,7 +71,7 @@ constexpr bool is_less(const SimpleFrac & a, const int b){
 };
 
 
-std::ostream& operator<<(std::ostream& os, const SimpleFrac& val_in){
+inline std::ostream& operator<<(std::ostream& os, const SimpleFrac& val_in){
   if( val_in.num%val_in.denom == 0){
     os << val_in.num/val_in.denom;
   }else{
