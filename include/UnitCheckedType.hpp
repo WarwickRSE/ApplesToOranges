@@ -167,6 +167,13 @@ class UnitCheckedType{
     friend UnitCheckedType operator/(UnitCheckedType lhs, const num & rhs){
         return lhs/=rhs;
     }
+    //Divide arithmetic type by unitted type - remember units!
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
+    friend UnitCheckedType<-L,-M,-T, ST> operator/(const num & lhs, UnitCheckedType rhs){
+        UnitCheckedType<-L,-M,-T,ST> tval;
+        tval.val = lhs/rhs.val;
+        return tval;
+    }
 
     // Other products - dot, cross, etc \TODO implement
 

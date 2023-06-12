@@ -394,6 +394,24 @@ STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   }
   return out;
 }
+// Scalar-vector divide, both ways round
+template <typename T, int dim>
+STVector<T, dim> operator/(const STScalar<T> &a, const STVector<T, dim> &b){
+  STVector<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    out[i] = a[0]/b[i];
+  }
+  return out;
+}
+template <typename T, int dim>
+STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
+  STVector<T, dim> out;
+  for(size_t i = 0; i<dim; i++){
+    out[i] = a[i]/b[0];
+  }
+  return out;
+}
+
 // Scalar-Tensor multiply, both ways round
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
