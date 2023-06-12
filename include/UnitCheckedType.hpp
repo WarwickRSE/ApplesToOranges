@@ -134,8 +134,8 @@ class UnitCheckedType{
     template<typename Ts>
     using ReturnTypeDivide = decltype(operator/(std::declval<ST>(), std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, typename STi>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDivide<STi> > operator/(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDivide<STi> > tval;
+        UnitCheckedType<L-Li, M-Mi, T-Ti, ReturnTypeDivide<STi> > operator/(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L-Li, M-Mi, T-Ti, ReturnTypeDivide<STi> > tval;
         tval.val = this->val/other.val;
         return tval;
     }
