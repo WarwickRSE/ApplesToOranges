@@ -22,10 +22,17 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+  // Numeric multiply
+  std::cout<<"2x= "<<2.0*x<<x.units()<<"=="<<x*2.0<<x.units()<<std::endl;
+  std::cout<<"x/2= "<<x/2.0<<x.units()<<std::endl;
+
   Length l{1.0};
   // Demo of comparison operators
   std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
   std::cout<<"x == x? "<< (x == x)<<std::endl;
+
+  std::cout<<"x.magnitude()= "<<x.magnitude()<<std::endl;
+  std::cout<<"l.magnitude()= "<<l.magnitude()<<std::endl;
 
   std::cout<< "x > l? "<< (x.magnitude() > l.magnitude())<<std::endl;
   std::cout<< "x > l? "<< (x > l)<<std::endl;
