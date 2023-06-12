@@ -139,7 +139,7 @@ class STVector{
         STVector(std::initializer_list<U> l){
             memset(val, 0, sizeof(T)*dim);
             const size_t ct=std::min((int)l.size(), dim);
-            for(size_t i = 0; i<ct; i++){val[i]=(l.begin()+i)->get();}
+            for(size_t i = 0; i<ct; i++){val[i]=(l.begin()+i)->unsafeGet();}
         }
         STVector(const STVector &a) = default;
         STVector operator=(const STVector &a){

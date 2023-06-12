@@ -62,19 +62,13 @@ class UnitCheckedType{
     UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
 
     // Accessors
-    auto& operator[](size_t i){
-        return val[i];
-    }
-    auto operator[](size_t i)const{
-        return val[i];
-    }
-    // \TODO should we rename to 'unsafeValue' or something?
+    // unsafeGet - no unit checks, just return bare value. Use with CAUTION
     template <typename... Args>
-    auto& get(Args ... args_in){
+    auto& unsafeGet(Args ... args_in){
         return val.get(args_in...);
     }
     template <typename... Args>
-    auto get(Args ... args_in)const{
+    auto unsafeGet(Args ... args_in)const{
         return val.get(args_in...);
     }
 
