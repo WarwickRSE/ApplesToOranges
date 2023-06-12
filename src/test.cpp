@@ -22,6 +22,9 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+  // Dot product
+  std::cout<<"x.v="<<x.dot(v)<<std::endl;
+
   // Numeric multiply
   std::cout<<"2x= "<<2.0*x<<x.units()<<"=="<<x*2.0<<x.units()<<std::endl;
   std::cout<<"x/2= "<<x/2.0<<x.units()<<std::endl;

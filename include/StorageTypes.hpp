@@ -83,6 +83,10 @@ class STScalar{
             return lhs/=other;
         }
 
+        STScalar dot(const STScalar & other)const{
+          return val*other.val;
+        }
+
         //Comparisons
         friend bool operator==(const STScalar & first, const STScalar & other){
           return first.val==other.val;
@@ -204,6 +208,14 @@ class STVector{
         }
         friend STVector operator/(STVector lhs, const STVector & other){
             return lhs/=other;
+        }
+
+        STScalar<T> dot(const STVector & other)const{
+          STScalar<T> sum=0;
+          for(size_t i = 0; i<dim; i++){
+            sum+=val[i]*other.val[i];
+          }
+          return sum;
         }
 
         // Comparisons - in terms of ordering of the norm only

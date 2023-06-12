@@ -68,7 +68,7 @@ class UnitCheckedType{
     auto operator[](size_t i)const{
         return val[i];
     }
-
+    // \TODO should we rename to 'unsafeValue' or something?
     template <typename... Args>
     auto& get(Args ... args_in){
         return val.get(args_in...);
@@ -176,13 +176,20 @@ class UnitCheckedType{
     }
 
     // Other products - dot, cross, etc \TODO implement
-
-    // Magnitude/ norm
-    
+    // \TODO currently requires ST implement this - should not force this
+    template<typename Ts>
+    using ReturnTypeDot = decltype((std::declval<ST>()).dot(std::declval<Ts>()));
+    template<SF Li, SF Mi, SF Ti, typename STi>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<STi> > dot(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<STi> > tval;
+        tval.val = this->val.dot(other.val);
+        return tval;
+    }    
+    // Magnitude function
     using ReturnTypeMagnitude = decltype((std::declval<ST>()).magnitude());
     UnitCheckedType<L, M, T, ReturnTypeMagnitude > magnitude()const{
         UnitCheckedType<L, M, T, ReturnTypeMagnitude > tval;
-        tval.val = val.magnitude();
+        tval.val = val.magnitude(); // \TODO should use plain = here and throughout operators?
         return tval;
     }
 
