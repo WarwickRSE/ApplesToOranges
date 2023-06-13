@@ -19,7 +19,13 @@
 // Optional arithmetic operators for scalar ops
 // Heterogenous ops for any desired interactions (such as scalar-vector or vector-tensor)
 
- 
+// Implements nothing - for development purposes
+class STDummy{
+    double val;
+  public:
+    STDummy()=default;
+};
+
 
 template <typename T>
 class STScalar{
