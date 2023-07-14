@@ -56,4 +56,5 @@ Functions that the UnitChecked type will wrap if available:
 * Optional arithmetic operators for scalar ops (e.g. multiply with double or int)
 * Heterogenous ops for any desired interactions (such as scalar-vector or vector-tensor multiplication which we have implemented)
 
-
+## But why the name?
+Because comparing a distance to a time is like comparing apples to oranges, and adding one of each together doesn't get you ttwo, it gets you an apple and an orange. My PhD supervisor loved this phrase, and it's the first thing I think of whenever I am checking units make sense or are compatible.
