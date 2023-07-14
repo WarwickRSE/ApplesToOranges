@@ -171,18 +171,20 @@ class UnitCheckedType{
 
     // Other products - dot, cross, etc \TODO implement
     // \TODO currently requires ST implement this - should not force this
-    template<typename Ts>
-    using ReturnTypeDot = decltype((std::declval<ST>()).dot(std::declval<Ts>()));
-    template<SF Li, SF Mi, SF Ti, typename STi>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<STi> > dot(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<STi> > tval;
+    template<typename Ts, typename Q=ST>
+    using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
+    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<Q,STi> > dot(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<Q,STi> > tval;
         tval.val = this->val.dot(other.val);
         return tval;
     }    
     // Magnitude function
-    using ReturnTypeMagnitude = decltype((std::declval<ST>()).magnitude());
-    UnitCheckedType<L, M, T, ReturnTypeMagnitude > magnitude()const{
-        UnitCheckedType<L, M, T, ReturnTypeMagnitude > tval;
+    template <typename Q=ST>
+    using ReturnTypeMagnitude = decltype((std::declval<Q>()).magnitude());
+    template <typename Q=ST>
+    UnitCheckedType<L, M, T, ReturnTypeMagnitude<Q> > magnitude()const{
+        UnitCheckedType<L, M, T, ReturnTypeMagnitude<Q> > tval;
         tval.val = val.magnitude(); // \TODO should use plain = here and throughout operators?
         return tval;
     }
