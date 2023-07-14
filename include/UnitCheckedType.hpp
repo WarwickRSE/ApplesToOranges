@@ -37,6 +37,8 @@ class UnitCheckedType{
     template <typename Tl>
     explicit UnitCheckedType(Tl x):val(x){}
 
+
+    UnitCheckedType(const UnitCheckedType& src):val(src.val){}
     UnitCheckedType& operator=(const UnitCheckedType& src){
         val=src.val;
         return *this;
