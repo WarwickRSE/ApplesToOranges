@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <vector>
 #include "PhysicalTypes.hpp"
 
 int main(){
@@ -23,7 +24,12 @@ int main(){
   // A time
   Time t{0.1};
   std::cout<<"Defined time t= "<<t<<t.units()<<std::endl;
-  
+
+  std::vector<Time> t_steps;
+  t_steps.push_back(t);
+
+  Time t2(t);
+
   // A position
   Position x{1.0, 2.0, 3.0};  
   std::cout<<"Defined position x= "<<x<<x.units()<<std::endl;
