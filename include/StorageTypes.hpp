@@ -24,6 +24,9 @@ class STDummy{
     double val;
   public:
     STDummy()=default;
+    STDummy(double a){val=a;}
+    STDummy(std::initializer_list<double> l){l.size()>0? val=*(l.begin()):val=0;};
+
 };
 
 
