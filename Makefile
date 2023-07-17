@@ -28,7 +28,8 @@ EXENAME = Test
 DEPS = -MM
 
 ifeq ($(strip $(MODE)),debug)
-  CFLAGS += $(DEBUG)
+  CFLAGS += $(DEBUG) -DDEBUG
+
 endif
 
 #list of all header and cpp pairs. Add new files here.....

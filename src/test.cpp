@@ -1,17 +1,37 @@
 
 #include <iostream>
+#include <vector>
 #include "PhysicalTypes.hpp"
 
 int main(){
 
+#ifdef USE_FRACTIONAL_POWERS
+#ifdef DEBUG
+  // Quick test of fractions
+  SimpleFrac aa{1,2}, bb{2,4}, cc{1,3};
+  std::cout<<"aa = "<<aa<<std::endl;
+  std::cout<<"bb = "<<bb<<std::endl;
+  std::cout<<"cc = "<<cc<<std::endl;
+  std::cout<<"aa == bb? "<<(aa==bb)<<std::endl;
+  std::cout<<"aa equal bb? "<<is_equal(aa, bb)<<std::endl;
+
+  std::cout<<"aa < cc? "<<is_less(aa,cc)<<std::endl;
+  std::cout<<"aa > cc? "<<is_greater(aa,cc)<<std::endl;
+#endif
+#endif
   // Create three related physical quantities
 
   // A time
   Time t{0.1};
   std::cout<<"Defined time t= "<<t<<t.units()<<std::endl;
-  
+
+  std::vector<Time> t_steps;
+  t_steps.push_back(t);
+
+  Time t2(t);
+
   // A position
-  Position x{1.0, 2.0, 3.0};  
+  Position x{1.0, 2.0, 3.0};
   std::cout<<"Defined position x= "<<x<<x.units()<<std::endl;
 
   // A velocity
@@ -58,6 +78,10 @@ int main(){
   std::cout<<" lu = "<<lu<<lu.units()<<std::endl;
   std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
 
+#endif
+
+#ifdef DEBUG
+  UnitCheckedType<0, 0, 0, STDummy> dummy{1.0};
 #endif
 
   return 0;
