@@ -19,6 +19,7 @@ using UCVector = UnitCheckedType<0, 0, 0, dbl3vec>;
 using Length = UnitCheckedType<1, 0, 0, dblscalar>;
 using Mass = UnitCheckedType<0, 1, 0, dblscalar>;
 using Time = UnitCheckedType<0, 0, 1, dblscalar>;
+using Frequency = UnitCheckedType<0, 0, -1, dblscalar>;
 using Position = UnitCheckedType<1, 0, 0, dbl3vec>;
 
 // Common physical quantities for dynamics
