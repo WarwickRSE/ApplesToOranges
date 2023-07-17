@@ -5,7 +5,7 @@
 
 int main(){
 
-#ifdef USE_FRACTIONAL_POWERS 
+#ifdef USE_FRACTIONAL_POWERS
 #ifdef DEBUG
   // Quick test of fractions
   SimpleFrac aa{1,2}, bb{2,4}, cc{1,3};
@@ -31,7 +31,7 @@ int main(){
   Time t2(t);
 
   // A position
-  Position x{1.0, 2.0, 3.0};  
+  Position x{1.0, 2.0, 3.0};
   std::cout<<"Defined position x= "<<x<<x.units()<<std::endl;
 
   // A velocity
