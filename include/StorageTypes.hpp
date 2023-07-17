@@ -19,6 +19,7 @@
 // Optional arithmetic operators for scalar ops
 // Heterogenous ops for any desired interactions (such as scalar-vector or vector-tensor)
 
+#ifdef DEBUG
 // Implements nothing - for development purposes
 class STDummy{
     double val;
@@ -28,7 +29,7 @@ class STDummy{
     STDummy(std::initializer_list<double> l){l.size()>0? val=*(l.begin()):val=0;};
 
 };
-
+#endif
 
 template <typename T>
 class STScalar{
