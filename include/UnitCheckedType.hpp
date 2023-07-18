@@ -48,18 +48,18 @@ class UnitCheckedType{
         return *this;
     }
 
-    // Only arithmetic types for this
+    // Scalar initialisation for single value of arithmetic types only
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
     UnitCheckedType& operator=(const num& src){
         val=src;
         return *this;
-    }// Scalar equals for arithmetic types
+    }
 
 
     // Initializer list type deduction requires that we have
     // a constructor for each layer of nesting we want to accept
-    // After 2-3 layers the syntax is so ugly and error prone that
-    // there it little point going further
+    // After 2-3 layers the syntax to initialise this way is so ugly
+    // and error prone that there it little point going further
     template <typename Tl>
     UnitCheckedType(std::initializer_list<Tl> l):val(l){}
     template <typename Tl>
@@ -175,8 +175,7 @@ class UnitCheckedType{
         return tval;
     }
 
-    // Other products - dot, cross, etc \TODO implement
-    // \TODO currently requires ST implement this - should not force this
+    // Other products - dot, cross, etc \TODO implement others
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
@@ -191,7 +190,7 @@ class UnitCheckedType{
     template <typename Q=ST>
     UnitCheckedType<L, M, T, ReturnTypeMagnitude<Q> > magnitude()const{
         UnitCheckedType<L, M, T, ReturnTypeMagnitude<Q> > tval;
-        tval.val = val.magnitude(); // \TODO should use plain = here and throughout operators?
+        tval.val = val.magnitude();
         return tval;
     }
 
