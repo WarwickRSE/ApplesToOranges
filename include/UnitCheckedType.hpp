@@ -199,29 +199,29 @@ class UnitCheckedType{
     // storage types providing they implement a comparison
     // Equality
     template<typename STi>
-    friend bool operator==(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
-        return first.val == other.val;
+    bool operator==(const UnitCheckedType<L, M, T, STi> & other)const{
+        return val == other.val;
     }
     template<typename STi>
-    friend bool operator!=(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
-        return first.val != other.val;
+    bool operator!=(const UnitCheckedType<L, M, T, STi> & other)const{
+        return val != other.val;
     }
     // Comparisons
     template<typename STi>
-    friend bool operator<(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
-        return first.val < other.val;
+    bool operator<(const UnitCheckedType<L, M, T, STi> & other)const{
+        return val < other.val;
     }
     template<typename STi>
-    friend bool operator<=(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
-        return first.val <= other.val;
+    bool operator<=(const UnitCheckedType<L, M, T, STi> & other)const{
+        return val <= other.val;
     }
     template<typename STi>
-    friend bool operator>(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
-        return first.val > other.val;
+    bool operator>(const UnitCheckedType<L, M, T, STi> & other)const{
+        return val > other.val;
     }
     template<typename STi>
-    friend bool operator>=(const UnitCheckedType<L, M, T, ST> & first, const UnitCheckedType<L, M, T, STi> & other){
-        return first.val >= other.val;
+    bool operator>=(const UnitCheckedType<L, M, T, STi> & other)const{
+        return val >= other.val;
     }
 
 
