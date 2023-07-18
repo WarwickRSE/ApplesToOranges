@@ -20,6 +20,9 @@
 template <SF L, SF M, SF T, typename ST>
 class UnitCheckedType{
 
+    // Friend all other unit-checked-types for heterogeneous functions
+    template<SF,SF,SF,typename> friend class UnitCheckedType;
+
     // Verify anything necessary about fractions
 #ifdef USE_FRACTIONAL_POWERS
  static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
@@ -28,9 +31,10 @@ class UnitCheckedType{
     // Verify that ST is a valid storage type
     // \TODO
 
-  public:
-    ST val; //\TODO Should we try to protect val from direct modification?
+  private:
+    ST val;
 
+  public:
     UnitCheckedType():val(0){};
 
     // Constructors are very permissive - expect ST to restrict to valid values if necessary
