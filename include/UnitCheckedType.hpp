@@ -16,6 +16,8 @@
  inline constexpr bool is_greater(int a, int b){return a>b;}
 #endif
 
+// \TODO Add any other operators to complete set
+// \TODO Any other functions we want?
 
 template <SF L, SF M, SF T, typename ST>
 class UnitCheckedType{
