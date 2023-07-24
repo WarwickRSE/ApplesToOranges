@@ -7,23 +7,25 @@ a Time as this is not physically meaningful.
 The UnitCheckedType class enforces unit checking (currently for 3 units, length,
 time and mass) and the inner storage class holds numeric data.
 
-This is a WORK IN PROGRESS and is not ready for use - currently it
-is at proof-of-concept stage.
+This is a WORK IN PROGRESS but can be used in real codes with some caveats:
 In particular:
-* Only 3 units are implemented
-* Many constructors are missing
-* Nearly all operators are missing
+* Only 3 units are implemented (Length, Time, Mass)
+* Some constructors may be missing
+* Some operators may be missing
 * Error checking is minimal
-* Only scalar, vector and tensor storage is available
-    * These are incomplete - missing most constructors, operators etc
+* Only scalar, vector and tensor storage is implemented
+    * These may be incomplete
+In short, basic physical equations can definitely be coded and checked with the current state, but there may be bugs or things may fail to compile which should be OK.
 
 However, using C++20 facilities this can enforce units checking at compile time
 for arbirary rational exponents, and for any data-storage inner class which exposes
 sufficient functionality.
 
 Created June 2023 by Warwick RSE
+Version 1.0 July 2023
 ## How to use this code
-EITHER copy the 5 header files from the include directory into an appropriate place, or copy and unpack the tarball and add to your build. 
+You need the 5 header files to be included/accessible in your build, and can then include either PhysicalTypes.hpp to get common Physical units and access to UnitCheckedType to construct your own, or include UnitCheckedType.hpp directly if you do not want the extra defines.
+You will need at least C++17 support - C++20 for full power (see section below about fractional exponent support).
 
 The PhysicalTypes.hpp header provides common Physical named units, such as Position (a double precision 3-element vector with units of m) or Force (a double precision 3-element vector with units of kgms<sup>-2</sup>)
 After including the header you can also instantiate a type of arbitrary units; create a UnitCheckedType\<L, M, T, Storage\>. L is the exponent of length (m), M of mass (kg) and T of time (s). Storage is the data storage type, which can be one of the built ins, scalar (dblscalar), 3-component or 4-component vector (dbl3vec or dbl4vec) or 3x3 or 4x4 tensor (dbl3tens or dbl4tens) all double precision; or can be ay other suitable storage type (see below). 
@@ -46,9 +48,9 @@ Functions that the UnitChecked type will wrap if available:
 * Any of the following constructors
     * Default constructor
     * One element constructor (all values set)
-    * Initializer list constructor handling any depth of nesting required
+    * Initializer list constructor handling up to 3 layers of nesting
 * Copy, move etc constructors
-* 'get' function taking as many arguments as wanted, returning a reference to value, and const variant returning copy
+* 'get' function taking as many arguments as wanted, returning a reference to value, and const variant returning copy (Note: this is exposed as unsafeGet, as it effectively casts away units)
 * Optional [] operator if 1D access makes sense and is desired
 * << stream operator
 * Standard arithmetic operators for self binary ops
@@ -57,4 +59,4 @@ Functions that the UnitChecked type will wrap if available:
 * Heterogenous ops for any desired interactions (such as scalar-vector or vector-tensor multiplication which we have implemented)
 
 ## But why the name?
-Because comparing a distance to a time is like comparing apples to oranges, and adding one of each together doesn't get you ttwo, it gets you an apple and an orange. My PhD supervisor loved this phrase, and it's the first thing I think of whenever I am checking units make sense or are compatible.
+Because comparing a distance to a time is like comparing apples to oranges, and adding one of each together doesn't get you two, it gets you an apple and an orange. My PhD supervisor loved this phrase, and it's the first thing I think of whenever I am checking units make sense or are compatible.
