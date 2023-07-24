@@ -32,7 +32,7 @@ class UnitCheckedType{
     ST val;
 
   public:
-    UnitCheckedType():val(0){};
+    UnitCheckedType():val(){};
 
     // Constructors are very permissive - expect ST to restrict to valid values if necessary
     template <typename Tl>

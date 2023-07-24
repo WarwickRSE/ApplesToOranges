@@ -34,9 +34,10 @@ class STDummy{
 template <typename T>
 class STScalar{
     private:
-        T val;
+        T val{};
 
     public:
+        STScalar(){};
         STScalar(T val_in):val(val_in){};
         STScalar(std::initializer_list<T> l){l.size()>0? val=*(l.begin()):val=0;};
 
@@ -127,7 +128,7 @@ std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
 template <typename T, int dim>
 class STVector{
     private:
-        T val[dim];
+        T val[dim]{};
 
         T normSq()const{
           T sum=0;
@@ -289,7 +290,7 @@ std::ostream& operator<<(std::ostream& os, const STVector<T, dim>& val_in){
 template <typename T, int dim>
 class STTensor{
     private:
-        T val[dim*dim];
+        T val[dim*dim]{};
 
     public:
         STTensor(){};
