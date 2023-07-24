@@ -28,9 +28,6 @@ class UnitCheckedType{
  static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
 #endif
 
-    // Verify that ST is a valid storage type
-    // \TODO
-
   private:
     ST val;
 
