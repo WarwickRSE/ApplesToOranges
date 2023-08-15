@@ -67,6 +67,19 @@ class UnitCheckedType{
     UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
 
     // Accessors
+    // Value extraction for all units 0 only
+    template <typename... Args>
+    auto& get(Args ... args_in){
+      static_assert(is_equal(L, 0) && is_equal(T, 0) && is_equal(M, 0));
+      return val.get(args_in...);
+    }
+
+    template <typename... Args>
+    auto get(Args ... args_in)const{
+      static_assert(is_equal(L, 0) && is_equal(T, 0) && is_equal(M, 0));
+      return val.get(args_in...);
+    }
+
     // unsafeGet - no unit checks, just return bare value. Use with CAUTION
     template <typename... Args>
     auto& unsafeGet(Args ... args_in){

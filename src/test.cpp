@@ -60,6 +60,12 @@ int main(){
   std::cout<< "x > l? "<< (x.magnitude() > l.magnitude())<<std::endl;
   std::cout<< "x > l? "<< (x > l)<<std::endl;
 
+  // Accessor functions
+  std::cout<<"t's value, ignoring units, is "<<t.unsafeGet()<<" and can be added to a simple double like this:"<<1.0 + t.unsafeGet()<< std::endl;
+  auto scal = UCScalar{7.5};
+  std::cout<<"Type without units supports simple get like this: "<<scal.get()<<std::endl;
+
+
   // Try gridded operations and show how to initialise
   UCScalar Arr[3][3];
   Arr[0][0] = UCScalar{1.0, 2.0, 3.0};
