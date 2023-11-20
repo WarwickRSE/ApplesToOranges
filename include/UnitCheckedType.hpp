@@ -205,6 +205,21 @@ class UnitCheckedType{
         tval.val = val.magnitude();
         return tval;
     }
+    // Cross product
+    template<typename Ts, typename Q=ST>
+    using ReturnTypeCross = decltype((std::declval<Q>()).cross(std::declval<Ts>()));
+    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeCross<Q,STi> > cross(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeCross<Q,STi> > tval;
+        tval.val = this->val.cross(other.val);
+        return tval;
+    }
+
+    //Normalize function
+    template <typename Q=ST>
+    void normalize(){
+        val.normalize();
+    }
 
     // Comparison operators
     // Implement these for matching units only, but allow different

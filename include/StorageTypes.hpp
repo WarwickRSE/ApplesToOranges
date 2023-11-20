@@ -229,6 +229,21 @@ class STVector{
           return sum;
         }
 
+        STVector<T,dim> cross(const STVector & other) const{
+          STVector<T,dim> out;
+          for(size_t i = 0; i<dim; i++){
+            out[i] = val[(i+1)%dim]*other.val[(i+2)%dim] - val[(i+2)%dim]*other.val[(i+1)%dim];
+          }
+          return out;
+        }
+
+        void normalize(){
+          const STScalar<T> mag = magnitude();
+          for(size_t i = 0; i<dim; i++){
+            val[i]/=mag[0];
+          }
+        }
+
         // Comparisons - in terms of ordering of the norm only
         friend bool operator==(const STVector & first, const STVector & other){
           for(size_t i = 0; i<dim; i++){

@@ -45,6 +45,15 @@ int main(){
   // Dot product
   std::cout<<"x.v="<<x.dot(v)<<std::endl;
 
+  Position x2{4.0, 5.0, 6.0};
+  // Cross product
+  std::cout<<"x cross x2="<<x.cross(x2)<<std::endl;
+
+  //Normalize
+  x2.normalize();
+  std::cout << "x2 normalised is " << x2 << std::endl;
+  std::cout << "magnitude of x2 normalised is " << x2.magnitude() << std::endl;
+
   // Numeric multiply
   std::cout<<"2x= "<<2.0*x<<x.units()<<"=="<<x*2.0<<x.units()<<std::endl;
   std::cout<<"x/2= "<<x/2.0<<x.units()<<std::endl;
