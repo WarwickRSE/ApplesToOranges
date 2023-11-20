@@ -230,6 +230,7 @@ class STVector{
         }
 
         STVector<T,dim> cross(const STVector & other) const{
+          static_assert(dim ==3); // Well defined only for dim 3 vector
           STVector<T,dim> out;
           for(size_t i = 0; i<dim; i++){
             out[i] = val[(i+1)%dim]*other.val[(i+2)%dim] - val[(i+2)%dim]*other.val[(i+1)%dim];
