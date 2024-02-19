@@ -187,6 +187,24 @@ class UnitCheckedType{
         return tval;
     }
 
+    // Exponentiation
+    template<SF exp>
+    friend UnitCheckedType<L*exp, M*exp, T*exp, ST> pow(const UnitCheckedType & base){
+        UnitCheckedType<L*exp, M*exp, T*exp, ST> tval;
+        if constexpr(exp.denom == 1){
+            tval.val = base.val.pow((long)exp.num);
+        }else{
+            tval.val = base.val.pow((double)exp.num/exp.denom);
+        }
+        return tval;
+    }
+
+    friend UnitCheckedType<L/2, M/2, T/2, ST> sqrt(const UnitCheckedType & base){
+        UnitCheckedType<L/2, M/2, T/2, ST> tval;
+        tval.val = base.val.sqrt();
+        return tval;
+    }
+
     // Other products - dot, cross, etc \TODO implement others
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));

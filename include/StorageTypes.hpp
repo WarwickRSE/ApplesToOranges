@@ -94,6 +94,16 @@ class STScalar{
             return lhs/=other;
         }
 
+        STScalar sqrt()const{
+          return std::sqrt(val);
+        }
+        STScalar pow(long p)const{
+          return std::pow(val, p);
+        }
+        STScalar pow(double p)const{
+          return std::pow(val, p);
+        }
+
         STScalar dot(const STScalar & other)const{
           return val*other.val;
         }

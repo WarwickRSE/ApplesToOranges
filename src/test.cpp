@@ -45,6 +45,12 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+  // Powers
+  auto tsqrt = sqrt(t);
+  std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
+  auto tsq = pow<2>(t);
+  std::cout<<"t^2= "<<tsq<<tsq.units()<<std::endl;
+
   // Dot product
   std::cout<<"x.v="<<x.dot(v)<<std::endl;
 
