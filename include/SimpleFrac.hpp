@@ -54,10 +54,10 @@ constexpr SimpleFrac operator-(const SimpleFrac& a, const SimpleFrac& b){
   return simplify(SimpleFrac(a.num*b.denom - b.num*a.denom, a.denom*b.denom));
 };
 constexpr SimpleFrac operator*(const SimpleFrac& a, const SimpleFrac& b){
-  return simplify(SimpleFrac(a.num+b.num, a.denom+b.denom));
+  return simplify(SimpleFrac(a.num*b.num, a.denom*b.denom));
 };
 constexpr SimpleFrac operator/(const SimpleFrac& a, const SimpleFrac& b){
-  return simplify(SimpleFrac(a.num+b.denom, a.denom+b.num));
+  return simplify(SimpleFrac(a.num*b.denom, a.denom*b.num));
 };
 
 constexpr bool is_greater(const SimpleFrac & a, const int b){
