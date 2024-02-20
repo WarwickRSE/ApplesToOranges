@@ -33,6 +33,8 @@ class UnitCheckedType{
   private:
     ST val;
 
+    static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0);}
+
   public:
     UnitCheckedType():val(){};
 
@@ -70,13 +72,13 @@ class UnitCheckedType{
     // Value extraction for all units 0 only
     template <typename... Args>
     auto& get(Args ... args_in){
-      static_assert(is_equal(L, 0) && is_equal(T, 0) && is_equal(M, 0));
+      static_assert(hasNoUnits());
       return val.get(args_in...);
     }
 
     template <typename... Args>
     auto get(Args ... args_in)const{
-      static_assert(is_equal(L, 0) && is_equal(T, 0) && is_equal(M, 0));
+      static_assert(hasNoUnits());
       return val.get(args_in...);
     }
 
