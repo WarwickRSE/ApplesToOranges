@@ -12,6 +12,7 @@ SRCDIR = src
 OBJDIR = obj
 
 CFLAGS = -g -c $(INCLUDE) -O3
+CFLAGS += -DNO_NARROWING_CONVERSIONS
 ifeq ($(strip $(USE_FRACTIONAL_POWERS)),1)
   CFLAGS += -std=c++20 -DUSE_FRACTIONAL_POWERS
   $(info *****Enabled fractional powers*****)

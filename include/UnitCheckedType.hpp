@@ -82,6 +82,12 @@ class UnitCheckedType{
       return val.get(args_in...);
     }
 
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
+    explicit operator num() const{
+      static_assert(hasNoUnits());
+      return static_cast<num>(val);
+    }
+
     // unsafeGet - no unit checks, just return bare value. Use with CAUTION
     template <typename... Args>
     auto& unsafeGet(Args ... args_in){

@@ -78,6 +78,21 @@ int main(){
   std::cout<< "x > l? "<< (x.magnitude() > l.magnitude())<<std::endl;
   std::cout<< "x > l? "<< (x > l)<<std::endl;
 
+  //Using casting in comparison
+  UCScalar l2{1.0};
+  std::cout<<"Comparison of Scalar (no units) to double: "<<std::endl;
+  std::cout<<"Construct comparable type, val > UCScalar{1.0}"<<(l2 > UCScalar{1.0})<<std::endl;
+  std::cout<<"Cast UCScalar to double, static_cast<double>(val) > 1.0 "<<(static_cast<double>(l2) > 1.0)<<std::endl;
+
+  // Using casting to construct
+  double tmp2{l2};
+  std::cout<<"Casting to double: "<< typeid(tmp2).name()<<std::endl;
+  /*
+  float tmp1{l2};  //Disallowed by -DNO_NARROWING_CONVERSIONS
+  std::cout<<"Narrowing to float: "<< typeid(tmp1).name()<<std::endl;
+  */
+
+
   // Accessor functions
   std::cout<<"t's value, ignoring units, is "<<t.unsafeGet()<<" and can be added to a simple double like this:"<<1.0 + t.unsafeGet()<< std::endl;
   auto scal = UCScalar{7.5};

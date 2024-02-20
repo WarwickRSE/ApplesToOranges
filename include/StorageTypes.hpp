@@ -58,6 +58,18 @@ class STScalar{
         T get()const{
             return val;
         }
+
+        explicit operator T() const{return val;}
+
+        template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
+        explicit operator num() const{
+#ifdef NO_NARROWING_CONVERSIONS
+          return num{val};
+# else
+          return static_cast<num>(val);
+ #endif
+        }
+
         STScalar<T> magnitude()const{
           return std::abs(val);
         }
