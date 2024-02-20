@@ -67,6 +67,7 @@ obj/%.o:./src/%.cpp
 	$(CC) $(CFLAGS)  $< -o $@
 
 #Dependencies
+$(OBJDIR)/test.o : $(SRCDIR)/test.cpp $(INCLS)
 
 .PHONY : tar clean veryclean
 
