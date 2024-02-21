@@ -507,4 +507,22 @@ STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STVector<T, dim> &b)
   return out;
 }
 
+// Special functions
+// Provide any function taking dimensionless argument(s) like this
+// EXAMPLES ONLY
+template<typename T>
+T mysinfunction(const STScalar<T> &a){
+  return std::sin(a[0]);
+}
+template<typename T>
+STVector<T, 3> mysinfunction(const STVector<T, 3> &a){
+  STVector<T, 3> out;
+  for(size_t i = 0; i<3; i++){
+    out[i] = std::sin(a[i]);
+  }
+  return out;
+}
+
+
+
 #endif

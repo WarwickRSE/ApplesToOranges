@@ -60,3 +60,6 @@ Functions that the UnitChecked type will wrap if available:
 
 ## But why the name?
 Because comparing a distance to a time is like comparing apples to oranges, and adding one of each together doesn't get you two, it gets you an apple and an orange. My PhD supervisor loved this phrase, and it's the first thing I think of whenever I am checking units make sense or are compatible.
+
+## Which operations make sense?
+In theory, the unit-checked type could wrap arbitrary functions on the underlying data. However, a lot of operations can only be applied to a unit-less value - for example, sin, exp etc can only be given a dimensionless argument. For all of these, one should combine unit-ed quantities until a dimensionless value is reached. Then, either extract the value with .get if there is an overload for the underlying storage type, or use a cast to a suitable numeric type if there is one.

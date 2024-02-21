@@ -92,6 +92,13 @@ int main(){
   std::cout<<"Narrowing to float: "<< typeid(tmp1).name()<<std::endl;
   */
 
+  // Using special functions on dimensionless values
+  // For scalars, cast to, or store to, a double
+  std::cout<<"sin(l/l_0): "<<sin(static_cast<double>(l/Length{1.0}))<<std::endl;
+  // OR use specialisation (if provided) on the underlying value
+  std::cout<<"sin(l/l_0): "<<mysinfunction((l/Length{1.0}).get())<<std::endl;
+  // Storage type can provide operations on higher rank types, either elementwise or whatever
+  std::cout<<"sin(x/x_0): "<<mysinfunction((x/Length{1.0}).get())<<std::endl;
 
   // Accessor functions
   std::cout<<"t's value, ignoring units, is "<<t.unsafeGet()<<" and can be added to a simple double like this:"<<1.0 + t.unsafeGet()<< std::endl;
