@@ -187,6 +187,15 @@ void basic_demo(){
   auto t_over_t = t/t;
   std::cout<<"t/t is dimensionless: "<<t_over_t<<t_over_t.units()<<std::endl;
 
+  // All SI base units included:
+  Energy E{1.0};
+  Charge Q{1.0};
+  Voltage V = E/Q;
+  std::cout<<"As of version 2.0, all 7 SI base units are available: Energy, Charge, Voltage, Time, Length, Mass, Temperature\n";
+  std::cout<<"For example Voltage = Energy/Charge = "<<V<<V.units()<<std::endl;
+
+
+
 };
 
 void initialisation_and_access_demo(){

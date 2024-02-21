@@ -23,15 +23,23 @@
 // \TODO Add any other operators to complete set
 // \TODO Any other functions we want?
 
-template <SF L, SF M, SF T, typename ST>
-class UnitCheckedType{
-
+/* Units are in order with short names:
+L Length (m)
+M Mass (kg)
+T Time (s)
+K Temperature (K)
+A Current (A)
+MO Amount (mole)
+CD Luminous intensity (cd)
+*/
+template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
+class UnitCheckedTypeFull{
     // Friend all other unit-checked-types for heterogeneous functions
-    template<SF,SF,SF,typename> friend class UnitCheckedType;
+    template<SF,SF,SF,SF,SF,SF,SF, typename> friend class UnitCheckedTypeFull;
 
     // Verify anything necessary about fractions
 #ifdef USE_FRACTIONAL_POWERS
- static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
+ static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0 && K.denom !=0 && A.denom !=0 && MO.denom !=0 && CD.denom !=0, "Fraction cannot have zero denom");
 #endif
 
 #ifndef NO_SUPPORT_TEMPLATE_FRIENDSHIP
@@ -42,19 +50,19 @@ class UnitCheckedType{
     ST val;
 
   private:
-    static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0);}
+    static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0) && is_equal(K, 0) && is_equal(A, 0) && is_equal(MO, 0) && is_equal(CD, 0);}
 
   public:
-    constexpr UnitCheckedType():val(){};
+    constexpr UnitCheckedTypeFull():val(){};
 
     // Constructors are very permissive - expect ST to restrict to valid values if necessary
     template <typename Tl>
-    constexpr explicit UnitCheckedType(Tl x):val(x){}
+    constexpr explicit UnitCheckedTypeFull(Tl x):val(x){}
 
 
-    constexpr UnitCheckedType(const UnitCheckedType& src):val(src.val){}
-    constexpr UnitCheckedType(const ST& src):val(src){}
-    constexpr UnitCheckedType& operator=(const UnitCheckedType& src){
+    constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull& src):val(src.val){}
+    constexpr UnitCheckedTypeFull(const ST& src):val(src){}
+    constexpr UnitCheckedTypeFull& operator=(const UnitCheckedTypeFull& src){
         val=src.val;
         return *this;
     }
@@ -68,23 +76,23 @@ class UnitCheckedType{
     // OR a unitchecked type of SAME units but any storage type (deferring to storage type for validity checks)
     typedef typename extract_value_type<ST>::value_type ST_t;
     template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
-    constexpr UnitCheckedType(std::initializer_list<Tl> l):val(l){}
+    constexpr UnitCheckedTypeFull(std::initializer_list<Tl> l):val(l){}
     template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
-    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
+    constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
     template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
-    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
+    constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
     // Overload to give nicer error message
     template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl> && !std::is_same_v<ST, Tl>, bool> =true >
-    constexpr UnitCheckedType(std::initializer_list<Tl> l){
+    constexpr UnitCheckedTypeFull(std::initializer_list<Tl> l){
         // Condition always false BUT this is only known after substitution of Tl
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
     }
     template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
-    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l){
+    constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<Tl> > l){
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
     }
     template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
-    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l){
+    constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l){
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
     }
 
@@ -94,11 +102,11 @@ class UnitCheckedType{
     }
 
     template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
-    constexpr UnitCheckedType(std::initializer_list< UnitCheckedType<L, M, T, STi> > l):val(l){}
+    constexpr UnitCheckedTypeFull(std::initializer_list< UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> > l):val(l){}
     template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
-    constexpr UnitCheckedType(std::initializer_list<std::initializer_list< UnitCheckedType<L, M, T, STi> > > l):val(l){}
+    constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list< UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> > > l):val(l){}
     template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
-    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<UnitCheckedType<L, M, T, STi> > > > l):val(l){}
+    constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<std::initializer_list<UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> > > > l):val(l){}
 
     // Accessors
 
@@ -156,65 +164,77 @@ class UnitCheckedType{
       if constexpr(is_greater(M, 0) && ! is_equal(M, 1)) ss<<"kg^(" << M << ")";
       if constexpr(is_greater(L, 0) && ! is_equal(L, 1)) ss<<"m^(" << L << ")";
       if constexpr(is_greater(T, 0) && ! is_equal(T, 1)) ss<<"s^(" << T << ")";
+      if constexpr(is_greater(K, 0) && ! is_equal(K, 1)) ss<<"K^(" << K << ")";
+      if constexpr(is_greater(A, 0) && ! is_equal(A, 1)) ss<<"A^(" << A << ")";
+      if constexpr(is_greater(MO, 0) && ! is_equal(MO, 1)) ss<<"mol^(" << MO << ")";
+      if constexpr(is_greater(CD, 0) && ! is_equal(CD, 1)) ss<<"cd^(" << CD << ")";
       if constexpr(is_equal(M, 1)) ss<<"kg";
       if constexpr(is_equal(L, 1)) ss<<"m";
       if constexpr(is_equal(T, 1)) ss<<"s";
+      if constexpr(is_equal(K, 1)) ss<<"K";
+      if constexpr(is_equal(A, 1)) ss<<"A";
+      if constexpr(is_equal(MO, 1)) ss<<"mol";
+      if constexpr(is_equal(CD, 1)) ss<<"cd";
       if constexpr(is_less(M, 0)) ss<<"kg^(" << M << ")";
       if constexpr(is_less(L, 0)) ss<<"m^(" << L << ")";
       if constexpr(is_less(T, 0)) ss<<"s^(" << T << ")";
+      if constexpr(is_less(K, 0)) ss<<"K^(" << K << ")";
+      if constexpr(is_less(A, 0)) ss<<"A^(" << A << ")";
+      if constexpr(is_less(MO, 0)) ss<<"mol^(" << MO << ")";
+      if constexpr(is_less(CD, 0)) ss<<"cd^(" << CD << ")";
       return ss.str();
     };
 
-    template<SF Li, SF Mi, SF Ti, typename STi>
-    constexpr bool isSameUnits(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
-        return is_equal(L, Li) && is_equal(M, Mi) && is_equal(T, Ti);
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
+    bool isSameUnits(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
+        return is_equal(L, Li) && is_equal(M, Mi) && is_equal(T, Ti) && is_equal(K, Ki) && is_equal(A, Ai) && is_equal(MO, MOi) && is_equal(CD, CDi);
     }
-    template<SF Li, SF Mi, SF Ti, typename STi>
-    constexpr bool isSameRank(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
+    bool isSameRank(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
         return std::is_same_v<ST, STi>;
     }
-    template<SF Li, SF Mi, SF Ti, typename STi>
-    constexpr bool isSameType(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
+    bool isSameType(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
         return isSameUnits(other) && isSameRank(other);
     }
 
     // Operators
     // Unary minus
-    UnitCheckedType operator-()const{
-        UnitCheckedType tval;
+    UnitCheckedTypeFull operator-()const{
+        UnitCheckedTypeFull tval;
         tval.val = -val;
         return tval;
     }
 
     // Addition/subtraction for same type and dims only
-    UnitCheckedType operator+=(const UnitCheckedType & other){
+    UnitCheckedTypeFull operator+=(const UnitCheckedTypeFull & other){
         val += other.val;
         return *this;
     }
-    friend UnitCheckedType operator+(UnitCheckedType lhs, const UnitCheckedType & other){
+    friend UnitCheckedTypeFull operator+(UnitCheckedTypeFull lhs, const UnitCheckedTypeFull & other){
         return lhs+=other;
     }
-    UnitCheckedType operator-=(const UnitCheckedType & other){
+    UnitCheckedTypeFull operator-=(const UnitCheckedTypeFull & other){
         val -= other.val;
         return *this;
     }
-    friend UnitCheckedType operator-(UnitCheckedType lhs, const UnitCheckedType & other){
+    friend UnitCheckedTypeFull operator-(UnitCheckedTypeFull lhs, const UnitCheckedTypeFull & other){
         return lhs-=other;
     }
 
     template<typename Ts>
     using ReturnTypeMultiply = decltype(operator*(std::declval<ST>(), std::declval<Ts>()));
-    template<SF Li, SF Mi, SF Ti, typename STi>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeMultiply<STi> > operator*(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeMultiply<STi> > tval;
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > operator*(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > tval;
         tval.val = this->val*other.val;
         return tval;
     }
     template<typename Ts>
     using ReturnTypeDivide = decltype(operator/(std::declval<ST>(), std::declval<Ts>()));
-    template<SF Li, SF Mi, SF Ti, typename STi>
-        UnitCheckedType<L-Li, M-Mi, T-Ti, ReturnTypeDivide<STi> > operator/(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L-Li, M-Mi, T-Ti, ReturnTypeDivide<STi> > tval;
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
+      UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > operator/(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+        UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > tval;
         tval.val = this->val/other.val;
         return tval;
     }
@@ -223,68 +243,68 @@ class UnitCheckedType{
 
     // Allow only arithmetic types and exclude char
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
-    UnitCheckedType operator*=(const num & other){
+    UnitCheckedTypeFull operator*=(const num & other){
         val *= other;
         return *this;
     }
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
-    friend UnitCheckedType operator*(const num & lhs, UnitCheckedType rhs){
+    friend UnitCheckedTypeFull operator*(const num & lhs, UnitCheckedTypeFull rhs){
         return rhs*=lhs;
     }
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
-    friend UnitCheckedType operator*(UnitCheckedType lhs, const num & rhs){
+    friend UnitCheckedTypeFull operator*(UnitCheckedTypeFull lhs, const num & rhs){
         return lhs*=rhs;
     }
 
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
-    UnitCheckedType operator/=(const num & other){
+    UnitCheckedTypeFull operator/=(const num & other){
         val /= other;
         return *this;
     }
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
-    friend UnitCheckedType operator/(UnitCheckedType lhs, const num & rhs){
+    friend UnitCheckedTypeFull operator/(UnitCheckedTypeFull lhs, const num & rhs){
         return lhs/=rhs;
     }
     //Divide arithmetic type by unitted type
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
-    friend UnitCheckedType<-L,-M,-T, ST> operator/(const num & lhs, UnitCheckedType rhs){
-        UnitCheckedType<-L,-M,-T,ST> tval;
+    friend auto operator/(const num & lhs, UnitCheckedTypeFull rhs){
+        UnitCheckedTypeFull<-L,-M,-T,-K,-A,-MO,-CD,ST> tval;
         tval.val = lhs/rhs.val;
         return tval;
     }
 
     // Exponentiation (note that pre-20 C++ does not support non-integral types so we rely on our defining SF as int in that case)
     template<SF exp>
-    friend UnitCheckedType<L*exp, M*exp, T*exp, ST> pow(const UnitCheckedType & base){
-        UnitCheckedType<L*exp, M*exp, T*exp, ST> tval;
+    friend auto pow(const UnitCheckedTypeFull & base){
+        UnitCheckedTypeFull<L*exp, M*exp, T*exp, K*exp, A*exp, MO*exp, CD*exp,ST> tval;
         tval.val = base.val.pow((double)exp);
         return tval;
     }
 
-    friend UnitCheckedType<L/2, M/2, T/2, ST> sqrt(const UnitCheckedType & base){
-        static_assert(divides(L, 2) && divides(M,2) && divides(T,2));
-        UnitCheckedType<L/2, M/2, T/2, ST> tval;
+    friend auto sqrt(const UnitCheckedTypeFull & base){
+        static_assert(divides(L, 2) && divides(M,2) && divides(T,2) && divides(K,2) && divides(A,2) && divides(MO,2) && divides(CD,2));
+        UnitCheckedTypeFull<L/2, M/2, T/2, K/2, A/2, MO/2, CD/2,ST> tval;
         tval.val = base.val.sqrt();
         return tval;
     }
-    friend UnitCheckedType<L/3, M/3, T/3, ST> cbrt(const UnitCheckedType & base){
-        static_assert(divides(L, 3) && divides(M,3) && divides(T,3));
-        UnitCheckedType<L/3, M/3, T/3, ST> tval;
+    friend auto cbrt(const UnitCheckedTypeFull & base){
+        static_assert(divides(L, 3) && divides(M,3) && divides(T,3) && divides(K,3) && divides(A,3) && divides(MO,3) && divides(CD,3));
+        UnitCheckedTypeFull<L/3, M/3, T/3, K/3, A/3, MO/3, CD/3, ST> tval;
         tval.val = base.val.cbrt();
         return tval;
     }
     template <long exp>
-    friend UnitCheckedType<L/exp, M/exp, T/exp, ST> nthrt(const UnitCheckedType & base){
-        static_assert(divides(L, exp) && divides(M,exp) && divides(T,exp));
-        UnitCheckedType<L/exp, M/exp, T/exp, ST> tval;
+    friend auto nthrt(const UnitCheckedTypeFull & base){
+        static_assert(divides(L, exp) && divides(M,exp) && divides(T,exp) && divides(K,exp) && divides(A,exp) && divides(MO,exp) && divides(CD,exp));
+        UnitCheckedTypeFull<L/exp, M/exp, T/exp, K/exp, A/exp, MO/exp, CD/exp, ST> tval;
         tval.val = base.val.pow(1.0/exp);
         return tval;
     }
     // Exponentiation for unitless types - runtime allowable
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
-    friend UnitCheckedType<L, M, T, ST> pow(const UnitCheckedType & base, const num & exp){
+    friend auto pow(const UnitCheckedTypeFull & base, const num & exp){
         static_assert(hasNoUnits());
-        UnitCheckedType<L, M, T, ST> tval;
+        UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ST> tval;
         tval.val = base.val.pow(exp);
         return tval;
     }
@@ -293,9 +313,9 @@ class UnitCheckedType{
     // Again, storage types are expected to define these IFF applicable
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
-    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<Q,STi> > dot(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeDot<Q,STi> > tval;
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi, typename Q=ST>
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeDot<Q,STi> > dot(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeDot<Q,STi> > tval;
         tval.val = this->val.dot(other.val);
         return tval;
     }    
@@ -303,17 +323,17 @@ class UnitCheckedType{
     template <typename Q=ST>
     using ReturnTypeMagnitude = decltype((std::declval<Q>()).magnitude());
     template <typename Q=ST>
-    UnitCheckedType<L, M, T, ReturnTypeMagnitude<Q> > magnitude()const{
-        UnitCheckedType<L, M, T, ReturnTypeMagnitude<Q> > tval;
+    UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ReturnTypeMagnitude<Q> > magnitude()const{
+        UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ReturnTypeMagnitude<Q> > tval;
         tval.val = val.magnitude();
         return tval;
     }
     // Cross product
     template<typename Ts, typename Q=ST>
     using ReturnTypeCross = decltype((std::declval<Q>()).cross(std::declval<Ts>()));
-    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeCross<Q,STi> > cross(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeCross<Q,STi> > tval;
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi, typename Q=ST>
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi,ReturnTypeCross<Q,STi> > cross(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi,ReturnTypeCross<Q,STi> > tval;
         tval.val = this->val.cross(other.val);
         return tval;
     }
@@ -321,9 +341,9 @@ class UnitCheckedType{
     //Outer product
     template<typename Ts, typename Q=ST>
     using ReturnTypeOuter = decltype((std::declval<Q>()).outer(std::declval<Ts>()));
-    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeOuter<Q,STi> > outer(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
-        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeOuter<Q,STi> > tval;
+    template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi, typename Q=ST>
+        auto outer(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi,ReturnTypeOuter<Q,STi> > tval;
         tval.val = this->val.outer(other.val);
         return tval;
     }
@@ -334,8 +354,8 @@ class UnitCheckedType{
         val.normalize();
     }
     template <typename Q=ST>
-    UnitCheckedType normalized()const{
-        UnitCheckedType tval;
+    UnitCheckedTypeFull normalized()const{
+        UnitCheckedTypeFull tval;
         tval.val = val;
         tval.val.normalize();
         return tval;
@@ -343,8 +363,8 @@ class UnitCheckedType{
 
     //Transpose
     template <typename Q=ST>
-    UnitCheckedType<M, L, T, Q> transpose()const{
-        UnitCheckedType<M, L, T, Q> tval;
+    auto transpose()const{
+        UnitCheckedTypeFull<M, L, T, K, A, MO, CD, Q> tval;
         tval.val = val.transpose();
         return tval;
     }
@@ -354,36 +374,36 @@ class UnitCheckedType{
     // storage types providing they implement a comparison
     // Equality
     template<typename STi>
-    bool operator==(const UnitCheckedType<L, M, T, STi> & other)const{
+    bool operator==(const UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> & other)const{
         return val == other.val;
     }
     template<typename STi>
-    bool operator!=(const UnitCheckedType<L, M, T, STi> & other)const{
+    bool operator!=(const UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> & other)const{
         return val != other.val;
     }
     // Comparisons
     template<typename STi>
-    bool operator<(const UnitCheckedType<L, M, T, STi> & other)const{
+    bool operator<(const UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> & other)const{
         return val < other.val;
     }
     template<typename STi>
-    bool operator<=(const UnitCheckedType<L, M, T, STi> & other)const{
+    bool operator<=(const UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> & other)const{
         return val <= other.val;
     }
     template<typename STi>
-    bool operator>(const UnitCheckedType<L, M, T, STi> & other)const{
+    bool operator>(const UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> & other)const{
         return val > other.val;
     }
     template<typename STi>
-    bool operator>=(const UnitCheckedType<L, M, T, STi> & other)const{
+    bool operator>=(const UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STi> & other)const{
         return val >= other.val;
     }
 
 
 };
 
-template <SF L, SF M, SF T, typename ST>
-std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& val_in){
+template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
+std::ostream& operator<<(std::ostream& os, const UnitCheckedTypeFull<L, M, T, K, A, MO, CD,ST>& val_in){
   os << val_in.to_string();
   return os;
 }
@@ -401,5 +421,21 @@ U makeIdentity(){
 // Just need compiler to find template function with right name, any type
 template <typename T> void pow();
 template <typename T> void nthrt();
+
+// Note - all checked types interoperate
+// Default is "dynamics only" - i.e. Length Mass and Time
+template<SF L, SF M, SF T, typename ST>
+using UnitCheckedTypeDynamic = UnitCheckedTypeFull<L, M, T, 0, 0, 0, 0, ST>;
+template<SF L, SF M, SF T, typename ST>
+using UnitCheckedType = UnitCheckedTypeDynamic<L, M, T, ST>;
+
+// Dynamics plus temperature
+template<SF L, SF M, SF T, SF K, typename ST>
+using UnitCheckedTypeThermodynamic = UnitCheckedTypeFull<L, M, T, K, 0, 0, 0, ST>;
+
+// Electrodynamics - Length, Mass, Time, Temperature, Charge
+template<SF L, SF M, SF T, SF K, SF A, typename ST>
+using UnitCheckedTypeElectrodynamic = UnitCheckedTypeFull<L, M, T, K, A, 0, 0, ST>;
+
 
 #endif
