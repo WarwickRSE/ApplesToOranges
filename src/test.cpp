@@ -45,6 +45,12 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+  // All SI base units included:
+  Energy E{1.0};
+  Charge Q{1.0};
+  Voltage V = E/Q;
+  std::cout<<"Voltage = Energy/Charge = "<<V<<V.units()<<std::endl;
+
   // Powers
   auto tsqrt = sqrt(t);
   std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
