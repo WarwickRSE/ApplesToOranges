@@ -8,7 +8,7 @@ To achieve this, every physical quantity has a different type, and the inter-ope
 Two Velocities can be added together, or Velocity can be divided by Time again to yield Acceleration etc. 
 Using C++20 facilities this can enforce units checking at compile time for arbitrary rational exponents. See below for details.
 
-Thus, any physical equation which compiles is shown to be dimensionally correct. 
+Thus, _any physical equation which compiles is shown to be dimensionally correct_. See the test code for a host of examples.
 
 The UnitCheckedType class enforces unit checking on all operations and the inner storage class holds numeric data. 
 Numeric operations and some functions such as dot product are avalable. 
@@ -21,7 +21,9 @@ Notes:
 
 
 Created June 2023 by Warwick RSE
+
 Version 1.0 (Only Length Mass and Time) July 2023
+
 Version 2.0 (All 7 SI base units) February 2024
 ## How to use this code
 You need the 5 header files to be included/accessible in your build, and can then include either PhysicalTypes.hpp to get common Physical units and access to UnitCheckedType to construct your own, or include UnitCheckedType.hpp directly if you do not want the extra defines.
@@ -45,7 +47,7 @@ A UnitCheckedType or UnitCheckedTypeDynamic exposes the first 3, UnitCheckedType
 ### Fractional exponentss
 C++20 introduces support which allows us to cleanly implement fractional exponents, such as m<sup>1/2</sup>. While we believe this could be done pre-20, we do not support it - instead we roll over to Integer exponents only. To enable fractional exponent support with C++20 supporting compilers, set the define -DUSE\_FRACTIONAL\_POWERS at the compile step. 
 
-Fractional powers mostly arise due to square-rooting etc, but can be instantiated directly if desired by creating an SF type with 2 parameters, the numerator and the denominator, such as SF{1,2} for 1/2, and creating a UnitChecked type with this as the relevant parameter. See example code for an example.
+Fractional powers mostly arise due to square-rooting etc, but can be instantiated directly if desired by creating an SF (a simple fraction type) type with 2 parameters, the numerator and the denominator, such as SF{1,2} for 1/2, and creating a UnitChecked type with this as the relevant parameter. See example code for an example.
 
 Note: Fraction equality is strict - 1/2 is not the same entity as 2/4. As long as you never instantiate an unsimplified fraction, they will never arise from arithmetic, so this should not matter. 
 
