@@ -161,34 +161,33 @@ class UnitCheckedType{
     }
 
     // Numeric multiply/divide
-    template<typename num>
+
+    // Allow only arithmetic types and exclude char
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
     UnitCheckedType operator*=(const num & other){
         val *= other;
         return *this;
     }
-    // Only arithmetic types for this
-    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
     friend UnitCheckedType operator*(const num & lhs, UnitCheckedType rhs){
-        static_assert(std::is_arithmetic_v<num>, "Can only multiply by arithmetic types");
         return rhs*=lhs;
     }
-    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
     friend UnitCheckedType operator*(UnitCheckedType lhs, const num & rhs){
-        static_assert(std::is_arithmetic_v<num>, "Can only multiply by arithmetic types");
         return lhs*=rhs;
     }
-    template<typename num>
+
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
     UnitCheckedType operator/=(const num & other){
         val /= other;
         return *this;
     }
-    // Only arithmetic types for this
-    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
     friend UnitCheckedType operator/(UnitCheckedType lhs, const num & rhs){
         return lhs/=rhs;
     }
-    //Divide arithmetic type by unitted type - remember units!
-    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
+    //Divide arithmetic type by unitted type
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> && !std::is_same_v<num,char> > >
     friend UnitCheckedType<-L,-M,-T, ST> operator/(const num & lhs, UnitCheckedType rhs){
         UnitCheckedType<-L,-M,-T,ST> tval;
         tval.val = lhs/rhs.val;

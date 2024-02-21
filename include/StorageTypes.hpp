@@ -48,7 +48,7 @@ class STScalar{
         }
         T& operator[](size_t i){
             return val;
-        }// Dumb but required
+        }// Include these for consistency
         T operator[](size_t i)const{
             return val;
         }
