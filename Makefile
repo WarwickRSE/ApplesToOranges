@@ -35,7 +35,10 @@ ifeq ($(strip $(MODE)),debug)
   CFLAGS += $(DEBUG) -DDEBUG
 
 endif
+ifeq ($(strip $(TIMER)),true)
+  CFLAGS += -DRUN_TIMER_TEST
 
+endif
 #list of all header and cpp pairs. Add new files here.....
 INCLS =
 

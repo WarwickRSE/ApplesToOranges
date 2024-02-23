@@ -1,12 +1,17 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 #include "PhysicalTypes.hpp"
+
+void run_timer_test();
 
 int main(){
 
 #ifdef USE_FRACTIONAL_POWERS
 #ifdef DEBUG
+
+  std::cout<<"___________________________________________________________"<<std::endl;
   // Quick test of fractions
   SimpleFrac aa{1,2}, bb{2,4}, cc{1,3};
   std::cout<<"aa = "<<aa<<std::endl;
@@ -17,6 +22,8 @@ int main(){
 
   std::cout<<"aa < cc? "<<is_less(aa,cc)<<std::endl;
   std::cout<<"aa > cc? "<<is_greater(aa,cc)<<std::endl;
+
+  std::cout<<"___________________________________________________________"<<std::endl;
 #endif
 #endif
   // Create three related physical quantities
@@ -120,22 +127,125 @@ int main(){
   Arr[2][2] = UCScalar{1.0, 2.0, 3.0};
 
   auto Arr2 = Arr;
-  auto Arr3 = Arr2;
-  std::cout<<"Arr3[0][0] = "<<Arr3[0][0]<<std::endl;
 
 #ifdef USE_FRACTIONAL_POWERS
 
   // Creating your own custom physical type to use elsewhere
   using UnsquareM = UnitCheckedType<SF{1,2}, 0, 0, dblscalar>;
   UnsquareM lu{0.3};
-  std::cout<<" lu = "<<lu<<lu.units()<<std::endl;
+  std::cout<<"A quantity with fractional exponent units: lu = "<<lu<<lu.units()<<std::endl;
   std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
 
 #endif
 
 #ifdef DEBUG
+  // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
   UnitCheckedType<0, 0, 0, STDummy> dummy{1.0};
 #endif
 
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Performance tests"<<std::endl;
+  UCScalar Arr3[100];
+  auto sz = sizeof(Arr3)/sizeof(double);
+  if(sz == 100){
+    std::cout<<"There is no storage overhead, a 100 element array of UCScalar is the size of "<<sz<<" doubles"<<std::endl;
+  }else{
+    std::cout<<"There is storage overhead, a 100 element array of UCScalar is the size of "<<sz<<" doubles"<<std::endl;
+  }
+
+#ifdef RUN_TIMER_TEST
+  run_timer_test();
+#endif
+
   return 0;
+};
+
+
+class timer{
+    private:
+        std::chrono::time_point<std::chrono::steady_clock> start, stop;
+    public:
+        void start_timer(){
+            start = std::chrono::steady_clock::now();
+        }
+        void stop_timer(){
+            stop = std::chrono::steady_clock::now();
+        }
+        long time_taken(){
+            return std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+        }
+        void print_time(){
+            std::cout<<"Time taken: "<<std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count()<<" ms"<<std::endl;
+        }
+};
+
+void run_timer_test(){
+
+  // Stack arrays first, keep to about 1000 elements in 1D
+
+  std::cout<<"Checking stack array performance -------------------"<<std::endl;
+  const long sz = 1000;
+  UCScalar Arr[sz];
+  long iters = 10000000;
+  timer t;
+
+  t.start_timer();
+  for (long i = 0; i < iters; i++){
+    for(int j = 0; j < sz; j++){
+      Arr[j] = Arr[j] + UCScalar{1.0};
+    }
+  }
+  t.stop_timer();
+  t.print_time();
+  auto first_time = t.time_taken();
+  // Use Arr to avoid optimiser removing entirely
+  std::cout<<Arr[10]<<std::endl;
+
+  double Arr2[sz];
+  t.start_timer();
+  for (long i = 0; i < iters; i++){
+    for(int j = 0; j < sz; j++){
+      Arr2[j] = Arr2[j] + 1.0;
+    }
+  }
+  t.stop_timer();
+  t.print_time();
+  auto second_time = t.time_taken();
+  std::cout<<Arr2[10]<<std::endl;
+
+  std::cout<<"---------------------------------------------"<<std::endl;
+  std::cout<<"         Time overhead for unit checked use: "<<(((double)first_time / (double)second_time)-1)*100.0<<" %"<<std::endl;
+
+  std::cout<<"Checking heap array performance -------------------"<<std::endl;
+  const long hsz = 1000000;
+  UCScalar * hArr = new UCScalar[hsz];
+  long hiters = 10000;
+
+  t.start_timer();
+  for (long i = 0; i < hiters; i++){
+    for(int j = 0; j < hsz; j++){
+      hArr[j] = hArr[j] + UCScalar{1.0};
+    }
+  }
+  t.stop_timer();
+  t.print_time();
+  first_time = t.time_taken();
+  // Use Arr to avoid optimiser removing entirely
+  std::cout<<hArr[10]<<std::endl;
+
+  double* hArr2 = new double[hsz];
+  t.start_timer();
+  for (long i = 0; i < hiters; i++){
+    for(int j = 0; j < hsz; j++){
+      hArr2[j] = hArr2[j] + 1.0;
+    }
+  }
+  t.stop_timer();
+  t.print_time();
+  second_time = t.time_taken();
+  std::cout<<hArr2[10]<<std::endl;
+
+  std::cout<<"---------------------------------------------"<<std::endl;
+  std::cout<<"         Time overhead for unit checked use: "<<(((double)first_time / (double)second_time)-1)*100.0<<" %"<<std::endl;
+
 };
