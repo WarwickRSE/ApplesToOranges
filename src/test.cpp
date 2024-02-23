@@ -191,6 +191,10 @@ void run_timer_test(){
   long iters = 10000000;
   timer t;
 
+  for(int j = 0; j < sz; j++){
+    Arr[j] = UCScalar{1.0};
+  }
+
   t.start_timer();
   for (long i = 0; i < iters; i++){
     for(int j = 0; j < sz; j++){
@@ -204,6 +208,9 @@ void run_timer_test(){
   std::cout<<Arr[10]<<std::endl;
 
   double Arr2[sz];
+  for(int j = 0; j < sz; j++){
+    Arr2[j] = 1.0;
+  }
   t.start_timer();
   for (long i = 0; i < iters; i++){
     for(int j = 0; j < sz; j++){
@@ -260,6 +267,10 @@ void run_addition_timer_test(){
   UCScalar Arr[sz];
   long iters = 10000000;
   timer t;
+
+  for(int j = 0; j < sz; j++){
+    Arr[j] = UCScalar{1.0};
+  }
 
   t.start_timer();
   for (long i = 0; i < iters; i++){
