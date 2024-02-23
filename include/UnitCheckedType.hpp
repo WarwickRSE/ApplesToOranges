@@ -127,6 +127,18 @@ class UnitCheckedType{
       return ss.str();
     };
 
+    template<SF Li, SF Mi, SF Ti, typename STi>
+    bool isSameUnits(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+        return is_equal(L, Li) && is_equal(M, Mi) && is_equal(T, Ti);
+    }
+    template<SF Li, SF Mi, SF Ti, typename STi>
+    bool isSameRank(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+        return std::is_same_v<ST, STi>;
+    }
+    template<SF Li, SF Mi, SF Ti, typename STi>
+    bool isSameType(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+        return isSameUnits(other) && isSameRank(other);
+    }
 
     // Operators
     // Unary minus

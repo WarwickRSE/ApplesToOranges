@@ -28,10 +28,17 @@ int main(){
   auto OneOverT = 1.0/t;
   std::cout<<"Inverse of t is "<<OneOverT<<OneOverT.units()<<std::endl;
 
+  auto OneOverPos = 1.0/Position{1.0, 1.0, 1.0};
+  std::cout<<"Inverse of pos is "<<OneOverPos<<OneOverPos.units()<<std::endl;
+
   std::vector<Time> t_steps;
   t_steps.push_back(t);
+  std::cout<<"A vector of type time, containing "<<t_steps.size()<<" elements"<<std::endl;
 
   Time t2(t);
+
+  std::cout<<"Two times are the same type: "<<t.isSameType(t2)<<std::endl;
+  std::cout<<"t and 1/t are not: "<<t.isSameType(OneOverT)<<std::endl;
 
   // A position
   Position x{1.0, 2.0, 3.0};
