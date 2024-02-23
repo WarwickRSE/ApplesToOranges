@@ -73,21 +73,22 @@ class UnitCheckedType{
     template <typename... Args>
     auto& get(Args ... args_in){
       static_assert(hasNoUnits());
-      if constexpr(sizeof...(args_in) == 0){
-        return val;
-      }else{
-        return val.get(args_in...);
-      }
+      return val.get(args_in...);
     }
 
     template <typename... Args>
     auto get(Args ... args_in)const{
       static_assert(hasNoUnits());
-      if constexpr(sizeof...(args_in) == 0){
-        return val;
-      }else{
-        return val.get(args_in...);
-      }
+      return val.get(args_in...);
+    }
+ 
+    auto& data(){
+      static_assert(hasNoUnits());
+      return val;
+    }
+    auto data()const{
+      static_assert(hasNoUnits());
+      return val;
     }
 
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
