@@ -5,6 +5,7 @@
 #include "PhysicalTypes.hpp"
 
 void run_timer_test();
+void run_addition_timer_test();
 
 int main(){
 
@@ -155,6 +156,7 @@ int main(){
 
 #ifdef RUN_TIMER_TEST
   run_timer_test();
+  run_addition_timer_test();
 #endif
 
   return 0;
@@ -192,7 +194,7 @@ void run_timer_test(){
   t.start_timer();
   for (long i = 0; i < iters; i++){
     for(int j = 0; j < sz; j++){
-      Arr[j] = Arr[j] + UCScalar{1.0};
+      Arr[j] += UCScalar{1.0};
     }
   }
   t.stop_timer();
@@ -205,7 +207,7 @@ void run_timer_test(){
   t.start_timer();
   for (long i = 0; i < iters; i++){
     for(int j = 0; j < sz; j++){
-      Arr2[j] = Arr2[j] + 1.0;
+      Arr2[j] += 1.0;
     }
   }
   t.stop_timer();
@@ -224,7 +226,7 @@ void run_timer_test(){
   t.start_timer();
   for (long i = 0; i < hiters; i++){
     for(int j = 0; j < hsz; j++){
-      hArr[j] = hArr[j] + UCScalar{1.0};
+      hArr[j] += UCScalar{1.0};
     }
   }
   t.stop_timer();
@@ -237,7 +239,7 @@ void run_timer_test(){
   t.start_timer();
   for (long i = 0; i < hiters; i++){
     for(int j = 0; j < hsz; j++){
-      hArr2[j] = hArr2[j] + 1.0;
+      hArr2[j] += 1.0;
     }
   }
   t.stop_timer();
@@ -248,4 +250,40 @@ void run_timer_test(){
   std::cout<<"---------------------------------------------"<<std::endl;
   std::cout<<"         Time overhead for unit checked use: "<<(((double)first_time / (double)second_time)-1)*100.0<<" %"<<std::endl;
 
+};
+
+void run_addition_timer_test(){
+  // Compare the time for += and A = A + b
+
+  std::cout<<"Checking relative performance of + and += -------------------"<<std::endl;
+  const long sz = 1000;
+  UCScalar Arr[sz];
+  long iters = 10000000;
+  timer t;
+
+  t.start_timer();
+  for (long i = 0; i < iters; i++){
+    for(int j = 0; j < sz; j++){
+      Arr[j] += UCScalar{1.0};
+    }
+  }
+  t.stop_timer();
+  t.print_time();
+  auto first_time = t.time_taken();
+  // Use Arr to avoid optimiser removing entirely
+  std::cout<<Arr[10]<<std::endl;
+
+  t.start_timer();
+  for (long i = 0; i < iters; i++){
+    for(int j = 0; j < sz; j++){
+      Arr[j] = Arr[j] + UCScalar{1.0};
+    }
+  }
+  t.stop_timer();
+  t.print_time();
+  auto second_time = t.time_taken();
+  // Use Arr to avoid optimiser removing entirely
+  std::cout<<Arr[10]<<std::endl;
+
+  std::cout<<"         Time benefit from best optimization: "<<(((double)first_time / (double)second_time)-1)*100.0<<" %"<<std::endl;
 };
