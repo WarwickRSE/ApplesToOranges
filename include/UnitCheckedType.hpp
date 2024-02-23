@@ -30,9 +30,14 @@ class UnitCheckedType{
  static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0, "Fraction cannot have zero denom");
 #endif
 
+#ifndef NO_SUPPORT_TEMPLATE_FRIENDSHIP
   private:
+#else
+  public:
+#endif
     ST val;
 
+  private:
     static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0);}
 
   public:

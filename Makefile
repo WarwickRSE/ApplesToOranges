@@ -7,6 +7,9 @@ CC = g++
 USE_FRACTIONAL_POWERS = 1
 DEFAULT_STD = c++17
 
+#Set this for compilers which dont support templating friendship, such as GCC pre 13
+#NO_SUPPORT_TEMPLATE_FRIENDSHIP = 1
+
 INCLUDE = -I ./include/
 SRCDIR = src
 OBJDIR = obj
