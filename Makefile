@@ -23,6 +23,9 @@ else
   CFLAGS += -std=$(DEFAULT_STD)
   $(info *****Disabled fractional powers*****)
 endif
+ifeq ($(strip $(NO_SUPPORT_TEMPLATE_FRIENDSHIP)),1)
+  CFLAGS += -DNO_SUPPORT_TEMPLATE_FRIENDSHIP
+endif
 
 DEBUG = -W -Wall -O0 -pedantic -D_GLIBCXX_DEBUG
 #DEBUG+= -Wno-sign-compare
