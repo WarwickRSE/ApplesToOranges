@@ -238,6 +238,19 @@ class UnitCheckedType{
         return tval;
     }
 
+    // Exponentiation for unitless types - runtime allowable
+    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
+    friend UnitCheckedType<L, M, T, ST> pow(const UnitCheckedType & base, const num & exp){
+        static_assert(hasNoUnits());
+        UnitCheckedType<L, M, T, ST> tval;
+        if constexpr(std::is_integral_v<num>){
+           tval.val = base.val.pow(static_cast<long>(exp));
+        }else{
+           tval.val = base.val.pow(static_cast<double>(exp));
+        }
+        return tval;
+    }
+
     // Other products - dot, cross, etc \TODO implement others
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
