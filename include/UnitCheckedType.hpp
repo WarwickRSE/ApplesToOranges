@@ -243,11 +243,7 @@ class UnitCheckedType{
     friend UnitCheckedType<L, M, T, ST> pow(const UnitCheckedType & base, const num & exp){
         static_assert(hasNoUnits());
         UnitCheckedType<L, M, T, ST> tval;
-        if constexpr(std::is_integral_v<num>){
-           tval.val = base.val.pow(static_cast<long>(exp));
-        }else{
-           tval.val = base.val.pow(static_cast<double>(exp));
-        }
+        tval.val = base.val.pow(exp);
         return tval;
     }
 
