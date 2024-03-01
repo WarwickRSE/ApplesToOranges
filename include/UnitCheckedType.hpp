@@ -66,11 +66,12 @@ class UnitCheckedType{
     // a constructor for each layer of nesting we want to accept
     // After 2-3 layers the syntax to initialise this way is so ugly
     // and error prone that there it little point going further
-    template <typename Tl>
+    // Exclude self as initialiser list type so that copy constructor is used instead
+    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
     UnitCheckedType(std::initializer_list<Tl> l):val(l){}
-    template <typename Tl>
+    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
     UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
-    template <typename Tl>
+    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
     UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
 
     // Accessors
