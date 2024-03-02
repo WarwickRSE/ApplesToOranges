@@ -60,18 +60,28 @@ int main(){
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
+#ifdef FAIL_DEMO
+  // Invalid - trying to add a position to a velocity
+  auto bad_add = x + v;
+#endif
+
   // Construct a dimensionless value (still unit checked, but strictly all units 0)
   auto dimless = 2.0 * t/t;
 
   // Powers
-  auto tsqrt = sqrt(t);
-  std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
   // NOTE: since exponentiation changes the units, we have to supply the exponent at compile time to get the compile time unit checking. Hence, this is a templated function. As a convenience, there is also a runtime version for DIMENSIONLESS types only
   auto tsq = pow<2>(t);
   std::cout<<"t^2= "<<tsq<<tsq.units()<<std::endl;
 
+#ifdef USE_FRACTIONAL_POWERS
+  auto tsqrt2 = pow<SF{1,2}>(tsq);
+  std::cout<<"       = "<<tsqrt2<<tsqrt2.units()<<std::endl;
+#endif
+
+#ifdef FAIL_DEMO
   // Not valid - t has units:
-  //auto tsq2 = pow(t, 2);
+  auto tsq2 = pow(t, 2);
+#endif
   // Valid - dimensionless type supplied
   std::cout<<"t/t is dimensionless, so can be raised to a runtime power: 2.0^2 = "<< pow(dimless, 2)<<" and 2.0^2.0 = "<<pow(dimless, 2.0)<<std::endl;
 
@@ -113,10 +123,10 @@ int main(){
   // Using casting to construct
   double tmp2{l2};
   std::cout<<"Casting to double: "<< typeid(tmp2).name()<<std::endl;
-  /*
+#if !defined NO_NARROWING_CONVERSIONS || defined FAIL_DEMO
   float tmp1{l2};  //Disallowed by -DNO_NARROWING_CONVERSIONS
   std::cout<<"Narrowing to float: "<< typeid(tmp1).name()<<std::endl;
-  */
+#endif
 
   // Using special functions on dimensionless values
   // For scalars, cast to, or store to, a double

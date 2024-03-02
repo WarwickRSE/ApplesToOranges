@@ -42,6 +42,10 @@ ifeq ($(strip $(TIMER)),true)
   CFLAGS += -DRUN_TIMER_TEST
 
 endif
+ifeq ($(strip $(FAIL)), true)
+  CFLAGS += -DFAIL_DEMO
+endif
+
 #list of all header and cpp pairs. Add new files here.....
 INCLS =
 
