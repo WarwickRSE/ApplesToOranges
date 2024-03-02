@@ -83,6 +83,8 @@ int main(){
 #if defined USE_FRACTIONAL_POWERS || defined FAIL_DEMO
   auto tsqrt = sqrt(t);
   std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
+  auto tcbrt = cbrt(t);
+  std::cout<<"cbrt(t)= "<<tcbrt<<tcbrt.units()<<std::endl;
 #endif
 
 

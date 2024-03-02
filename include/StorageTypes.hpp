@@ -109,6 +109,9 @@ class STScalar{
         STScalar sqrt()const{
           return std::sqrt(val);
         }
+        STScalar cbrt()const{
+          return std::cbrt(val);
+        }
         STScalar pow(double p)const{
           return std::pow(val, p);
         }
