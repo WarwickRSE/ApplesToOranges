@@ -224,7 +224,7 @@ class UnitCheckedType{
         return tval;
     }
 
-    // Exponentiation
+    // Exponentiation (note that pre-20 C++ does not support non-integral types so we rely on our defining SF as int in that case)
     template<SF exp>
     friend UnitCheckedType<L*exp, M*exp, T*exp, ST> pow(const UnitCheckedType & base){
         UnitCheckedType<L*exp, M*exp, T*exp, ST> tval;
@@ -244,7 +244,7 @@ class UnitCheckedType{
         tval.val = base.val.cbrt();
         return tval;
     }
-    template <long exp >
+    template <long exp>
     friend UnitCheckedType<L/exp, M/exp, T/exp, ST> nthrt(const UnitCheckedType & base){
         static_assert(divides(L, exp) && divides(M,exp) && divides(T,exp));
         UnitCheckedType<L/exp, M/exp, T/exp, ST> tval;
@@ -332,5 +332,10 @@ std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& v
   os << val_in.to_string();
   return os;
 }
+
+// Needed for template friend function name resolution pre c++20
+// Just need compiler to find template function with right name, any type
+template <typename T> void pow();
+template <typename T> void nthrt();
 
 #endif
