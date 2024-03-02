@@ -72,6 +72,14 @@ int main(){
   // NOTE: since exponentiation changes the units, we have to supply the exponent at compile time to get the compile time unit checking. Hence, this is a templated function. As a convenience, there is also a runtime version for DIMENSIONLESS types only
   auto tsq = pow<2>(t);
   std::cout<<"t^2= "<<tsq<<tsq.units()<<std::endl;
+  auto tsqsqrt = sqrt(tsq);
+  std::cout<<"sqrt(t^2)= "<<tsqsqrt<<tsqsqrt.units()<<std::endl;
+
+  // Valid only with fractional powers enabled, as units are s^(1/2)
+#if defined USE_FRACTIONAL_POWERS || defined FAIL_DEMO
+  auto tsqrt = sqrt(t);
+  std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
+#endif
 
 #ifdef USE_FRACTIONAL_POWERS
   auto tsqrt2 = pow<SF{1,2}>(tsq);

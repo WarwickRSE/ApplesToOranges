@@ -24,6 +24,7 @@ struct SimpleFrac
   constexpr SimpleFrac(f_int inum): num(inum), denom(1) {};
   constexpr SimpleFrac(f_int inum, f_int idenom): num(inum), denom(idenom) {};
   constexpr auto operator<=>(const SimpleFrac &)const = default;
+  constexpr explicit operator double()const{return static_cast<double>(num)/denom;}
 };
 
 constexpr bool simplifiable(const SimpleFrac & a){

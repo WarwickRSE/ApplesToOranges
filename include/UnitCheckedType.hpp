@@ -2,6 +2,7 @@
 #define UNITCHECKEDTYPE_HPP
 
 #include <sstream>
+#include <numeric>
 
 #include <helper.hpp>
 #include <SimpleFrac.hpp>
@@ -9,11 +10,13 @@
 
 #ifdef USE_FRACTIONAL_POWERS
  using SF = SimpleFrac;
+ inline constexpr bool divides(SF a, int b){return true;}// Stub
 #else
  using SF = int;
  inline constexpr bool is_equal(int a, int b){return a==b;}
  inline constexpr bool is_less(int a, int b){return a<b;}
  inline constexpr bool is_greater(int a, int b){return a>b;}
+ inline constexpr bool divides(int a, int divisor){return divisor!=0 ? std::gcd(a, divisor)==divisor : false;}
 #endif
 
 // \TODO Add any other operators to complete set
@@ -87,7 +90,7 @@ class UnitCheckedType{
       static_assert(hasNoUnits());
       return val.get(args_in...);
     }
- 
+
     auto& data(){
       static_assert(hasNoUnits());
       return val;
@@ -225,15 +228,12 @@ class UnitCheckedType{
     template<SF exp>
     friend UnitCheckedType<L*exp, M*exp, T*exp, ST> pow(const UnitCheckedType & base){
         UnitCheckedType<L*exp, M*exp, T*exp, ST> tval;
-        if constexpr(exp.denom == 1){
-            tval.val = base.val.pow((long)exp.num);
-        }else{
-            tval.val = base.val.pow((double)exp.num/exp.denom);
-        }
+        tval.val = base.val.pow((double)exp);
         return tval;
     }
 
     friend UnitCheckedType<L/2, M/2, T/2, ST> sqrt(const UnitCheckedType & base){
+        static_assert(divides(L, 2) && divides(M,2) && divides(T,2));
         UnitCheckedType<L/2, M/2, T/2, ST> tval;
         tval.val = base.val.sqrt();
         return tval;
