@@ -75,16 +75,16 @@ int main(){
   auto tsqsqrt = sqrt(tsq);
   std::cout<<"sqrt(t^2)= "<<tsqsqrt<<tsqsqrt.units()<<std::endl;
 
+#ifdef USE_FRACTIONAL_POWERS
+  auto tsqrt2 = pow<SF{1,2}>(tsq);
+  std::cout<<"         = "<<tsqrt2<<tsqrt2.units()<<std::endl;
+#endif
   // Valid only with fractional powers enabled, as units are s^(1/2)
 #if defined USE_FRACTIONAL_POWERS || defined FAIL_DEMO
   auto tsqrt = sqrt(t);
   std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
 #endif
 
-#ifdef USE_FRACTIONAL_POWERS
-  auto tsqrt2 = pow<SF{1,2}>(tsq);
-  std::cout<<"       = "<<tsqrt2<<tsqrt2.units()<<std::endl;
-#endif
 
 #ifdef FAIL_DEMO
   // Not valid - t has units:
