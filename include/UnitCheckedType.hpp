@@ -244,6 +244,13 @@ class UnitCheckedType{
         tval.val = base.val.cbrt();
         return tval;
     }
+    template <long exp >
+    friend UnitCheckedType<L/exp, M/exp, T/exp, ST> nthrt(const UnitCheckedType & base){
+        static_assert(divides(L, exp) && divides(M,exp) && divides(T,exp));
+        UnitCheckedType<L/exp, M/exp, T/exp, ST> tval;
+        tval.val = base.val.pow(1.0/exp);
+        return tval;
+    }
     // Exponentiation for unitless types - runtime allowable
     template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
     friend UnitCheckedType<L, M, T, ST> pow(const UnitCheckedType & base, const num & exp){

@@ -79,13 +79,19 @@ int main(){
   auto tsqrt2 = pow<SF{1,2}>(tsq);
   std::cout<<"         = "<<tsqrt2<<tsqrt2.units()<<std::endl;
 #endif
-  // Valid only with fractional powers enabled, as units are s^(1/2)
+  // Valid only with fractional powers enabled, as units are s^(1/N) (N=2, 3, 5 shown)
 #if defined USE_FRACTIONAL_POWERS || defined FAIL_DEMO
   auto tsqrt = sqrt(t);
   std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
   auto tcbrt = cbrt(t);
   std::cout<<"cbrt(t)= "<<tcbrt<<tcbrt.units()<<std::endl;
+  auto fifthroot_t = nthrt<5>(t);
+  std::cout<<"5th root of t= "<<fifthroot_t<<fifthroot_t.units()<<std::endl;
 #endif
+  // But this is always valid as we make sure to have integral units
+  auto fifthpow = pow<5>(t);
+  auto fifthroot = nthrt<5>(fifthpow);
+  std::cout<<"5th root of t^5= "<<fifthroot<<fifthroot.units()<<std::endl;
 
 
 #ifdef FAIL_DEMO
