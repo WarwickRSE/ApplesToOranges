@@ -4,9 +4,9 @@
 #include <sstream>
 #include <numeric>
 
-#include <helper.hpp>
-#include <SimpleFrac.hpp>
-#include <StorageTypes.hpp>
+#include "helper.hpp"
+#include "SimpleFrac.hpp"
+#include "StorageTypes.hpp"
 
 #ifdef USE_FRACTIONAL_POWERS
  using SF = SimpleFrac;
