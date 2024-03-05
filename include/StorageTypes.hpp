@@ -423,9 +423,12 @@ class STTensor{
 template <typename T, int dim>
 std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
   os << "(";
-  for(size_t i = 0; i<dim*dim; i++){
-    os << val_in[i];
-    if(i<dim-1) os << ',';
+  for(size_t i = 0; i<dim; i++){
+    for(size_t j = 0; j<dim; j++){
+      os << val_in[i*dim + j];
+      if(j<dim-1) os << ',';
+    }
+    if(i < dim-1) os << ";";
   }
   os<<")";
   return os;
