@@ -157,6 +157,16 @@ int main(){
   auto scal = UCScalar{7.5};
   std::cout<<"Type without units supports simple get like this: "<<scal.get()<<std::endl;
 
+  // Checking that we can apply constexpr for compile-time values
+  constexpr Length l3{1.0};
+  std::cout<<"Values can be used in constexpr contexts: constexpr l3 = "<<l3<<l3.units()<<std::endl;
+  constexpr Position p{0.1, 0.2}, p2{0.1}, p3(0.1);
+  std::cout<<"Missing values are zero initialised: "<<p<<std::endl;
+  std::cout<<"But a single value performs Scalar initialisation: "<<p2<<std::endl;
+  std::cout<<"Whichever way you do it: "<<p3<<std::endl;
+  // Show shortcut Scalar initialisation on a Tensor
+  constexpr UCTensor TT{1.0};
+  std::cout<<"Which is very useful on a Tensor TT{1.0} -> "<<TT<<std::endl;
 
   // Try gridded operations and show how to initialise
   UCScalar Arr[3][3];

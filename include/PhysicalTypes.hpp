@@ -13,6 +13,7 @@ using dbl4tens = STTensor<double, 4>;
 // No physical units
 using UCScalar = UnitCheckedType<0, 0, 0, dblscalar>;
 using UCVector = UnitCheckedType<0, 0, 0, dbl3vec>;
+using UCTensor = UnitCheckedType<0, 0, 0, dbl3tens>;
 
 // Single units, scalar and (where sensible), 3-vector
 

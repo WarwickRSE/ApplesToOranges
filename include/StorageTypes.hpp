@@ -37,9 +37,9 @@ class STScalar{
         T val{};
 
     public:
-        STScalar(){};
-        STScalar(T val_in):val(val_in){};
-        STScalar(std::initializer_list<T> l){l.size()>0? val=*(l.begin()):val=0;};
+        constexpr STScalar(){};
+        constexpr STScalar(T val_in):val(val_in){};
+        constexpr STScalar(std::initializer_list<T> l){l.size()>0? val=*(l.begin()):val=0;};
 
         STScalar(const STScalar &a) = default;
         STScalar operator=(const STScalar &a){
@@ -160,19 +160,23 @@ class STVector{
           return sum;
         }
     public:
-        STVector(){};
-        STVector(T val_in){for(size_t i = 0; i<dim; i++){val[i]=val_in;}};
-        STVector(std::initializer_list<T> l){
-            memset(val, 0, sizeof(T)*dim);
+        constexpr STVector(){};
+        constexpr STVector(T val_in){for(size_t i = 0; i<dim; i++){val[i]=val_in;}};
+        constexpr STVector(std::initializer_list<T> l){
             const size_t ct=std::min((int)l.size(), dim);
-            for(size_t i = 0; i<ct; i++){val[i]=*(l.begin()+i);}
+            if(ct == 1){
+              for(size_t i = 0; i < dim; i++){val[i]=*(l.begin());}
+            }else{
+              for(size_t i = 0; i<ct; i++){val[i]=*(l.begin()+i);}
+              for(size_t i = ct; i<dim; i++){val[i]=0;} // Zero any excess values
+            }
         }
         //Allow for initialisation from any other type which offers a get() method, such as an STScalar, but potentially wrapped in Units etc
         template <typename U>
-        STVector(std::initializer_list<U> l){
-            memset(val, 0, sizeof(T)*dim);
+        constexpr STVector(std::initializer_list<U> l){
             const size_t ct=std::min((int)l.size(), dim);
             for(size_t i = 0; i<ct; i++){val[i]=(l.begin()+i)->unsafeGet();}
+            for(size_t i = ct; i<dim; i++){val[i]=0;} // Zero any excess values
         }
         STVector(const STVector &a) = default;
         STVector operator=(const STVector &a){
@@ -331,8 +335,8 @@ class STTensor{
         T val[dim*dim]{};
 
     public:
-        STTensor(){};
-        STTensor(T val_in){for(size_t i = 0; i<dim*dim; i++){val[i]=val_in;}};
+        constexpr STTensor(){};
+        constexpr STTensor(T val_in){for(size_t i = 0; i<dim*dim; i++){val[i]=val_in;}};
         STTensor(const STTensor &a) = default;
         STTensor operator=(const STTensor &a){
           for(size_t i = 0; i<dim*dim; i++){
@@ -343,9 +347,8 @@ class STTensor{
 
         // Allow initialisation from single element, or from doubly nested list
         template<typename Tl>
-        STTensor(std::initializer_list<Tl> l){
+        constexpr STTensor(std::initializer_list<Tl> l){
             // Force everything to zero
-            memset(val, 0, sizeof(T)*dim*dim);
             const size_t ct=std::min((int)l.size(), dim);
             if constexpr (std::is_same_v<Tl, std::initializer_list<T>>){
                 for(size_t i = 0; i<ct; i++){
@@ -354,6 +357,14 @@ class STTensor{
                     for(size_t j=0; j<ct2; j++){
                       // Assign as many elements as are given
                       val[i*dim+j]= *(l2.begin()+j);
+                    }
+                    for(size_t j = ct2; j<dim; j++){
+                        val[i*dim+j]=0;
+                    }
+                }
+                for(size_t i = ct; i<dim; i++){
+                    for(size_t j = 0; j<dim; j++){
+                        val[i*dim+j]=0;
                     }
                 }
             }else if constexpr(std::is_same_v<Tl, T>){

@@ -44,11 +44,11 @@ class UnitCheckedType{
     static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0);}
 
   public:
-    UnitCheckedType():val(){};
+    constexpr UnitCheckedType():val(){};
 
     // Constructors are very permissive - expect ST to restrict to valid values if necessary
     template <typename Tl>
-    explicit UnitCheckedType(Tl x):val(x){}
+    constexpr explicit UnitCheckedType(Tl x):val(x){}
 
 
     UnitCheckedType(const UnitCheckedType& src):val(src.val){}
@@ -71,11 +71,11 @@ class UnitCheckedType{
     // and error prone that there it little point going further
     // Exclude self as initialiser list type so that copy constructor is used instead
     template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
-    UnitCheckedType(std::initializer_list<Tl> l):val(l){}
+    constexpr UnitCheckedType(std::initializer_list<Tl> l):val(l){}
     template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
-    UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
     template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
-    UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
 
     // Accessors
     // Value extraction for all units 0 only
