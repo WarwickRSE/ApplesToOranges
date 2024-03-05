@@ -1,0 +1,28 @@
+
+
+v 1.3 -> 1.4
+* Failing test mode to show things that will not (as is desired) compile
+* cbrt and nthroot functions
+* BUGFIX - pre 20 resolution of power function
+* BUGFIX - printing of Tensor values
+* constexpr constructors to allow use in constexpr contexts
+* BUGFIX - wrong include style used ('<' for '"')
+
+
+v 1.2 -> 1.3
+* Adds casting
+* Adds powers and sqrts
+* Adds special function examples
+* Internal refactoring and cleanup
+
+v 1.1 -> 1.2
+* BUGFIX on fractions (no effects on current functions)
+* Test of inverting a quantity
+
+v 1.0 -> 1.1
+* Cross product and Normalize (in place) functions
+* Adds get for dimensionless values
+
+Pre v1.0
+Incomplete function, interfaces subject to change
+
