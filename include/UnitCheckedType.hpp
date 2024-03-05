@@ -225,7 +225,7 @@ class UnitCheckedTypeFull{
     template<typename Ts>
     using ReturnTypeMultiply = decltype(operator*(std::declval<ST>(), std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
-        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > operator*(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+    auto operator*(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
         UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > tval;
         tval.val = this->val*other.val;
         return tval;
@@ -233,7 +233,7 @@ class UnitCheckedTypeFull{
     template<typename Ts>
     using ReturnTypeDivide = decltype(operator/(std::declval<ST>(), std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
-      UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > operator/(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+    auto operator/(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
         UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > tval;
         tval.val = this->val/other.val;
         return tval;
