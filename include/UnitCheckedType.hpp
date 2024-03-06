@@ -293,6 +293,13 @@ class UnitCheckedType{
     void normalize(){
         val.normalize();
     }
+    template <typename Q=ST>
+    UnitCheckedType normalized()const{
+        UnitCheckedType tval;
+        tval.val = val;
+        tval.val.normalize();
+        return tval;
+    }
 
     // Comparison operators
     // Implement these for matching units only, but allow different

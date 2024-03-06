@@ -110,9 +110,11 @@ int main(){
   // Cross product
   std::cout<<"x cross x2="<<x.cross(x2)<<std::endl;
 
-  //Normalize
+  //Normalize, two ways
+  auto x3 = x2.normalized();
   x2.normalize();
-  std::cout << "x2 normalised is " << x2 << std::endl;
+  std::cout <<"x2 normalised is " << x2 << std::endl;
+  std::cout <<"              or " << x3 << std::endl;
   std::cout << "magnitude of x2 normalised is " << x2.magnitude() << std::endl;
 
   // Numeric multiply
