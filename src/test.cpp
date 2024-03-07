@@ -65,6 +65,17 @@ int main(){
   auto bad_add = x + v;
 #endif
 
+  // Construct a vector from a scalar
+  Length l0{1.0};
+  Position xl{l0, Length{0.0}, Length{0.0}};
+  Position xll{0.0, 0.0, 0.0};
+#ifdef FAIL_DEMO
+  // Initialising from wrong numeric underlying type not allowed
+  Position xlll{0, 0, 0};
+  // Initialising from other units not allowed
+  Velocity vl{l0, Length{0.0}, Length{0.0}};
+#endif
+
   // Construct a dimensionless value (still unit checked, but strictly all units 0)
   auto dimless = 2.0 * t/t;
 

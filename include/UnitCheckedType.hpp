@@ -70,12 +70,36 @@ class UnitCheckedType{
     // After 2-3 layers the syntax to initialise this way is so ugly
     // and error prone that there it little point going further
     // Exclude self as initialiser list type so that copy constructor is used instead
-    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
+    // NOTE: Valid types for list are either base data type of underlying storage
+    // OR a unitchecked type of SAME units but any storage type
+    typedef typename extract_value_type<ST>::value_type ST_t;
+    template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
     constexpr UnitCheckedType(std::initializer_list<Tl> l):val(l){}
-    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
+    template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
-    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
+    template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
+    // Overload to give nicer error message
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
+    constexpr UnitCheckedType(std::initializer_list<Tl> l){
+        // Condition always false BUT this is only known after substitution of Tl
+        static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l){
+        static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l){
+        static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+
+    template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
+    constexpr UnitCheckedType(std::initializer_list< UnitCheckedType<L, M, T, STi> > l):val(l){}
+    template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list< UnitCheckedType<L, M, T, STi> > > l):val(l){}
+    template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<UnitCheckedType<L, M, T, STi> > > > l):val(l){}
 
     // Accessors
     // Value extraction for all units 0 only
@@ -137,15 +161,15 @@ class UnitCheckedType{
     };
 
     template<SF Li, SF Mi, SF Ti, typename STi>
-    bool isSameUnits(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    constexpr bool isSameUnits(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
         return is_equal(L, Li) && is_equal(M, Mi) && is_equal(T, Ti);
     }
     template<SF Li, SF Mi, SF Ti, typename STi>
-    bool isSameRank(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    constexpr bool isSameRank(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
         return std::is_same_v<ST, STi>;
     }
     template<SF Li, SF Mi, SF Ti, typename STi>
-    bool isSameType(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    constexpr bool isSameType(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
         return isSameUnits(other) && isSameRank(other);
     }
 
