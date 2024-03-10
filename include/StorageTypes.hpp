@@ -189,8 +189,12 @@ class STVector{
         template <typename U, typename=std::enable_if_t<std::is_same_v<WrappedType<U>, STScalar<T> > > >
         constexpr STVector(std::initializer_list<U> l){
             const size_t ct=std::min((int)l.size(), dim);
-            for(size_t i = 0; i<ct; i++){val[i]=(l.begin()+i)->stripUnits().get();}
-            for(size_t i = ct; i<dim; i++){val[i]=0;} // Zero any excess values
+            if(ct == 1){
+              for(size_t i = 0; i < dim; i++){val[i]=(l.begin())->stripUnits().get();}
+            }else{
+              for(size_t i = 0; i<ct; i++){val[i]=(l.begin()+i)->stripUnits().get();}
+              for(size_t i = ct; i<dim; i++){val[i]=0;} // Zero any excess values
+            }
         }
 
         STVector operator=(const STVector &a){
@@ -388,6 +392,7 @@ class STTensor{
                   // Single layer - as many as given in 1-D order
                   const size_t ct=std::min((int)l.size(), dim*dim);
                   for(size_t i = 0; i<dim*dim; i++){val[i]= *(l.begin()+i);}
+                  for(size_t i = ct; i<dim*dim; i++){val[i]=0;}
                 }
             }
         }
@@ -414,8 +419,15 @@ class STTensor{
                     }
                 }
             }else{
-                // Single layer - assume single element
-                for(size_t i = 0; i<dim*dim; i++){val[i]=*(l.begin())->get();}
+                // Single layer, single element
+                if(l.size() == 1){
+                  for(size_t i = 0; i<dim*dim; i++){val[i]=(l.begin())->get();}
+                }else{
+                  // Single layer - as many as given in 1-D order
+                  const size_t ct=std::min((int)l.size(), dim*dim);
+                  for(size_t i = 0; i<ct; i++){val[i]= *(l.begin()+i)->get();}
+                  for(size_t i = ct; i<dim*dim; i++){val[i]=0;}
+                }
             }
         }
 
