@@ -4,11 +4,67 @@
 #include <chrono>
 #include "PhysicalTypes.hpp"
 
+void debug_checks();
+
+void basic_demo();
+void initialisation_and_access_demo();
+void more_initialisation_demo();
+void exponents_and_roots();
+void products_and_functions();
+void comparison_demo();
+
+void constexpr_checks();
+void last_bits();
+void performance_tests();
+
 void run_timer_test();
 void run_addition_timer_test();
 
 int main(){
 
+  debug_checks();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Basic demo of Unit Checking"<<std::endl;
+  basic_demo();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Ways to initialise Unit Checked variables"<<std::endl;
+  initialisation_and_access_demo();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"MORE ways to initialise Unit Checked variables"<<std::endl;
+  more_initialisation_demo();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Exponentiation and roots"<<std::endl;
+  exponents_and_roots();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Products and special functions"<<std::endl;
+  products_and_functions();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Comparison operators"<<std::endl;
+  comparison_demo();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Constexpr checks and EVEN MORE ways to initialise"<<std::endl;
+  constexpr_checks();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"A few final bits"<<std::endl;
+  last_bits();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Performance tests"<<std::endl;
+  performance_tests();
+
+  return 0;
+
+};
+
+void debug_checks(){
 #ifdef USE_FRACTIONAL_POWERS
 #ifdef DEBUG
 
@@ -53,29 +109,26 @@ int main(){
   std::cout<<"test_t2 = "<<test_t2<<std::endl;
   STTensor test_t3{v1, v1, v1};
   std::cout<<"test_t3 = "<<test_t3<<std::endl;
-
+  std::cout<<"___________________________________________________________"<<std::endl;
 #endif
 
+#ifdef DEBUG
+  // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
+  UnitCheckedType<0, 0, 0, STDummy> dummy;
+#endif
+
+};
+
+void basic_demo(){
   // Create three related physical quantities
 
   // A time
   Time t{0.1};
   std::cout<<"Defined time t= "<<t<<t.units()<<std::endl;
 
-  auto OneOverT = 1.0/t;
-  std::cout<<"Inverse of t is "<<OneOverT<<OneOverT.units()<<std::endl;
-
-  auto OneOverPos = 1.0/Position{1.0, 1.0, 1.0};
-  std::cout<<"Inverse of pos is "<<OneOverPos<<OneOverPos.units()<<std::endl;
-
   std::vector<Time> t_steps;
   t_steps.push_back(t);
   std::cout<<"A vector of type time, containing "<<t_steps.size()<<" elements"<<std::endl;
-
-  Time t2(t);
-
-  std::cout<<"Two times are the same type: "<<t.isSameType(t2)<<std::endl;
-  std::cout<<"t and 1/t are not: "<<t.isSameType(OneOverT)<<std::endl;
 
   // A position
   Position x{1.0, 2.0, 3.0};
@@ -84,6 +137,10 @@ int main(){
   // A velocity
   Velocity v{1.0, 2.0, 3.0};
   std::cout<<"Defined velocity v= "<<v<<v.units()<<std::endl;
+
+  Time t2 = t;
+  std::cout<<"Two times are the same type: "<<t.isSameType(t2)<<std::endl;
+  std::cout<<"Position and Velocity are not: "<<x.isSameType(v)<<std::endl;
 
   // Update position using x = x_0 + v * t
   x = x + v * t;
@@ -94,22 +151,50 @@ int main(){
   auto bad_add = x + v;
 #endif
 
+  std::cout<<"One can also multiply by numeric types, and perform a one-over operation"<<std::endl;
+  // Numeric multiply
+  std::cout<<"2x= "<<2.0*x<<x.units()<<"=="<<x*2.0<<x.units()<<std::endl;
+  std::cout<<"x/2= "<<x/2.0<<x.units()<<std::endl;
+
+  auto OneOverT = 1.0/t;
+  std::cout<<"Inverse of t is "<<OneOverT<<OneOverT.units()<<std::endl;
+
+  auto OneOverPos = 1.0/Position{1.0, 1.0, 1.0};
+  std::cout<<"Inverse of pos is "<<OneOverPos<<OneOverPos.units()<<std::endl;
+
+  auto t_over_t = t/t;
+  std::cout<<"t/t is dimensionless: "<<t_over_t<<t_over_t.units()<<std::endl;
+
+};
+
+void initialisation_and_access_demo(){
   // Construct a vector from a scalar
-  Length l0{1.0};
-  Position xl{l0, l0, l0};
-  Position xl2{xl};
-  Position xll{0.0, 0.0, 0.0};
+  Length l{1.0};
+  Position xl{l, l, l};
+  Position x2{xl};
+  Position x3{0.0, 0.0, 0.0};
 #ifdef FAIL_DEMO
   // Initialising from wrong numeric underlying type not allowed
   Position xlll{0, 0, 0};
   // Initialising from other units not allowed
-  Velocity vl{l0, Length{0.0}, Length{0.0}};
+  Velocity vl{l, Length{0.0}, Length{0.0}};
   // Scalar from vector makes no sense...
   Length l1{xl};
+  // Can't set equal to scalar as escapes unit checking again
+  Length l2 = 0.2;
 #endif
 
-  // Construct a dimensionless value (still unit checked, but strictly all units 0)
-  auto dimless = 2.0 * t/t;
+  // Accessor functions
+  // It is not recommended, but units can be ignored like this:
+  std::cout<<"l's value, forcibly ignoring units, is "<<l.unsafeGet()<<" and can be added to a simple double like this:"<<1.0 + l.unsafeGet()<< std::endl;
+  auto scal = UCScalar{7.5};
+  std::cout<<"A type without units safely allows getting of the value: "<<scal.get()<<std::endl;
+
+};
+
+void exponents_and_roots(){
+
+  Time t{0.1};
 
   // Powers
   // NOTE: since exponentiation changes the units, we have to supply the exponent at compile time to get the compile time unit checking. Hence, this is a templated function. As a convenience, there is also a runtime version for DIMENSIONLESS types only
@@ -142,63 +227,36 @@ int main(){
   auto tsq2 = pow(t, 2);
 #endif
   // Valid - dimensionless type supplied
+  auto dimless = t/t;
   std::cout<<"t/t is dimensionless, so can be raised to a runtime power: 2.0^2 = "<< pow(dimless, 2)<<" and 2.0^2.0 = "<<pow(dimless, 2.0)<<std::endl;
 
+};
 
+void products_and_functions(){
+
+  Length l{0.1};
+  Position x{1.0, 2.0, 3.0};
+  Velocity v{1.0, 1.0, 1.0};
 
   // Dot product
-  std::cout<<"x.v="<<x.dot(v)<<std::endl;
+  auto dt = x.dot(v);
+  std::cout<<"x.v="<<dt<<dt.units()<<std::endl;
 
-  Position x2{4.0, 5.0, 6.0};
   // Cross product
-  std::cout<<"x cross x2="<<x.cross(x2)<<std::endl;
+  auto crs = x.cross(v);
+  std::cout<<"x cross v="<<crs<<crs.units()<<std::endl;
+
+  // Outer product
+  auto out = x.outer(v);
+  std::cout<<"x outer v="<<out<<out.units()<<std::endl;
+
 
   //Normalize, two ways
-  auto x3 = x2.normalized();
-  x2.normalize();
-  std::cout <<"x2 normalised is " << x2 << std::endl;
-  std::cout <<"              or " << x3 << std::endl;
-  std::cout << "magnitude of x2 normalised is " << x2.magnitude() << std::endl;
-
-  // Identities
-  Length il=makeIdentity<Length>();
-  std::cout<<"Identity Scalar :"<<il<<std::endl;
-  Position ip=makeIdentity<Position>();
-  std::cout<<"Identity Vector :"<< ip<<std::endl;
-  UCTensor it=makeIdentity<UCTensor>();
-  std::cout<<"Identity Tensor :"<<it<<std::endl;
-  UCTensor it2{tens3_ident};
-  std::cout<<"Identity Tensor another way :"<<it2<<std::endl;
-
-
-  // Numeric multiply
-  std::cout<<"2x= "<<2.0*x<<x.units()<<"=="<<x*2.0<<x.units()<<std::endl;
-  std::cout<<"x/2= "<<x/2.0<<x.units()<<std::endl;
-
-  Length l{1.0};
-  // Demo of comparison operators
-  std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
-  std::cout<<"x == x? "<< (x == x)<<std::endl;
-
-  std::cout<<"x.magnitude()= "<<x.magnitude()<<std::endl;
-  std::cout<<"l.magnitude()= "<<l.magnitude()<<std::endl;
-
-  std::cout<< "x > l? "<< (x.magnitude() > l.magnitude())<<std::endl;
-  std::cout<< "x > l? "<< (x > l)<<std::endl;
-
-  //Using casting in comparison
-  UCScalar l2{1.0};
-  std::cout<<"Comparison of Scalar (no units) to double: "<<std::endl;
-  std::cout<<"Construct comparable type, val > UCScalar{1.0}"<<(l2 > UCScalar{1.0})<<std::endl;
-  std::cout<<"Cast UCScalar to double, static_cast<double>(val) > 1.0 "<<(static_cast<double>(l2) > 1.0)<<std::endl;
-
-  // Using casting to construct
-  double tmp2{l2};
-  std::cout<<"Casting to double: "<< typeid(tmp2).name()<<std::endl;
-#if !defined NO_NARROWING_CONVERSIONS || defined FAIL_DEMO
-  float tmp1{l2};  //Disallowed by -DNO_NARROWING_CONVERSIONS
-  std::cout<<"Narrowing to float: "<< typeid(tmp1).name()<<std::endl;
-#endif
+  auto x2 = x.normalized();
+  x.normalize();
+  std::cout <<"x normalised is " << x << std::endl;
+  std::cout <<"              or " << x2 << std::endl;
+  std::cout << "magnitude of x normalised is " << x.magnitude() << std::endl;
 
   // Using special functions on dimensionless values
   // For scalars, cast to, or store to, a double
@@ -208,11 +266,52 @@ int main(){
   // Storage type can provide operations on higher rank types, either elementwise or whatever
   std::cout<<"sin(x/x_0): "<<mysinfunction((x/Length{1.0}).data())<<std::endl;
 
-  // Accessor functions
-  std::cout<<"t's value, ignoring units, is "<<t.unsafeGet()<<" and can be added to a simple double like this:"<<1.0 + t.unsafeGet()<< std::endl;
-  auto scal = UCScalar{7.5};
-  std::cout<<"Type without units supports simple get like this: "<<scal.get()<<std::endl;
+};
 
+void more_initialisation_demo(){
+  // Identities
+  Length il=makeIdentity<Length>();
+  std::cout<<"Identity Scalar :"<<il<<std::endl;
+  Position ip=makeIdentity<Position>();
+  std::cout<<"Identity Vector :"<< ip<<std::endl;
+  UCTensor it=makeIdentity<UCTensor>();
+  std::cout<<"Identity Tensor :\n"<<it<<std::endl;
+  UCTensor it2{tens3_ident};
+  std::cout<<"Identity Tensor another way :\n"<<it2<<std::endl;
+
+  // Using casting to construct
+  UCScalar l{1.0};
+  double tmp2{l};
+  std::cout<<"Casting to double from type with no units: "<< typeid(tmp2).name()<<std::endl;
+#if !defined NO_NARROWING_CONVERSIONS || defined FAIL_DEMO
+  float tmp1{il};  //Disallowed by -DNO_NARROWING_CONVERSIONS
+  std::cout<<"Narrowing to float: "<< typeid(tmp1).name()<<std::endl;
+#endif
+
+};
+
+void comparison_demo(){
+  Length l{1.0};
+  Position x{1.0, 2.0, 3.0};
+  // Demo of comparison operators
+  std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
+  std::cout<<"x == x? "<< (x == x)<<std::endl;
+
+  std::cout<<"x.magnitude()= "<<x.magnitude()<<std::endl;
+  std::cout<<"l.magnitude()= "<<l.magnitude()<<std::endl;
+
+  std::cout<< "x > l? (using magnitude) "<< (x.magnitude() > l.magnitude())<<std::endl;
+  std::cout<< "x > l? (using scalar-vector comparator (magnitude behind the scenes))"<< (x > l)<<std::endl;
+
+  //Using casting in comparison
+  UCScalar l2{1.0};
+  std::cout<<"Comparison of Scalar (no units) to double: "<<std::endl;
+  std::cout<<"Construct comparable type, val > UCScalar{1.0}"<<(l2 > UCScalar{1.0})<<std::endl;
+  std::cout<<"Cast UCScalar to double, static_cast<double>(val) > 1.0 "<<(static_cast<double>(l2) > 1.0)<<std::endl;
+
+};
+
+void constexpr_checks(){
   // Checking that we can apply constexpr for compile-time values
   constexpr Length l3{1.0};
   std::cout<<"Values can be used in constexpr contexts: constexpr l3 = "<<l3<<l3.units()<<std::endl;
@@ -224,14 +323,14 @@ int main(){
   std::cout<<"And you can initialise a vector from 1, or n, Scalars: "<<p4<<" "<<p5<<std::endl;
   // Show shortcut Scalar initialisation on a Tensor
   constexpr UCTensor TT{1.0};
-  std::cout<<"Which is very useful on a Tensor TT{1.0} -> "<<TT<<std::endl;
+  std::cout<<"Which is very useful on a Tensor TT{1.0} -> \n"<<TT<<std::endl;
 
   // More initialisation tests on tensors
   constexpr UCTensor TT2{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
   constexpr UCTensor TT3{1.0, 2.0, 3.0,  4.0, 5.0, 6.0,  7.0, 8.0, 9.0}; // Don't have to provide the inner braces IF the number of elements is correct (fills as many as given)
-  std::cout<<"Initialisation from nested lists: "<<TT2<<std::endl;
-  std::cout<<"Initialisation from flat list (length > 1): "<<TT3<<std::endl;
-  std::cout<<"Transpose of TT3: "<<TT3.transpose()<<std::endl;
+  std::cout<<"Initialisation from nested lists: \n"<<TT2<<std::endl;
+  std::cout<<"Initialisation from flat list (length > 1): \n"<<TT3<<std::endl;
+  std::cout<<"Transpose of TT3: \n"<<TT3.transpose()<<std::endl;
 
 
   Stress s{1.0}; // A Scalar
@@ -254,8 +353,12 @@ int main(){
   std::cout<<"Arr2[0][1] = "<<Arr2[0][1]<<std::endl;
   std::cout<<"Arr2[1][1] = "<<Arr2[1][1]<<std::endl;
 
+};
 
+void last_bits(){
 #ifdef USE_FRACTIONAL_POWERS
+
+  Length l{0.1};
 
   // Creating your own custom physical type to use elsewhere
   using UnsquareM = UnitCheckedType<SF{1,2}, 0, 0, dblscalar>;
@@ -265,10 +368,9 @@ int main(){
 
 #endif
 
-#ifdef DEBUG
-  // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
-  UnitCheckedType<0, 0, 0, STDummy> dummy;
-#endif
+};
+
+void performance_tests(){
 
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Performance tests"<<std::endl;
@@ -285,7 +387,6 @@ int main(){
   run_addition_timer_test();
 #endif
 
-  return 0;
 };
 
 
