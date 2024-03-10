@@ -325,6 +325,16 @@ class UnitCheckedType{
         return tval;
     }
 
+    //Outer product
+    template<typename Ts, typename Q=ST>
+    using ReturnTypeOuter = decltype((std::declval<Q>()).outer(std::declval<Ts>()));
+    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeOuter<Q,STi> > outer(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeOuter<Q,STi> > tval;
+        tval.val = this->val.outer(other.val);
+        return tval;
+    }
+
     //Normalize function
     template <typename Q=ST>
     void normalize(){

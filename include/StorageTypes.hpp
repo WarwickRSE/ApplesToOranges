@@ -147,6 +147,10 @@ std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
   return os;
 };
 
+//Forward declare for use in outer product
+template <typename T, int dim>
+class STTensor;
+
 template <typename T, int dim>
 class STVector{
     private:
@@ -283,6 +287,16 @@ class STVector{
           STVector<T,dim> out;
           for(size_t i = 0; i<dim; i++){
             out[i] = val[(i+1)%dim]*other.val[(i+2)%dim] - val[(i+2)%dim]*other.val[(i+1)%dim];
+          }
+          return out;
+        }
+
+        STTensor<T, dim> outer(const STVector & other) const{
+          STTensor<T, dim> out;
+          for(size_t i = 0; i<dim; i++){
+            for(size_t j = 0; j<dim; j++){
+              out[i*dim+j] = val[i]*other.val[j];
+            }
           }
           return out;
         }
