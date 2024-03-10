@@ -70,6 +70,10 @@ class STScalar{
  #endif
         }
 
+        static STScalar<T> identity(){
+          return STScalar<T>{1};
+        }
+
         STScalar<T> magnitude()const{
           return std::abs(val);
         }
@@ -216,6 +220,11 @@ class STVector{
         constexpr T get(int i)const{
             return val[i];
         }
+
+        static STVector<T,dim> identity(){
+          return STVector<T, dim>{1, 1, 1};
+        }
+
         STScalar<T> magnitude()const{
           return STScalar<T>{std::sqrt(normSq())};
         }
@@ -498,6 +507,20 @@ class STTensor{
         }
         constexpr T get(size_t i, size_t j)const{
             return val[i*dim+j];
+        }
+
+        static STTensor<T,dim> identity(){
+          return STTensor<T, dim>{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        }
+
+        constexpr STTensor transpose()const{
+          STTensor out;
+          for(size_t i = 0; i<dim; i++){
+            for(size_t j = 0; j<dim; j++){
+              out[i*dim+j]=val[j*dim+i];
+            }
+          }
+          return out;
         }
 
         STTensor operator-()const{

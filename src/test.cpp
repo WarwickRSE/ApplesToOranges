@@ -160,6 +160,17 @@ int main(){
   std::cout <<"              or " << x3 << std::endl;
   std::cout << "magnitude of x2 normalised is " << x2.magnitude() << std::endl;
 
+  // Identities
+  Length il=makeIdentity<Length>();
+  std::cout<<"Identity Scalar :"<<il<<std::endl;
+  Position ip=makeIdentity<Position>();
+  std::cout<<"Identity Vector :"<< ip<<std::endl;
+  UCTensor it=makeIdentity<UCTensor>();
+  std::cout<<"Identity Tensor :"<<it<<std::endl;
+  UCTensor it2{tens3_ident};
+  std::cout<<"Identity Tensor another way :"<<it2<<std::endl;
+
+
   // Numeric multiply
   std::cout<<"2x= "<<2.0*x<<x.units()<<"=="<<x*2.0<<x.units()<<std::endl;
   std::cout<<"x/2= "<<x/2.0<<x.units()<<std::endl;
@@ -218,6 +229,10 @@ int main(){
   // More initialisation tests on tensors
   constexpr UCTensor TT2{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
   constexpr UCTensor TT3{1.0, 2.0, 3.0,  4.0, 5.0, 6.0,  7.0, 8.0, 9.0}; // Don't have to provide the inner braces IF the number of elements is correct (fills as many as given)
+  std::cout<<"Initialisation from nested lists: "<<TT2<<std::endl;
+  std::cout<<"Initialisation from flat list (length > 1): "<<TT3<<std::endl;
+  std::cout<<"Transpose of TT3: "<<TT3.transpose()<<std::endl;
+
 
   Stress s{1.0}; // A Scalar
   StressVector sv{s,s,s}; // A 3-vector constructed from a scalar

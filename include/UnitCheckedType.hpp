@@ -53,6 +53,7 @@ class UnitCheckedType{
 
 
     constexpr UnitCheckedType(const UnitCheckedType& src):val(src.val){}
+    constexpr UnitCheckedType(const ST& src):val(src){}
     constexpr UnitCheckedType& operator=(const UnitCheckedType& src){
         val=src.val;
         return *this;
@@ -81,7 +82,7 @@ class UnitCheckedType{
     template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
     // Overload to give nicer error message
-    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl> && !std::is_same_v<ST, Tl>, bool> =true >
     constexpr UnitCheckedType(std::initializer_list<Tl> l){
         // Condition always false BUT this is only known after substitution of Tl
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
@@ -108,6 +109,12 @@ class UnitCheckedType{
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<UnitCheckedType<L, M, T, STi> > > > l):val(l){}
 
     // Accessors
+
+    // Value setter
+    void set(const ST & val_in){
+      val = val_in;
+    }
+
     // Value extraction for all units 0 only
     template <typename... Args>
     auto& get(Args ... args_in){
@@ -331,6 +338,14 @@ class UnitCheckedType{
         return tval;
     }
 
+    //Transpose
+    template <typename Q=ST>
+    UnitCheckedType<M, L, T, Q> transpose()const{
+        UnitCheckedType<M, L, T, Q> tval;
+        tval.val = val.transpose();
+        return tval;
+    }
+
     // Comparison operators
     // Implement these for matching units only, but allow different
     // storage types providing they implement a comparison
@@ -368,6 +383,15 @@ template <SF L, SF M, SF T, typename ST>
 std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& val_in){
   os << val_in.to_string();
   return os;
+}
+
+template <typename U>
+using WrappedType = decltype(std::declval<U>().stripUnits());
+template <typename U>
+U makeIdentity(){
+  U tval;
+  tval.set(WrappedType<U>::identity());
+  return tval;
 }
 
 // Needed for template friend function name resolution pre c++20
