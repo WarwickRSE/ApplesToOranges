@@ -120,10 +120,6 @@ class STScalar{
           return std::pow(val, p);
         }
 
-        STScalar dot(const STScalar & other)const{
-          return val*other.val;
-        }
-
         //Comparisons
         friend bool operator==(const STScalar & first, const STScalar & other){
           return first.val==other.val;
