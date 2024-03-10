@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <numeric>
+#include <initializer_list>
 
 #include "helper.hpp"
 #include "SimpleFrac.hpp"
@@ -51,8 +52,8 @@ class UnitCheckedType{
     constexpr explicit UnitCheckedType(Tl x):val(x){}
 
 
-    UnitCheckedType(const UnitCheckedType& src):val(src.val){}
-    UnitCheckedType& operator=(const UnitCheckedType& src){
+    constexpr UnitCheckedType(const UnitCheckedType& src):val(src.val){}
+    constexpr UnitCheckedType& operator=(const UnitCheckedType& src){
         val=src.val;
         return *this;
     }
@@ -92,6 +93,11 @@ class UnitCheckedType{
     template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l){
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+
+    // Get a copy of the value, with units gone
+    constexpr ST stripUnits()const{
+        return val;
     }
 
     template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >

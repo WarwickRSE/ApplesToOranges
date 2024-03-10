@@ -27,6 +27,35 @@ int main(){
   std::cout<<"___________________________________________________________"<<std::endl;
 #endif
 #endif
+
+#ifdef DEBUG
+  // Initialization checks etc on Storage types
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Storage type checks"<<std::endl;
+
+  STScalar s1{1.0};
+  std::cout<<"s1 = "<<s1<<std::endl;
+  STScalar s2{s1};
+  std::cout<<"s2 = "<<s2<<std::endl;
+
+  STVector<double, 3> v1{1.0, 2.0, 3.0};
+  std::cout<<"v1 = "<<v1<<std::endl;
+  STVector v2{v1};
+  std::cout<<"v2 = "<<v2<<std::endl;
+  STVector<double, 3> v3{s1, s1, s1};
+  std::cout<<"v3 = "<<v3<<std::endl;
+
+  STTensor<double, 3> test_t1{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
+  std::cout<<"test_t1 = "<<test_t1<<std::endl;
+  STTensor<double, 3> test_t11{1.0, 2.0, 3.0, 4.0, 5.0, 6.0,  7.0, 8.0, 9.0};
+  std::cout<<"test_t11 = "<<test_t11<<std::endl;
+  STTensor test_t2{test_t1};
+  std::cout<<"test_t2 = "<<test_t2<<std::endl;
+  STTensor test_t3{v1, v1, v1};
+  std::cout<<"test_t3 = "<<test_t3<<std::endl;
+
+#endif
+
   // Create three related physical quantities
 
   // A time
@@ -67,13 +96,16 @@ int main(){
 
   // Construct a vector from a scalar
   Length l0{1.0};
-  Position xl{l0, Length{0.0}, Length{0.0}};
+  Position xl{l0, l0, l0};
+  Position xl2{xl};
   Position xll{0.0, 0.0, 0.0};
 #ifdef FAIL_DEMO
   // Initialising from wrong numeric underlying type not allowed
   Position xlll{0, 0, 0};
   // Initialising from other units not allowed
   Velocity vl{l0, Length{0.0}, Length{0.0}};
+  // Scalar from vector makes no sense...
+  Length l1{xl};
 #endif
 
   // Construct a dimensionless value (still unit checked, but strictly all units 0)
@@ -177,17 +209,36 @@ int main(){
   std::cout<<"Missing values are zero initialised: "<<p<<std::endl;
   std::cout<<"But a single value performs Scalar initialisation: "<<p2<<std::endl;
   std::cout<<"Whichever way you do it: "<<p3<<std::endl;
+  constexpr Position p4{l3, l3, l3}, p5{l3};
+  std::cout<<"And you can initialise a vector from 1, or n, Scalars: "<<p4<<" "<<p5<<std::endl;
   // Show shortcut Scalar initialisation on a Tensor
   constexpr UCTensor TT{1.0};
   std::cout<<"Which is very useful on a Tensor TT{1.0} -> "<<TT<<std::endl;
 
+  // More initialisation tests on tensors
+  constexpr UCTensor TT2{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
+  constexpr UCTensor TT3{1.0, 2.0, 3.0,  4.0, 5.0, 6.0,  7.0, 8.0, 9.0}; // Don't have to provide the inner braces IF the number of elements is correct (fills as many as given)
+
+  Stress s{1.0}; // A Scalar
+  StressVector sv{s,s,s}; // A 3-vector constructed from a scalar
+  StressTensor st{{s,s,s},{s,s,s},{s,s,s}}; // Tensor from scalars
+  StressTensor st2{sv, sv, sv}; // Tensor from vectors
+
+
   // Try gridded operations and show how to initialise
   UCScalar Arr[3][3];
-  Arr[0][0] = UCScalar{1.0, 2.0, 3.0};
-  Arr[1][1] = UCScalar{1.0, 2.0, 3.0};
-  Arr[2][2] = UCScalar{1.0, 2.0, 3.0};
+  Arr[0][0] = UCScalar{1.0};
+  Arr[1][1] = UCScalar{1.0};
+  Arr[2][2] = UCScalar{1.0};
+  std::cout<<"Arr[0][0] = "<<Arr[0][0]<<std::endl;
+  std::cout<<"Arr[0][1] = "<<Arr[0][1]<<std::endl;
+  std::cout<<"Arr[1][1] = "<<Arr[1][1]<<std::endl;
 
   auto Arr2 = Arr;
+  std::cout<<"Arr2[0][0] = "<<Arr2[0][0]<<std::endl;
+  std::cout<<"Arr2[0][1] = "<<Arr2[0][1]<<std::endl;
+  std::cout<<"Arr2[1][1] = "<<Arr2[1][1]<<std::endl;
+
 
 #ifdef USE_FRACTIONAL_POWERS
 
@@ -201,7 +252,7 @@ int main(){
 
 #ifdef DEBUG
   // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
-  UnitCheckedType<0, 0, 0, STDummy> dummy{1.0};
+  UnitCheckedType<0, 0, 0, STDummy> dummy;
 #endif
 
   std::cout<<"___________________________________________________________"<<std::endl;

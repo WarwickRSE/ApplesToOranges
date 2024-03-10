@@ -34,6 +34,8 @@ using Force = UnitCheckedType<1, 1, -2, dbl3vec>;
 using Energy = UnitCheckedType<2, 1, -2, dblscalar>;
 
 // Common Tensor types
+using Stress = UnitCheckedType<-1, 1, -2, dblscalar>;
+using StressVector = UnitCheckedType<-1, 1, -2, dbl3vec>;
 using StressTensor = UnitCheckedType<-1, 1, -2, dbl3tens>;
 
 
