@@ -1,4 +1,11 @@
-
+v 1.4 -> 1.5
+* Alternative normalization idiom (returns, not in-place)
+* BUGFIX(ish) - close loophole allowing construction from wrong types
+* More constexpr designations
+* Identity construction (1, (1,1,1) and (1,0,0),(0,1,0),(0,0,1))
+* Transpose (implemented for tensors only)
+* Outer product of two vectors (same dim only)
+* Refactor of test code to make clearer and improve commentary
 
 v 1.3 -> 1.4
 * Failing test mode to show things that will not (as is desired) compile
