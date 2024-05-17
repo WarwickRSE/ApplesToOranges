@@ -65,6 +65,9 @@ int main(){
 };
 
 void debug_checks(){
+  /** Useful checks of fractions and storage types for debugging
+  */
+
 #ifdef USE_FRACTIONAL_POWERS
 #ifdef DEBUG
 
@@ -120,6 +123,12 @@ void debug_checks(){
 };
 
 void basic_demo(){
+  /**
+   * @brief A basic demo of the unit checking system
+   *
+   * Initialises some physical quantities, performs some operations, and demonstrates the use of the unit checking system. Mostly shows how x = x + v * t can be performed, and how the units are checked.
+   */
+
   // Create three related physical quantities
 
   // A time
@@ -128,7 +137,8 @@ void basic_demo(){
 
   std::vector<Time> t_steps;
   t_steps.push_back(t);
-  std::cout<<"A vector of type time, containing "<<t_steps.size()<<" elements"<<std::endl;
+  t_steps.push_back(Time{0.2});
+  std::cout<<"Defined a vector of type time, containing "<<t_steps.size()<<" elements"<<std::endl;
 
   // A position
   Position x{1.0, 2.0, 3.0};
@@ -139,17 +149,29 @@ void basic_demo(){
   std::cout<<"Defined velocity v= "<<v<<v.units()<<std::endl;
 
   Time t2 = t;
-  std::cout<<"Two times are the same type: "<<t.isSameType(t2)<<std::endl;
-  std::cout<<"Position and Velocity are not: "<<x.isSameType(v)<<std::endl;
+  std::cout<<"Two times are the same type?: "<<t.isSameType(t2)<<std::endl;
+  std::cout<<"Position and Velocity are not?: "<<x.isSameType(v)<<std::endl;
 
   // Update position using x = x_0 + v * t
+  std::cout<<"Using SUVAT equations, update position using x = x_0 + v * t"<<std::endl;
   x = x + v * t;
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
+
+  // Update position using x += v * t
+  x += v * (t + t2);
+  std::cout<<"Position at t ="<<t*2+t2<<t.units()<<" is "<<x<<x.units()<<std::endl;
+
+  // Subtraction test
+  auto x_sub = x - x/2.0;
+  std::cout<<"For x="<<x<<", x - x/2 = "<<x_sub<<std::endl;
+
 
 #ifdef FAIL_DEMO
   // Invalid - trying to add a position to a velocity
   auto bad_add = x + v;
 #endif
+
+  std::cout<<"______________________________"<<std::endl;
 
   std::cout<<"One can also multiply by numeric types, and perform a one-over operation"<<std::endl;
   // Numeric multiply
@@ -169,10 +191,14 @@ void basic_demo(){
 
 void initialisation_and_access_demo(){
   // Construct a vector from a scalar
-  Length l{1.0};
+  std::cout<<"Values can be constructed or uniform initialised ({}-idiom) from underlying data type (here double) \n";
+  std::cout<<" Or they can be set equal to other values of correct units\n";
+  Length l = Length{1.0};
+  std::cout<<"Vectors can be set from numbers, scalars of the same units, or other vectors\n";
   Position xl{l, l, l};
   Position x2{xl};
   Position x3{0.0, 0.0, 0.0};
+  std::cout<<"Initialising from the wrong units is not allowed, nor is setting _equal_ to a number, such as x = 0.1;"<<std::endl;
 #ifdef FAIL_DEMO
   // Initialising from wrong numeric underlying type not allowed
   Position xlll{0, 0, 0};
@@ -185,7 +211,7 @@ void initialisation_and_access_demo(){
 #endif
 
   // Accessor functions
-  // It is not recommended, but units can be ignored like this:
+  std::cout<<"It is not recommended, but units can be ignored like this:\n";
   std::cout<<"l's value, forcibly ignoring units, is "<<l.unsafeGet()<<" and can be added to a simple double like this:"<<1.0 + l.unsafeGet()<< std::endl;
   auto scal = UCScalar{7.5};
   std::cout<<"A type without units safely allows getting of the value: "<<scal.get()<<std::endl;
@@ -198,17 +224,22 @@ void exponents_and_roots(){
 
   // Powers
   // NOTE: since exponentiation changes the units, we have to supply the exponent at compile time to get the compile time unit checking. Hence, this is a templated function. As a convenience, there is also a runtime version for DIMENSIONLESS types only
+  std::cout<<"Unit checked types with units can be raised to powers, but the power must be known at compile time as this is when the unit checking occurs \n";
   auto tsq = pow<2>(t);
   std::cout<<"t^2= "<<tsq<<tsq.units()<<std::endl;
   auto tsqsqrt = sqrt(tsq);
   std::cout<<"sqrt(t^2)= "<<tsqsqrt<<tsqsqrt.units()<<std::endl;
 
 #ifdef USE_FRACTIONAL_POWERS
+  // Here we need FRACTIONAL_POWERS to be able to specify the power as a fraction
+  // See below for nth roots using only integers which work as long as the resulting units are integer only
   auto tsqrt2 = pow<SF{1,2}>(tsq);
   std::cout<<"         = "<<tsqrt2<<tsqrt2.units()<<std::endl;
 #endif
+std::cout<<"Note that non-integer units can only occur if the precompiler define USE_FRACTIONAL_POWERS is set"<<std::endl;
   // Valid only with fractional powers enabled, as units are s^(1/N) (N=2, 3, 5 shown)
 #if defined USE_FRACTIONAL_POWERS || defined FAIL_DEMO
+  std::cout<<"With the ability to use fractional exponents in the units, we can do any sorts of roots\n";
   auto tsqrt = sqrt(t);
   std::cout<<"sqrt(t)= "<<tsqrt<<tsqrt.units()<<std::endl;
   auto tcbrt = cbrt(t);
@@ -217,6 +248,7 @@ void exponents_and_roots(){
   std::cout<<"5th root of t= "<<fifthroot_t<<fifthroot_t.units()<<std::endl;
 #endif
   // But this is always valid as we make sure to have integral units
+  std::cout<<"Otherwise we can only do ones where the units are come out to integer powers\n";
   auto fifthpow = pow<5>(t);
   auto fifthroot = nthrt<5>(fifthpow);
   std::cout<<"5th root of t^5= "<<fifthroot<<fifthroot.units()<<std::endl;
@@ -238,6 +270,7 @@ void products_and_functions(){
   Position x{1.0, 2.0, 3.0};
   Velocity v{1.0, 1.0, 1.0};
 
+  std::cout<<"A variety of linear algrbra type operations are defined: \n";
   // Dot product
   auto dt = x.dot(v);
   std::cout<<"x.v="<<dt<<dt.units()<<std::endl;
@@ -258,6 +291,7 @@ void products_and_functions(){
   std::cout <<"              or " << x2 << std::endl;
   std::cout << "magnitude of x normalised is " << x.magnitude() << std::endl;
 
+  std::cout<<"Using special functions can be done two ways, depending on what is defined by the stored data types\n";
   // Using special functions on dimensionless values
   // For scalars, cast to, or store to, a double
   std::cout<<"sin(l/l_0): "<<sin(static_cast<double>(l/Length{1.0}))<<std::endl;
@@ -269,6 +303,8 @@ void products_and_functions(){
 };
 
 void more_initialisation_demo(){
+
+  std::cout<<"For convenience, there are some initialisation shortcuts\n";
   // Identities
   Length il=makeIdentity<Length>();
   std::cout<<"Identity Scalar :"<<il<<std::endl;
@@ -294,6 +330,8 @@ void comparison_demo(){
   Length l{1.0};
   Position x{1.0, 2.0, 3.0};
   // Demo of comparison operators
+  std::cout<<"We can compare values of the same units\n";
+
   std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
   std::cout<<"x == x? "<< (x == x)<<std::endl;
 
@@ -304,10 +342,10 @@ void comparison_demo(){
   std::cout<< "x > l? (using scalar-vector comparator (magnitude behind the scenes))"<< (x > l)<<std::endl;
 
   //Using casting in comparison
+  std::cout<<"A dimensionless value can be compared to a double in two ways: \n";
   UCScalar l2{1.0};
-  std::cout<<"Comparison of Scalar (no units) to double: "<<std::endl;
-  std::cout<<"Construct comparable type, val > UCScalar{1.0}"<<(l2 > UCScalar{1.0})<<std::endl;
-  std::cout<<"Cast UCScalar to double, static_cast<double>(val) > 1.0 "<<(static_cast<double>(l2) > 1.0)<<std::endl;
+  std::cout<<"Construct comparable type, val > UCScalar{1.0} ?"<<(l2 > UCScalar{1.0})<<std::endl;
+  std::cout<<"Cast UCScalar to double, static_cast<double>(val) > 1.0 ? "<<(static_cast<double>(l2) > 1.0)<<std::endl;
 
 };
 
