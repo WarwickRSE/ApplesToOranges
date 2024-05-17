@@ -581,13 +581,13 @@ class STTensor{
 
 template <typename T, int dim>
 std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
-  os << "(";
   for(size_t i = 0; i<dim; i++){
+    os << "(";
     for(size_t j = 0; j<dim; j++){
       os << val_in[i*dim + j];
       if(j<dim-1) os << ',';
     }
-    if(i < dim-1) os << ";";
+    if(i < dim-1) os << ")\n";
   }
   os<<")";
   return os;
