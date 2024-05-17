@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <numeric>
+#include <initializer_list>
 
 #include "helper.hpp"
 #include "SimpleFrac.hpp"
@@ -51,33 +52,61 @@ class UnitCheckedType{
     constexpr explicit UnitCheckedType(Tl x):val(x){}
 
 
-    UnitCheckedType(const UnitCheckedType& src):val(src.val){}
-    UnitCheckedType& operator=(const UnitCheckedType& src){
+    constexpr UnitCheckedType(const UnitCheckedType& src):val(src.val){}
+    constexpr UnitCheckedType(const ST& src):val(src){}
+    constexpr UnitCheckedType& operator=(const UnitCheckedType& src){
         val=src.val;
         return *this;
     }
-
-    // Scalar initialisation for single value of arithmetic types only
-    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
-    UnitCheckedType& operator=(const num& src){
-        val=src;
-        return *this;
-    }
-
 
     // Initializer list type deduction requires that we have
     // a constructor for each layer of nesting we want to accept
     // After 2-3 layers the syntax to initialise this way is so ugly
     // and error prone that there it little point going further
     // Exclude self as initialiser list type so that copy constructor is used instead
-    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
+    // NOTE: Valid types for list are either base data type of underlying storage
+    // OR a unitchecked type of SAME units but any storage type (deferring to storage type for validity checks)
+    typedef typename extract_value_type<ST>::value_type ST_t;
+    template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
     constexpr UnitCheckedType(std::initializer_list<Tl> l):val(l){}
-    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
+    template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
-    template <typename Tl, typename=std::enable_if_t<!std::is_same_v<UnitCheckedType, std::remove_reference_t<Tl> > > >
+    template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
     constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
+    // Overload to give nicer error message
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl> && !std::is_same_v<ST, Tl>, bool> =true >
+    constexpr UnitCheckedType(std::initializer_list<Tl> l){
+        // Condition always false BUT this is only known after substitution of Tl
+        static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<Tl> > l){
+        static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l){
+        static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
+    }
+
+    // Get a copy of the value, with units gone
+    constexpr ST stripUnits()const{
+        return val;
+    }
+
+    template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
+    constexpr UnitCheckedType(std::initializer_list< UnitCheckedType<L, M, T, STi> > l):val(l){}
+    template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list< UnitCheckedType<L, M, T, STi> > > l):val(l){}
+    template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
+    constexpr UnitCheckedType(std::initializer_list<std::initializer_list<std::initializer_list<UnitCheckedType<L, M, T, STi> > > > l):val(l){}
 
     // Accessors
+
+    // Value setter
+    void set(const ST & val_in){
+      val = val_in;
+    }
+
     // Value extraction for all units 0 only
     template <typename... Args>
     auto& get(Args ... args_in){
@@ -137,15 +166,15 @@ class UnitCheckedType{
     };
 
     template<SF Li, SF Mi, SF Ti, typename STi>
-    bool isSameUnits(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    constexpr bool isSameUnits(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
         return is_equal(L, Li) && is_equal(M, Mi) && is_equal(T, Ti);
     }
     template<SF Li, SF Mi, SF Ti, typename STi>
-    bool isSameRank(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    constexpr bool isSameRank(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
         return std::is_same_v<ST, STi>;
     }
     template<SF Li, SF Mi, SF Ti, typename STi>
-    bool isSameType(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
+    constexpr bool isSameType(const UnitCheckedType<Li, Mi, Ti, STi> & other)const{
         return isSameUnits(other) && isSameRank(other);
     }
 
@@ -260,7 +289,8 @@ class UnitCheckedType{
         return tval;
     }
 
-    // Other products - dot, cross, etc \TODO implement others
+    // Other products and linear algebra functions - magnitude, normalize, transpose, dot, cross, etc
+    // Again, storage types are expected to define these IFF applicable
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
@@ -288,10 +318,35 @@ class UnitCheckedType{
         return tval;
     }
 
+    //Outer product
+    template<typename Ts, typename Q=ST>
+    using ReturnTypeOuter = decltype((std::declval<Q>()).outer(std::declval<Ts>()));
+    template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeOuter<Q,STi> > outer(const UnitCheckedType<Li, Mi, Ti, STi> &other)const{
+        UnitCheckedType<L+Li, M+Mi, T+Ti, ReturnTypeOuter<Q,STi> > tval;
+        tval.val = this->val.outer(other.val);
+        return tval;
+    }
+
     //Normalize function
     template <typename Q=ST>
     void normalize(){
         val.normalize();
+    }
+    template <typename Q=ST>
+    UnitCheckedType normalized()const{
+        UnitCheckedType tval;
+        tval.val = val;
+        tval.val.normalize();
+        return tval;
+    }
+
+    //Transpose
+    template <typename Q=ST>
+    UnitCheckedType<M, L, T, Q> transpose()const{
+        UnitCheckedType<M, L, T, Q> tval;
+        tval.val = val.transpose();
+        return tval;
     }
 
     // Comparison operators
@@ -331,6 +386,15 @@ template <SF L, SF M, SF T, typename ST>
 std::ostream& operator<<(std::ostream& os, const UnitCheckedType<L, M, T, ST>& val_in){
   os << val_in.to_string();
   return os;
+}
+
+template <typename U>
+using WrappedType = decltype(std::declval<U>().stripUnits());
+template <typename U>
+U makeIdentity(){
+  U tval;
+  tval.set(WrappedType<U>::identity());
+  return tval;
 }
 
 // Needed for template friend function name resolution pre c++20
