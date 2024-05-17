@@ -24,7 +24,7 @@ Created June 2023 by Warwick RSE
 
 Version 1.0 (Only Length Mass and Time) July 2023
 
-Version 2.0 (All 7 SI base units) February 2024
+Version 2.0 (All 7 SI base units) May 2024
 ## How to use this code
 You need the 5 header files to be included/accessible in your build, and can then include either PhysicalTypes.hpp to get common Physical units and access to UnitCheckedType to construct your own, or include UnitCheckedType.hpp directly if you do not want the extra defines.
 You will need at least C++17 support - C++20 for full power (see section below about fractional exponent support).
