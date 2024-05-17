@@ -1,3 +1,7 @@
+
+v 1.5 -> 2.0
+* Adds remaining 4 base units, giving all 7. For backwards compatibility the general type is now UnitCheckedTypeFull, and UnitCheckedType remains an alias for the 3 unit version (L, M, T)
+
 v 1.4 -> 1.5
 * Alternative normalization idiom (returns, not in-place)
 * BUGFIX(ish) - close loophole allowing construction from wrong types
