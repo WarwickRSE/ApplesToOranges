@@ -59,21 +59,13 @@ class UnitCheckedType{
         return *this;
     }
 
-    // Scalar initialisation for single value of arithmetic types only
-    template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > > 
-    UnitCheckedType& operator=(const num& src){
-        val=src;
-        return *this;
-    }
-
-
     // Initializer list type deduction requires that we have
     // a constructor for each layer of nesting we want to accept
     // After 2-3 layers the syntax to initialise this way is so ugly
     // and error prone that there it little point going further
     // Exclude self as initialiser list type so that copy constructor is used instead
     // NOTE: Valid types for list are either base data type of underlying storage
-    // OR a unitchecked type of SAME units but any storage type
+    // OR a unitchecked type of SAME units but any storage type (deferring to storage type for validity checks)
     typedef typename extract_value_type<ST>::value_type ST_t;
     template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
     constexpr UnitCheckedType(std::initializer_list<Tl> l):val(l){}
@@ -297,7 +289,8 @@ class UnitCheckedType{
         return tval;
     }
 
-    // Other products - dot, cross, etc \TODO implement others
+    // Other products and linear algebra functions - magnitude, normalize, transpose, dot, cross, etc
+    // Again, storage types are expected to define these IFF applicable
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, typename STi, typename Q=ST>
