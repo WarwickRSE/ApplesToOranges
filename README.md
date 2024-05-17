@@ -42,17 +42,18 @@ For more general quantities, the complete order (along with the names used in th
 * MO Amount (mole)
 * CD Luminous intensity (cd)
 
-A UnitCheckedType or UnitCheckedTypeDynamic exposes the first 3, UnitCheckedTypeThermodynamic the first 4, and UnitCheckedTypeElectrodynamic the first 5. UnitCheckedTypeFull exposes all 7 of these. 
+A UnitCheckedType (name for backwards compatibility) or UnitCheckedTypeDynamic exposes the first 3, UnitCheckedTypeThermodynamic the first 4, and UnitCheckedTypeElectrodynamic the first 5. UnitCheckedTypeFull exposes all 7 of these.
 
-### Fractional exponentss
-C++20 introduces support which allows us to cleanly implement fractional exponents, such as m<sup>1/2</sup>. While we believe this could be done pre-20, we do not support it - instead we roll over to Integer exponents only. To enable fractional exponent support with C++20 supporting compilers, set the define -DUSE\_FRACTIONAL\_POWERS at the compile step. 
+### Fractional exponents
+C++20 introduces support which allows us to cleanly implement fractional exponents, such as m<sup>1/2</sup>. While we believe this could be done pre-20, we do not support it - instead we roll over to Integer exponents only. To enable fractional exponent support with C++20 supporting compilers, set the define -DUSE\_FRACTIONAL\_POWERS at the compile step.
 
 Fractional powers mostly arise due to square-rooting etc, but can be instantiated directly if desired by creating an SF (a simple fraction type) type with 2 parameters, the numerator and the denominator, such as SF{1,2} for 1/2, and creating a UnitChecked type with this as the relevant parameter. See example code for an example.
 
-Note: Fraction equality is strict - 1/2 is not the same entity as 2/4. As long as you never instantiate an unsimplified fraction, they will never arise from arithmetic, so this should not matter. 
+Note: Fraction equality is strict - "1/2" is not the same entity as "2/4". As long as you never instantiate an unsimplified fraction, they will never arise from arithmetic, so this should not matter. 
 
 ### Example code
-The provided src/test.cpp and Makefile builds an example code showing how to use the code and demonstrating many of the features.
+The provided src/test.cpp and Makefile builds an example code showing how to use the code and demonstrating many of the features. Build with `make` and run with `./Test`. A _failing_ example build is also given, which shows compile time errors such as trying to add incompatible units. Build this with `make clean && make FAIL=true` - note it _will not compile_.
+
 
 
 ### Storage types
