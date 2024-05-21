@@ -419,6 +419,15 @@ void last_bits(){
   std::cout<<"A quantity with fractional exponent units: lu = "<<lu<<lu.units()<<std::endl;
   std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
 
+  //Reading from a stream or string
+  std::istringstream iss("0.3");
+  iss >> l;
+  std::cout<<"Reading from a stream: l = "<<l<<l.units()<<std::endl;
+  Position x;
+  std::istringstream iss2("0.1 0.2 0.3");
+  iss2>>x;
+  std::cout<<"Reading from a stream: x = "<<x<<x.units()<<std::endl;
+
 #endif
 
 };

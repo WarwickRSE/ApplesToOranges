@@ -400,13 +400,16 @@ class UnitCheckedTypeFull{
     }
 
 
-};
+  friend std::ostream& operator<<(std::ostream& os, const UnitCheckedTypeFull& val_in){
+    os << val_in.to_string();
+    return os;
+  }
 
-template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
-std::ostream& operator<<(std::ostream& os, const UnitCheckedTypeFull<L, M, T, K, A, MO, CD,ST>& val_in){
-  os << val_in.to_string();
-  return os;
-}
+  friend std::istream& operator>>(std::istream& is, UnitCheckedTypeFull& val_in){
+    is >> val_in.val;
+    return is;
+  }
+};
 
 template <typename U>
 using WrappedType = decltype(std::declval<U>().stripUnits());
