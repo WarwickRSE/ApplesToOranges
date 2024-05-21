@@ -15,6 +15,7 @@ void comparison_demo();
 
 void constexpr_checks();
 void last_bits();
+void internal_checks();
 void performance_tests();
 
 void run_timer_test();
@@ -55,6 +56,10 @@ int main(){
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"A few final bits"<<std::endl;
   last_bits();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Some internal stuff"<<std::endl;
+  internal_checks();
 
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Performance tests"<<std::endl;
@@ -119,6 +124,7 @@ void debug_checks(){
   // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
   UnitCheckedType<0, 0, 0, STDummy> dummy;
 #endif
+
 
 };
 
@@ -416,6 +422,22 @@ void last_bits(){
 #endif
 
 };
+
+void internal_checks(){
+  // Checks on stuff user shouldn't need to know about but that should be done somewhere
+
+  // Mostly to do with constness, constexpr, and references (lval, rval etc)
+
+  std::cout<<"Checking if Time is Unitchecked "<<is_unitchecked_v<Time><<std::endl;
+  std::cout<<"Checking if double is Unitchecked "<<is_unitchecked_v<double><<std::endl;
+  std::cout<<"Checking if Time is numeric (storage type) "<<is_unitchecked_numeric_v<Time><<std::endl;
+
+  UnitCheckedType<0, 0, 0, std::string> uct;
+  std::cout<<"Checking a non-numeric storage type "<<is_unitchecked_numeric_v<decltype(uct)><<std::endl;
+
+
+}
+
 
 void performance_tests(){
 
