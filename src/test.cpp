@@ -209,6 +209,7 @@ void initialisation_and_access_demo(){
   std::cout<<"Values can be constructed or uniform initialised ({}-idiom) from underlying data type (here double) \n";
   std::cout<<" Or they can be set equal to other values of correct units\n";
   Length l = Length{1.0};
+  Length l2{l};
   std::cout<<"Vectors can be set from numbers, scalars of the same units, or other vectors\n";
   Position xl{l, l, l};
   Position x2{xl};
@@ -445,6 +446,25 @@ void internal_checks(){
   std::cout<<"Checking a non-numeric storage type "<<is_unitchecked_numeric_v<decltype(uct)><<std::endl;
 
 
+  //Verifying all of the initialiser list options
+  Length l{0.0}; // From underlying numeric type
+  Length l2{l}; // From self-type
+  Position x{l, l, l}; // From smaller storage, same units
+  dbl3vec d{1.0, 1.0, 1.0};
+  Position x2{d}; // From storage type, no units
+  constexpr UCVector v{1.0}; // Convenience - from scalar
+  static_assert(v.get(1) == 1.0);
+  UCTensor t{v, v, v};
+  dbl3tens tt{tens3_ident};
+  UCTensor t2{tt};
+  UCScalar s{1.0};
+  UCTensor t3{{s, s, s}, {s, s, s}, {s, s, s}};
+ 
+#ifdef FAIL
+  Position x2{l}; // No - one length is not OK
+  //UCTensor t33{s, s, s}; // Works, so that we can allow single nest with correct total number
+  UCTensor t4{v}; // Ditto - too small
+#endif
 }
 
 

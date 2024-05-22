@@ -73,16 +73,26 @@ class UnitCheckedTypeFull{
     // and error prone that there it little point going further
     // Exclude self as initialiser list type so that copy constructor is used instead
     // NOTE: Valid types for list are either base data type of underlying storage
+    // or the storage itself (although only one element will be read)
     // OR a unitchecked type of SAME units but any storage type (deferring to storage type for validity checks)
     typedef typename extract_value_type<ST>::value_type ST_t;
-    template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
+
+    // Use one-element constructor above for init from single ST value, so exclude that specific case here
+    template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl> && !std::is_same_v<ST, Tl>, bool> =false >
     constexpr UnitCheckedTypeFull(std::initializer_list<Tl> l):val(l){}
-    template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
+    template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
     constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<Tl> > l):val(l){}
-    template<typename Tl, typename=std::enable_if_t<std::is_same_v<ST_t, Tl> > >
+    template<typename Tl, typename std::enable_if_t<std::is_same_v<ST_t, Tl>, bool> =false >
     constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l):val(l){}
+
+    // Get a copy of the value, with units gone
+    constexpr ST stripUnits()const{
+        return val;
+    }
+
     // Overload to give nicer error message
-    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl> && !std::is_same_v<ST, Tl>, bool> =true >
+    // In single nest case we exclude both self (use copy contructor) and type ST (use single element constructor). In neither case is more than one element meaningful
+    template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl> && !std::is_same_v<ST, Tl> && !std::is_same_v<UnitCheckedTypeFull, Tl>, bool> =true >
     constexpr UnitCheckedTypeFull(std::initializer_list<Tl> l){
         // Condition always false BUT this is only known after substitution of Tl
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
@@ -94,11 +104,6 @@ class UnitCheckedTypeFull{
     template<typename Tl, typename std::enable_if_t<!std::is_same_v<ST_t, Tl>, bool> =true >
     constexpr UnitCheckedTypeFull(std::initializer_list<std::initializer_list<std::initializer_list<Tl> > > l){
         static_assert(std::is_same_v<ST_t, Tl>, "Initialiser list type must match storage data-type or units");
-    }
-
-    // Get a copy of the value, with units gone
-    constexpr ST stripUnits()const{
-        return val;
     }
 
     template <typename STi, typename=std::enable_if_t<!std::is_same_v<ST, STi> > >
@@ -123,7 +128,7 @@ class UnitCheckedTypeFull{
     }
 
     template <typename... Args>
-    auto get(Args ... args_in)const{
+    constexpr auto get(Args ... args_in)const{
       static_assert(hasNoUnits());
       return val.get(args_in...);
     }
