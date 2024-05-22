@@ -1,4 +1,8 @@
 
+v 2.0 -> 2.1
+* Adds is_unitchecked, is_unitchecked_v and is_unitchecked_numeric_v type deduction
+* Adds ability to read from a stream (assuming ST has this)
+
 v 1.5 -> 2.0
 * Adds remaining 4 base units, giving all 7. For backwards compatibility the general type is now UnitCheckedTypeFull, and UnitCheckedType remains an alias for the 3 unit version (L, M, T)
 
