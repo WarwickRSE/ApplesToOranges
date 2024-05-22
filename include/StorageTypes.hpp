@@ -502,8 +502,6 @@ class STTensor{
         }
 
         // Ditto but from STVectors (single nested list)
-        template <typename U>
-        using WrappedType = decltype(std::declval<U>().stripUnits());
         template <typename U, typename std::enable_if_t<std::is_same_v<WrappedType<U>, STVector<T, dim> >, int > =0 >
         constexpr STTensor(std::initializer_list<U> l){
             const size_t ct=std::min((int)l.size(), dim);
