@@ -400,13 +400,16 @@ class UnitCheckedTypeFull{
     }
 
 
-};
+  friend std::ostream& operator<<(std::ostream& os, const UnitCheckedTypeFull& val_in){
+    os << val_in.to_string();
+    return os;
+  }
 
-template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
-std::ostream& operator<<(std::ostream& os, const UnitCheckedTypeFull<L, M, T, K, A, MO, CD,ST>& val_in){
-  os << val_in.to_string();
-  return os;
-}
+  friend std::istream& operator>>(std::istream& is, UnitCheckedTypeFull& val_in){
+    is >> val_in.val;
+    return is;
+  }
+};
 
 template <typename U>
 using WrappedType = decltype(std::declval<U>().stripUnits());
@@ -416,6 +419,29 @@ U makeIdentity(){
   tval.set(WrappedType<U>::identity());
   return tval;
 }
+
+// Template magic to identify is_unitchecked_type
+// Primary template that matches anything and defaults to false
+template<typename T>
+struct is_unitchecked{
+    static constexpr bool value = false;
+    static constexpr bool numeric = std::is_arithmetic_v<T>;
+};
+
+// Specialization for myclass that sets the value to true
+template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
+struct is_unitchecked<UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ST> >{
+    static constexpr bool value = true;
+    typedef typename extract_value_type<ST>::value_type core_type;
+    static constexpr bool numeric = std::is_arithmetic_v<core_type>;
+};
+
+// Helper variable templates
+template<typename T>
+inline constexpr bool is_unitchecked_v = is_unitchecked<T>::value;
+
+template<typename T>
+inline constexpr bool is_unitchecked_numeric_v = is_unitchecked<T>::numeric;
 
 // Needed for template friend function name resolution pre c++20
 // Just need compiler to find template function with right name, any type

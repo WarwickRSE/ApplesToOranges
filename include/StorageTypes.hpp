@@ -146,6 +146,11 @@ std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
   os <<val_in[0];
   return os;
 };
+template <typename T>
+std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
+  is >>val_in.get();
+  return is;
+};
 
 //Forward declare for use in outer product
 template <typename T, int dim>
@@ -364,6 +369,15 @@ std::ostream& operator<<(std::ostream& os, const STVector<T, dim>& val_in){
   }
   os<<")";
   return os;
+};
+
+template <typename T, int dim>
+std::istream& operator>>(std::istream& is, STVector<T, dim>& val_in){
+  for(size_t i = 0; i<dim; i++){
+    if(!is.good()) return is;
+    is >>val_in.get(i);
+  }
+  return is;
 };
 
 template <typename T, int dim>
@@ -592,6 +606,18 @@ std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
   os<<")";
   return os;
 };
+
+template <typename T, int dim>
+std::istream& operator>>(std::istream& is, STTensor<T, dim>& val_in){
+  for(size_t i = 0; i<dim; i++){
+    for(size_t j = 0; j<dim; j++){
+      if(!is.good()) return is;
+      is >>val_in.get(i, j);
+    }
+  }
+  return is;
+};
+
 
 
 // Scalar-vector multiply, both ways round

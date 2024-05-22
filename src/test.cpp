@@ -15,6 +15,7 @@ void comparison_demo();
 
 void constexpr_checks();
 void last_bits();
+void internal_checks();
 void performance_tests();
 
 void run_timer_test();
@@ -55,6 +56,10 @@ int main(){
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"A few final bits"<<std::endl;
   last_bits();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"Some internal stuff"<<std::endl;
+  internal_checks();
 
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Performance tests"<<std::endl;
@@ -119,6 +124,7 @@ void debug_checks(){
   // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
   UnitCheckedType<0, 0, 0, STDummy> dummy;
 #endif
+
 
 };
 
@@ -413,9 +419,34 @@ void last_bits(){
   std::cout<<"A quantity with fractional exponent units: lu = "<<lu<<lu.units()<<std::endl;
   std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
 
+  //Reading from a stream or string
+  std::istringstream iss("0.3");
+  iss >> l;
+  std::cout<<"Reading from a stream: l = "<<l<<l.units()<<std::endl;
+  Position x;
+  std::istringstream iss2("0.1 0.2 0.3");
+  iss2>>x;
+  std::cout<<"Reading from a stream: x = "<<x<<x.units()<<std::endl;
+
 #endif
 
 };
+
+void internal_checks(){
+  // Checks on stuff user shouldn't need to know about but that should be done somewhere
+
+  // Mostly to do with constness, constexpr, and references (lval, rval etc)
+
+  std::cout<<"Checking if Time is Unitchecked "<<is_unitchecked_v<Time><<std::endl;
+  std::cout<<"Checking if double is Unitchecked "<<is_unitchecked_v<double><<std::endl;
+  std::cout<<"Checking if Time is numeric (storage type) "<<is_unitchecked_numeric_v<Time><<std::endl;
+
+  UnitCheckedType<0, 0, 0, std::string> uct;
+  std::cout<<"Checking a non-numeric storage type "<<is_unitchecked_numeric_v<decltype(uct)><<std::endl;
+
+
+}
+
 
 void performance_tests(){
 
