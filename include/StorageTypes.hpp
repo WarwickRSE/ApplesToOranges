@@ -372,8 +372,14 @@ template <typename T, int dim>
 std::istream& operator>>(std::istream& is, STVector<T, dim>& val_in){
   for(size_t i = 0; i<dim; i++){
     if(!is.good()) return is;
+    char seps;
+    is>>seps; // Read and toss the bracket and commas
+    std::cout<<seps<<std::endl;
+    if(seps != '(' && seps != ',') return is;
     is >>val_in.get(i);
   }
+  char seps_last;
+  is>>seps_last; // Read and toss the closing ')'
   return is;
 };
 
@@ -618,8 +624,14 @@ std::istream& operator>>(std::istream& is, STTensor<T, dim>& val_in){
   for(size_t i = 0; i<dim; i++){
     for(size_t j = 0; j<dim; j++){
       if(!is.good()) return is;
+      char seps;
+      is>>seps; // Read and toss the bracket and commas
+      std::cout<<seps<<std::endl;
+      if(seps != '(' && seps != ',') return is;
       is >>val_in.get(i, j);
     }
+    char line_seps;
+    is>>line_seps; // Read and toss the ')\n' part
   }
   return is;
 };

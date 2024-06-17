@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <chrono>
 #include "PhysicalTypes.hpp"
@@ -15,6 +16,7 @@ void comparison_demo();
 
 void constexpr_checks();
 void last_bits();
+void io_checks();
 void internal_checks();
 void performance_tests();
 
@@ -56,6 +58,10 @@ int main(){
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"A few final bits"<<std::endl;
   last_bits();
+
+  std::cout<<"___________________________________________________________"<<std::endl;
+  std::cout<<"IO checks"<<std::endl;
+  io_checks();
 
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Some internal stuff"<<std::endl;
@@ -420,16 +426,54 @@ void last_bits(){
   std::cout<<"A quantity with fractional exponent units: lu = "<<lu<<lu.units()<<std::endl;
   std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
 
-  //Reading from a stream or string
-  std::istringstream iss("0.3");
-  iss >> l;
-  std::cout<<"Reading from a stream: l = "<<l<<l.units()<<std::endl;
-  Position x;
-  std::istringstream iss2("0.1 0.2 0.3");
-  iss2>>x;
-  std::cout<<"Reading from a stream: x = "<<x<<x.units()<<std::endl;
-
 #endif
+
+};
+
+void io_checks(){
+
+  // Setup a stream, push some entities into it, and then extract them again
+  std::stringstream ss;
+
+  Time t{12.34};
+  ss<<t;
+  Time t2;
+  ss>>t2;
+  std::cout<<"Wrote "<<t<<" and read "<<t2<<std::endl;
+  if(t != t2){
+    throw std::runtime_error("Time read from stream is not the same as written");
+  }
+
+  ss.clear(); // Because we hit the end of the stream before
+  Position x{1.2, 3.4, 5.6};
+  ss<<x;
+  Position x2;
+  ss>>x2;
+  std::cout<<"Wrote "<<x<<" and read "<<x2<<std::endl;
+  if(x != x2){
+    throw std::runtime_error("Position read from stream is not the same as written");
+  }
+
+  ss.clear();
+  UCTensor t3{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
+  ss<<t3;
+  UCTensor t4;
+  ss>>t4;
+  std::cout<<"Wrote "<<t3<<" and read "<<t4<<std::endl;
+  if(t3 != t4){
+    throw std::runtime_error("Tensor read from stream is not the same as written");
+  }
+
+  // Now do multiple
+  ss.clear();
+  ss<<t<<x<<t<<x;
+  Time t5, t6;
+  Position x5, x6;
+  ss>>t5>>x5>>t6>>x6;
+  std::cout<<"Wrote "<<t<<" "<<x<<" "<<t<<" "<<x<<" and read "<<t5<<" "<<x5<<" "<<t6<<" "<<x6<<std::endl;
+  if(t5 != t || x5 != x || t6 != t || x6 != x){
+    throw std::runtime_error("Multiple reads from stream failed");
+  }
 
 };
 
