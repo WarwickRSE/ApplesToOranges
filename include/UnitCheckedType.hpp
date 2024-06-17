@@ -31,7 +31,17 @@ K Temperature (K)
 A Current (A)
 MO Amount (mole)
 CD Luminous intensity (cd)
+
+The following is used for _printing_ the units.
+Prefixes (e.g. milli, kilo etc) are not included in this code. Mixing prefixes is risky and can lead to numerical unexpectedness, so we do not implement it.
+But if you use, for example, microns for length, then use microns everywhere, in all compounds, and your results will correctly come out in microns too, so you may wish to have microns as the label.
+Or modify this array for localisation.
+If you do change this, probably do it once, at the start, and then leave it alone.
 */
+/*Unit names*/
+namespace UnitChecked{
+    inline std::string unitNames[7] = {"m", "kg", "s", "K", "A", "mol", "cd"};
+};
 template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
 class UnitCheckedTypeFull{
     // Friend all other unit-checked-types for heterogeneous functions
@@ -165,28 +175,29 @@ class UnitCheckedTypeFull{
     };
 
     std::string units()const{
+      using namespace UnitChecked;
       std::stringstream ss;
-      if constexpr(is_greater(M, 0) && ! is_equal(M, 1)) ss<<"kg^(" << M << ")";
-      if constexpr(is_greater(L, 0) && ! is_equal(L, 1)) ss<<"m^(" << L << ")";
-      if constexpr(is_greater(T, 0) && ! is_equal(T, 1)) ss<<"s^(" << T << ")";
-      if constexpr(is_greater(K, 0) && ! is_equal(K, 1)) ss<<"K^(" << K << ")";
-      if constexpr(is_greater(A, 0) && ! is_equal(A, 1)) ss<<"A^(" << A << ")";
-      if constexpr(is_greater(MO, 0) && ! is_equal(MO, 1)) ss<<"mol^(" << MO << ")";
-      if constexpr(is_greater(CD, 0) && ! is_equal(CD, 1)) ss<<"cd^(" << CD << ")";
-      if constexpr(is_equal(M, 1)) ss<<"kg";
-      if constexpr(is_equal(L, 1)) ss<<"m";
-      if constexpr(is_equal(T, 1)) ss<<"s";
-      if constexpr(is_equal(K, 1)) ss<<"K";
-      if constexpr(is_equal(A, 1)) ss<<"A";
-      if constexpr(is_equal(MO, 1)) ss<<"mol";
-      if constexpr(is_equal(CD, 1)) ss<<"cd";
-      if constexpr(is_less(M, 0)) ss<<"kg^(" << M << ")";
-      if constexpr(is_less(L, 0)) ss<<"m^(" << L << ")";
-      if constexpr(is_less(T, 0)) ss<<"s^(" << T << ")";
-      if constexpr(is_less(K, 0)) ss<<"K^(" << K << ")";
-      if constexpr(is_less(A, 0)) ss<<"A^(" << A << ")";
-      if constexpr(is_less(MO, 0)) ss<<"mol^(" << MO << ")";
-      if constexpr(is_less(CD, 0)) ss<<"cd^(" << CD << ")";
+      if constexpr(is_greater(M, 0) && ! is_equal(M, 1)) ss<<unitNames[1]<<"^(" << M << ")";
+      if constexpr(is_greater(L, 0) && ! is_equal(L, 1)) ss<<unitNames[0]<<"^(" << L << ")";
+      if constexpr(is_greater(T, 0) && ! is_equal(T, 1)) ss<<unitNames[2]<<"^(" << T << ")";
+      if constexpr(is_greater(K, 0) && ! is_equal(K, 1)) ss<<unitNames[3]<<"^(" << K << ")";
+      if constexpr(is_greater(A, 0) && ! is_equal(A, 1)) ss<<unitNames[4]<<"^(" << A << ")";
+      if constexpr(is_greater(MO, 0) && ! is_equal(MO, 1)) ss<<unitNames[5]<<"^(" << MO << ")";
+      if constexpr(is_greater(CD, 0) && ! is_equal(CD, 1)) ss<<unitNames[6]<<"^(" << CD << ")";
+      if constexpr(is_equal(M, 1)) ss<<unitNames[1]<<" ";
+      if constexpr(is_equal(L, 1)) ss<<unitNames[0]<<" ";
+      if constexpr(is_equal(T, 1)) ss<<unitNames[2]<<" ";
+      if constexpr(is_equal(K, 1)) ss<<unitNames[3]<<" ";
+      if constexpr(is_equal(A, 1)) ss<<unitNames[4]<<" ";
+      if constexpr(is_equal(MO, 1)) ss<<unitNames[5]<<" ";
+      if constexpr(is_equal(CD, 1)) ss<<unitNames[6]<<" ";
+      if constexpr(is_less(M, 0)) ss<<unitNames[1]<<"^(" << M << ")";
+      if constexpr(is_less(L, 0)) ss<<unitNames[0]<<"^(" << L << ")";
+      if constexpr(is_less(T, 0)) ss<<unitNames[2]<<"^(" << T << ")";
+      if constexpr(is_less(K, 0)) ss<<unitNames[3]<<"^(" << K << ")";
+      if constexpr(is_less(A, 0)) ss<<unitNames[4]<<"^(" << A << ")";
+      if constexpr(is_less(MO, 0)) ss<<unitNames[5]<<"^(" << MO << ")";
+      if constexpr(is_less(CD, 0)) ss<<unitNames[6]<<"^(" << CD << ")";
       return ss.str();
     };
 

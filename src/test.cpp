@@ -428,6 +428,9 @@ void last_bits(){
 
 #endif
 
+  //If we want to have different names for our units, we can manipulate the _strings used for display_
+  UnitChecked::unitNames[0] = "mic";
+  std::cout<<"Units can be customised: Length will now show as "<<l<<l.units()<<std::endl;
 };
 
 void io_checks(){
