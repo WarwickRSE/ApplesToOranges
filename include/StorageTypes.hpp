@@ -321,10 +321,7 @@ class STVector{
           return true;
         }
         friend bool operator!=(const STVector & first, const STVector & other){
-          for(size_t i = 0; i<dim; i++){
-            if(first.val[i]!=other.val[i]) return true;
-          }
-          return false;
+          return ! (first == other);
         }
         friend bool operator<(const STVector & first, const STVector & other){
           return first.normSq()<other.normSq();
@@ -543,6 +540,17 @@ class STTensor{
             }
           }
           return out;
+        }
+
+        // Comparision, but no ordering
+        friend bool operator==(const STTensor & first, const STTensor & other){
+          for(size_t i = 0; i<dim*dim; i++){
+            if(first.val[i]!=other.val[i]) return false;
+          }
+          return true;
+        }
+        friend bool operator!=(const STTensor & first, const STTensor & other){
+          return ! (first == other);
         }
 
         STTensor operator-()const{
