@@ -374,7 +374,6 @@ std::istream& operator>>(std::istream& is, STVector<T, dim>& val_in){
     if(!is.good()) return is;
     char seps;
     is>>seps; // Read and toss the bracket and commas
-    std::cout<<seps<<std::endl;
     if(seps != '(' && seps != ',') return is;
     is >>val_in.get(i);
   }
@@ -626,7 +625,6 @@ std::istream& operator>>(std::istream& is, STTensor<T, dim>& val_in){
       if(!is.good()) return is;
       char seps;
       is>>seps; // Read and toss the bracket and commas
-      std::cout<<seps<<std::endl;
       if(seps != '(' && seps != ',') return is;
       is >>val_in.get(i, j);
     }
