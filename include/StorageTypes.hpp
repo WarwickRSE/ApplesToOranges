@@ -5,6 +5,9 @@
 #include <cstring>
 #include <cmath>
 
+/** @file
+ * Basic data types and Linear Algebra type operations on them */
+
 // Valid Storage Types probably implement (UnitChecking will attempt to use if a user does)
 // As many of the following as make sense:
   // Default constructor
@@ -20,37 +23,50 @@
 // Heterogenous ops for any desired interactions (such as scalar-vector or vector-tensor)
 
 #ifdef DEBUG
-// Implements nothing - for development purposes
+/** @brief A dummy class which implements nothing
+     *
+     * Used for development to make sure we do not make demands on storage types, by instantiating a UnitChecked type using this, i.e. `UnitCheckedType<0, 0, 0, STDummy> dummy;`
+*/
 class STDummy{
   public:
     STDummy()=default;
 };
 #endif
 
+/** @brief A Scalar type
+   *
+   * I.e. a single value
+   * @tparam T The underlying numeric type of the value
+*/
 template <typename T>
 class STScalar{
     private:
-        T val{};
+        T val{};///<The value
 
     public:
-        constexpr STScalar(){};
-        constexpr STScalar(T val_in):val(val_in){};
-        constexpr STScalar(std::initializer_list<T> l){l.size()>0? val=*(l.begin()):val=0;};
-
+        ///Default constructor
+        constexpr STScalar(){}
+        ///Single element constructor
+        constexpr STScalar(T val_in):val(val_in){}
+        ///Initializer list constructor (assumes one element long, or zero if empty)
+        constexpr STScalar(std::initializer_list<T> l){
+          l.size()>0? val=*(l.begin()):val=0;
+        }
+        ///Copy constructor
         constexpr STScalar(const STScalar &a) = default;
         STScalar operator=(const STScalar &a){
           val=a.val;
           return *this;
-        }
+        }///<Copy assignment
 
         constexpr T& get(){
             return val;
-        }
+        }///<Get the value (by reference)
         constexpr T get()const{
             return val;
-        }
+        }///<Get the value (by copy)
 
-        constexpr explicit operator T() const{return val;}
+        constexpr explicit operator T() const{return val;}///<Cast to stored type
 
         template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
         explicit operator num() const{
@@ -59,19 +75,19 @@ class STScalar{
 # else
           return static_cast<num>(val);
  #endif
-        }
+        }///<Cast to any arithmetic type (if possible)
 
         static STScalar<T> identity(){
           return STScalar<T>{1};
-        }
+        }///<Identity entity
 
         STScalar<T> magnitude()const{
           return std::abs(val);
-        }
+        }///<Magnitude of the value
 
         STScalar operator-()const{
           return -val;
-        }
+        }///<Unary minus
         STScalar operator +=(const STScalar & other){
           val+=other.val;
           return *this;
@@ -103,13 +119,13 @@ class STScalar{
 
         STScalar sqrt()const{
           return std::sqrt(val);
-        }
+        }///<Square root
         STScalar cbrt()const{
           return std::cbrt(val);
-        }
+        }///<Cube root
         STScalar pow(double p)const{
           return std::pow(val, p);
-        }
+        }///<Power for real exponent
 
         //Comparisons
         friend bool operator==(const STScalar & first, const STScalar & other){
@@ -130,13 +146,14 @@ class STScalar{
         friend bool operator>=(const STScalar & first, const STScalar & other){
           return first.val>=other.val;
         }
-
 };
+///Stream output operator for Scalars
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
   os <<val_in.get();
   return os;
 };
+///Stream input operator for Scalars
 template <typename T>
 std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
   is >>val_in.get();
@@ -147,12 +164,19 @@ std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
 template <typename T, int dim>
 class STTensor;
 
+/** @brief Vector (in linear algebra sense) storage
+   *
+   * Fixed length 1-D array of values
+   * @tparam T The underlying numeric type of the values
+   * @tparam dim The number of elements in the vector
+*/
 template <typename T, int dim>
 class STVector{
     private:
-        T val[dim]{};
+        T val[dim]{};///< The values
 
         T normSq()const{
+          /// \internal Square-and-add all elements
           T sum=0;
           for(size_t i = 0; i<dim; i++){
             sum+=val[i]*val[i];
@@ -160,10 +184,16 @@ class STVector{
           return sum;
         }
     public:
+        ///Default constructor
         constexpr STVector(){};
+        ///Single element constructor (all values set)
         constexpr STVector(T val_in){for(size_t i = 0; i<dim; i++){val[i]=val_in;}};
+        ///Copy constructor
         constexpr STVector(const STVector &a) = default;
+        ///Initializer list constructor from numeric type
         constexpr STVector(std::initializer_list<T> l){
+          /** Either one element long (all values set same), or for any other length up to dim values are set, any not supplied are zero, any excess are ignored
+          */
             const size_t ct=std::min((int)l.size(), dim);
             if(ct == 1){
               for(size_t i = 0; i < dim; i++){val[i]=*(l.begin());}
@@ -172,8 +202,9 @@ class STVector{
               for(size_t i = ct; i<dim; i++){val[i]=0;} // Zero any excess values
             }
         }
-        // From STScalars
+        /// Initializer list constructor from STScalars of same numeric type
         constexpr STVector(std::initializer_list< STScalar<T> > l){
+           /** \sa STVector(std::initializer_list<T> l) for behaviour of various lengths of list*/
             const size_t ct=std::min((int)l.size(), dim);
             if(ct == 1){
               for(size_t i = 0; i < dim; i++){val[i]=(l.begin())->get();}
@@ -184,8 +215,15 @@ class STVector{
         }
 
         // Allow initialisation from wrapped STScalars, where wrapper is assumed to have a stripUnits method to get this back
+        /// Typedef to get storage type from arbitrary UnitChecked type
         template <typename U>
         using WrappedType = decltype(std::declval<U>().stripUnits());
+        /// Initializer list constructor from doubly nested list of wrapped STScalars
+        /** This is needed to allow constructing a Vector of UnitChecked types from a list of Scalar UnitChecked types. Unit checking is done BEFORE this point is reached
+         * \sa STVector(std::initializer_list< STScalar<T> > l) for behaviour of various lengths of list
+         * \param l The list of lists of wrapped STScalars
+         * \tparam U Type of list elements, which must be a Wrapped STScalar<T> for same T as this Vector. That is, when we apply stripUnits to U we must get STScalar<T>
+        */
         template <typename U, typename=std::enable_if_t<std::is_same_v<WrappedType<U>, STScalar<T> > > >
         constexpr STVector(std::initializer_list<U> l){
             const size_t ct=std::min((int)l.size(), dim);
@@ -197,6 +235,7 @@ class STVector{
             }
         }
 
+        ///Copy assignment
         STVector operator=(const STVector &a){
           for(size_t i = 0; i<dim; i++){
             val[i]=a[i];
@@ -204,27 +243,34 @@ class STVector{
           return *this;
         }
 
+        /// Standard [] operator by reference
         constexpr T& operator[](size_t i){
             return val[i];
         }
+        /// Standard [] operator by copy
         constexpr T operator[](size_t i)const{
             return val[i];
         }
+        /// Get by reference
         constexpr T& get(size_t i){
             return val[i];
         }
+        /// Get by copy
         constexpr T get(size_t i)const{
             return val[i];
         }
 
+        /// Identity entity
         static STVector<T,dim> identity(){
           return STVector<T, dim>{1, 1, 1};
         }
 
+        /// Magnitude of the vector (square root of sum of squares)
         STScalar<T> magnitude()const{
           return STScalar<T>{std::sqrt(normSq())};
         }
 
+        /// Unary minus
         STVector operator-()const{
           STVector out;
           for(size_t i = 0; i<dim; i++){
@@ -270,6 +316,7 @@ class STVector{
             return lhs/=other;
         }
 
+        /// Linear algebra - standard dot product A dot B
         STScalar<T> dot(const STVector & other)const{
           STScalar<T> sum=0;
           for(size_t i = 0; i<dim; i++){
@@ -277,7 +324,7 @@ class STVector{
           }
           return sum;
         }
-
+        /// Linear algebra - standard cross product A cross B, well-defined only for 3-vectors
         STVector<T,dim> cross(const STVector & other) const{
           static_assert(dim ==3); // Well defined only for dim 3 vector
           STVector<T,dim> out;
@@ -286,7 +333,7 @@ class STVector{
           }
           return out;
         }
-
+        /// Linear algebra - standard outer product A outer B
         STTensor<T, dim> outer(const STVector & other) const{
           STTensor<T, dim> out;
           for(size_t i = 0; i<dim; i++){
@@ -296,7 +343,7 @@ class STVector{
           }
           return out;
         }
-
+        /// In-place normalization
         void normalize(){
           const STScalar<T> mag = magnitude();
           for(size_t i = 0; i<dim; i++){
@@ -305,23 +352,26 @@ class STVector{
         }
 
         // Comparisons - in terms of ordering of the norm only
+        /// Equality element wise
         friend bool operator==(const STVector & first, const STVector & other){
           for(size_t i = 0; i<dim; i++){
             if(first.val[i]!=other.val[i]) return false;
           }
           return true;
         }
+        /// Less-than using norm
         friend bool operator<(const STVector & first, const STVector & other){
           return first.normSq()<other.normSq();
         }
 
-        // Compare with Scalars
+        /// Equality with scalars - compares magnitudes
         friend bool operator==(const STVector & a, const STScalar<T> & b){
           return a.normSq()==b.magnitude()*b.magnitude();
         }
         friend bool operator==(const STScalar<T> & a, const STVector & b){
           return b==a;
         }
+        /// Less-than with scalars - compares magnitudes
         friend bool operator<(const STVector & a, const STScalar<T> & b){
           return a.normSq()<b.magnitude()*b.magnitude();
         }
@@ -349,6 +399,8 @@ class STVector{
 
 };
 
+/** Outputs the vector as a comma-separated list in brackets, e.g. (0.0, 1.0, 2.0)
+*/
 template <typename T, int dim>
 std::ostream& operator<<(std::ostream& os, const STVector<T, dim>& val_in){
   os << "(";
@@ -359,7 +411,7 @@ std::ostream& operator<<(std::ostream& os, const STVector<T, dim>& val_in){
   os<<")";
   return os;
 };
-
+/** Reads a vector from stream. Expects the format output by operator<< so e.g. (1.0, 2.0, 3.0) */
 template <typename T, int dim>
 std::istream& operator>>(std::istream& is, STVector<T, dim>& val_in){
   for(size_t i = 0; i<dim; i++){
@@ -374,10 +426,18 @@ std::istream& operator>>(std::istream& is, STVector<T, dim>& val_in){
   return is;
 };
 
+/**
+ * @brief A Tensor type
+ *
+ * An (ideally small) square matrix of fixed size
+ *
+ * @tparam T The underlying data type
+ * @tparam dim The size (dim x dim) of the matrix
+ */
 template <typename T, int dim>
 class STTensor{
     private:
-        T val[dim*dim]{};
+        T val[dim*dim]{};///<The values
 
     public:
         constexpr STTensor(){};
@@ -390,7 +450,9 @@ class STTensor{
           return *this;
         }
 
-        // Allow initialisation from single element, or from doubly nested list, only of type T
+        /// Initialisation from a list, singly or doubly nested, of values of type T
+        /** For a single list of length 1, we set all values. For a single list of length >1 we set as many elements as are given in 1-D ordering. For a nested list, we set as many values as are given in as many rows as given. All non-set elements are explicitly zeroed.
+        */
         template<typename Tl, typename std::enable_if_t<std::is_same_v<Tl, T> || std::is_same_v<Tl, std::initializer_list<T> >, int > =0 >
         constexpr STTensor(std::initializer_list<Tl> l){
             const size_t ct=std::min((int)l.size(), dim);
@@ -424,7 +486,8 @@ class STTensor{
             }
         }
 
-        // From STScalars, ditto
+        /// Initialisation from a list of STScalars
+        /** \sa STTensor(std::initializer_list<Tl> l) for details of how elements are mapped */
         template<typename Tl, typename std::enable_if_t<std::is_same_v<Tl, STScalar<T> > || std::is_same_v<Tl, std::initializer_list<STScalar<T> > >, int > =0 >
         constexpr STTensor(std::initializer_list<Tl> l){
             const size_t ct=std::min((int)l.size(), dim);
@@ -458,7 +521,9 @@ class STTensor{
             }
         }
 
-        // And from STVectors, single nest only
+        /// Initialisation from a list of STVectors
+        /** In this case we allow a list of vectors of the correct size (dim), and set as many rows as are given, zeroing any missing ones.
+        */
         constexpr STTensor(std::initializer_list<STVector<T, dim> > l){
             const size_t ct=std::min((int)l.size(), dim);
             for(size_t i = 0; i<ct; i++){
@@ -473,9 +538,15 @@ class STTensor{
             }
         }
 
-        // Allow initialisation from (doubly nested list of) wrapped STScalars, where wrapper is assumed to have a stripUnits method to get this back
+        /// Typedef to get storage type from arbitrary UnitChecked type
         template <typename U>
         using WrappedType = decltype(std::declval<U>().stripUnits());
+        /// Initializer list constructor from doubly nested list of wrapped STScalars
+        /** This is needed to allow constructing a Tensor of UnitChecked types from a list of Scalar UnitChecked types. Unit checking is done BEFORE this point is reached
+         * \sa STTensor(std::initializer_list< STScalar<T> > l) for behaviour of various lengths of list
+         * \param l The list of lists of wrapped STScalars
+         * \tparam U Type of list elements, which must be a Wrapped STScalar<T> for same T as this Tensor. That is, when we apply stripUnits to U we must get STScalar<T>
+        */
         template <typename U, typename std::enable_if_t<std::is_same_v<WrappedType<U>, STScalar<T> >, int > =0 >
         constexpr STTensor(std::initializer_list<std::initializer_list<U> > l){
             const size_t ct=std::min((int)l.size(), dim);
@@ -495,7 +566,12 @@ class STTensor{
             }
         }
 
-        // Ditto but from STVectors (single nested list)
+        /// Initializer list constructor from a list of wrapped STVectors
+        /** This is needed to allow constructing a Tensor of UnitChecked types from a list of Vector UnitChecked types. Unit checking is done BEFORE this point is reached
+         * \sa STTensor(std::initializer_list< STVector<T, dim> > l) for behaviour of various lengths of list
+         * \param l The list of wrapped STVectors
+         * \tparam U Type of list elements, which must be a Wrapped STVector<T, dim> for same T and dim as this Tensor. That is, when we apply stripUnits to U we must get STVector<T, dim>
+        */
         template <typename U, typename std::enable_if_t<std::is_same_v<WrappedType<U>, STVector<T, dim> >, int > =0 >
         constexpr STTensor(std::initializer_list<U> l){
             const size_t ct=std::min((int)l.size(), dim);
@@ -511,24 +587,29 @@ class STTensor{
               }
             }
         }
-
+        /// 1-D access (0<=i <dim*dim) by reference
         constexpr T& operator[](size_t i){
             return val[i];
         }
+        /// 1-D access (0<=i <dim*dim) by copy
         constexpr T operator[](size_t i)const{
             return val[i];
         }
+        /// 2-D access (0<=i,j<dim) by reference
         constexpr T& get(size_t i, size_t j){
             return val[i*dim+j];
         }
+        /// 2-D access (0<=i,j<dim) by copy
         constexpr T get(size_t i, size_t j)const{
             return val[i*dim+j];
         }
 
+        /// Identity entity (i.e. diagonal ones)
         static STTensor<T,dim> identity(){
           return STTensor<T, dim>{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
         }
 
+        /// Linear algebra transpose (i<-> j)
         constexpr STTensor transpose()const{
           STTensor out;
           for(size_t i = 0; i<dim; i++){
@@ -539,17 +620,19 @@ class STTensor{
           return out;
         }
 
-        // Comparision, but no ordering
+        //// Equality element wise. No ordering for tensors
         friend bool operator==(const STTensor & first, const STTensor & other){
           for(size_t i = 0; i<dim*dim; i++){
             if(first.val[i]!=other.val[i]) return false;
           }
           return true;
         }
+        /// Inequality element wise
         friend bool operator!=(const STTensor & first, const STTensor & other){
           return ! (first == other);
         }
 
+        /// Unary minus
         STTensor operator-()const{
           STTensor out;
           for(size_t i = 0; i<dim*dim; i++){
@@ -595,7 +678,11 @@ class STTensor{
             return lhs/=other;
         }
 };
-
+/// Stream output for tensors
+/** Outputs a bracketed, comma separated, and new-line broken array, e.g.
+ * (1.0, 2.0)
+ * (3.0, 4.0)
+*/
 template <typename T, int dim>
 std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
   for(size_t i = 0; i<dim; i++){
@@ -610,6 +697,11 @@ std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
   return os;
 };
 
+///Stream input for tensors
+/** Expects the format output by operator<< so e.g.
+ * (1.0, 2.0)
+ * (3.0, 4.0)
+*/
 template <typename T, int dim>
 std::istream& operator>>(std::istream& is, STTensor<T, dim>& val_in){
   for(size_t i = 0; i<dim; i++){
@@ -628,7 +720,7 @@ std::istream& operator>>(std::istream& is, STTensor<T, dim>& val_in){
 
 
 
-// Scalar-vector multiply, both ways round
+///Element-wise multiplication of a scalar and a vector
 template <typename T, int dim>
 STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
   STVector<T, dim> out;
@@ -637,6 +729,7 @@ STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
   }
   return out;
 }
+///Element-wise multiplication of a vector and a scalar
 template <typename T, int dim>
 STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   STVector<T, dim> out;
@@ -645,7 +738,9 @@ STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   }
   return out;
 }
-// Scalar-vector divide, both ways round
+///Element-wise division of a scalar and a vector
+/** Implemented mostly for completeness, assumes we want the vector result where each element is the scalar divided by the corresponding element of the vector
+*/
 template <typename T, int dim>
 STVector<T, dim> operator/(const STScalar<T> &a, const STVector<T, dim> &b){
   STVector<T, dim> out;
@@ -654,6 +749,7 @@ STVector<T, dim> operator/(const STScalar<T> &a, const STVector<T, dim> &b){
   }
   return out;
 }
+///Element-wise division of a vector and a scalar
 template <typename T, int dim>
 STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
   STVector<T, dim> out;
@@ -663,7 +759,7 @@ STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
   return out;
 }
 
-// Scalar-Tensor multiply, both ways round
+///Element-wise multiplication of a scalar and a tensor
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
   STTensor<T, dim> out;
@@ -674,6 +770,7 @@ STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
   }
   return out;
 }
+///Element-wise multiplication of a tensor and a scalar
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STScalar<T> &b){
   STTensor<T, dim> out;
@@ -685,7 +782,10 @@ STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STScalar<T> &b){
   return out;
 }
 
-// Vector-Tensor multiply, both ways round
+///Vector-Tensor multiply, vector on left
+/** This is the operation where we treat the vector as a row vector and multiply it by the tensor on the right, i.e. vT. Note that we don't check/care if vector _is_ a row vector, we just treat it as such
+ * \todo Consider adding co-contra variance to the vector type to make this more explicit. If so, implement transpose too
+*/
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STVector<T, dim> &a, const STTensor<T, dim> &b){
   STTensor<T, dim> out;
@@ -696,6 +796,9 @@ STTensor<T, dim> operator*(const STVector<T, dim> &a, const STTensor<T, dim> &b)
   }
   return out;
 }
+///Vector-Tensor multiply, vector on right
+/** This is the operation where we treat the vector as a column vector and multiply it by the tensor on the left, i.e. Tv. Note that we don't check/care if vector _is_ a column vector, we just treat it as such
+*/
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STVector<T, dim> &b){
   STTensor<T, dim> out;

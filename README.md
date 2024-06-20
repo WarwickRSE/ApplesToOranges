@@ -49,7 +49,9 @@ A UnitCheckedType (name for backwards compatibility) or UnitCheckedTypeDynamic e
 
 ### Fractional exponents
 
-C++20 introduces support which allows us to cleanly implement fractional exponents, such as m<sup>1/2</sup>. While we believe this could be done pre-20, we do not support it - instead we roll over to Integer exponents only. To enable fractional exponent support with C++20 supporting compilers, set the define -DUSE\_FRACTIONAL\_POWERS at the compile step.
+Although meaningful physical units should only contain integral powers of the base SI units, partial evaluations and/or temporary values may involve fractions of these. A classic example is Kolmogorov turbulence, where although the coeffcient is often defined such that it has "sensible" integral units, the value actually entering expressions does not.
+
+C++20 introduces support which allows us to cleanly implement such fractional exponents, such as m<sup>1/2</sup>. While we believe this could be done pre-20, we do not support it - instead we roll over to Integer exponents only. To enable fractional exponent support with C++20 supporting compilers, set the define -DUSE\_FRACTIONAL\_POWERS at the compile step.
 
 Fractional powers mostly arise due to square-rooting etc, but can be instantiated directly if desired by creating an SF (a simple fraction type) type with 2 parameters, the numerator and the denominator, such as SF{1,2} for 1/2, and creating a UnitChecked type with this as the relevant parameter. See example code for an example.
 
