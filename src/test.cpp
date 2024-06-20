@@ -124,6 +124,29 @@ void debug_checks(){
   STTensor test_t3{v1, v1, v1};
   std::cout<<"test_t3 = "<<test_t3<<std::endl;
   std::cout<<"___________________________________________________________"<<std::endl;
+
+  //Scalar
+  STScalar ss = s1 * s1;
+  STScalar ssd = ss / s1;
+  //Vector
+  STVector vv = v1 * v1;
+  STVector vvd = vv / v1;
+  //Tensor
+  STTensor tt = test_t1 * test_t1;
+  STTensor ttd = tt / test_t1;
+  //Scalar-vector
+  STVector m1 = ssd * vvd;
+  STVector m2 = m1 * s1;
+  STVector m3 = s1 / m2;
+  STVector m4 = m3 / s1;
+  //Scalar-tensor - only multiply implemented
+  STTensor m5 = s1 * test_t1;
+  STTensor m6 = m5 * s1;
+  //Vector-tensor - only multiply implemented
+  STTensor m9 = m4 * m6;
+  STTensor m10 = m9 * v1;
+  std::cout<<"Squashing some unused variable flags: "<<m10<<" "<<ttd<<std::endl;
+
 #endif
 
 #ifdef DEBUG

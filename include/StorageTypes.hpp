@@ -42,12 +42,7 @@ class STScalar{
           val=a.val;
           return *this;
         }
-        constexpr T& operator[](size_t i){
-            return val;
-        }// Include these for consistency
-        constexpr T operator[](size_t i)const{
-            return val;
-        }
+
         constexpr T& get(){
             return val;
         }
@@ -139,7 +134,7 @@ class STScalar{
 };
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
-  os <<val_in[0];
+  os <<val_in.get();
   return os;
 };
 template <typename T>
@@ -215,10 +210,10 @@ class STVector{
         constexpr T operator[](size_t i)const{
             return val[i];
         }
-        constexpr T& get(int i){
+        constexpr T& get(size_t i){
             return val[i];
         }
-        constexpr T get(int i)const{
+        constexpr T get(size_t i)const{
             return val[i];
         }
 
@@ -305,7 +300,7 @@ class STVector{
         void normalize(){
           const STScalar<T> mag = magnitude();
           for(size_t i = 0; i<dim; i++){
-            val[i]/=mag[0];
+            val[i]/=mag.get();
           }
         }
 
@@ -637,7 +632,7 @@ template <typename T, int dim>
 STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
   STVector<T, dim> out;
   for(size_t i = 0; i<dim; i++){
-    out[i] = a[0]*b[i];
+    out[i] = a.get()*b.get(i);
   }
   return out;
 }
@@ -645,7 +640,7 @@ template <typename T, int dim>
 STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   STVector<T, dim> out;
   for(size_t i = 0; i<dim; i++){
-    out[i] = a[i]*b[0];
+    out[i] = a.get(i)*b.get();
   }
   return out;
 }
@@ -654,7 +649,7 @@ template <typename T, int dim>
 STVector<T, dim> operator/(const STScalar<T> &a, const STVector<T, dim> &b){
   STVector<T, dim> out;
   for(size_t i = 0; i<dim; i++){
-    out[i] = a[0]/b[i];
+    out[i] = a.get()/b.get(i);
   }
   return out;
 }
@@ -662,7 +657,7 @@ template <typename T, int dim>
 STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
   STVector<T, dim> out;
   for(size_t i = 0; i<dim; i++){
-    out[i] = a[i]/b[0];
+    out[i] = a.get(i)/b.get();
   }
   return out;
 }
@@ -671,16 +666,20 @@ STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
   STTensor<T, dim> out;
-  for(size_t i = 0; i<dim*dim; i++){
-    out[i] = a[0]*b[i];
+  for(size_t i = 0; i<dim; i++){
+    for(size_t j = 0; j<dim; j++){
+      out.get(i,j) = a.get()*b.get(i,j);
+    }
   }
   return out;
 }
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STScalar<T> &b){
   STTensor<T, dim> out;
-  for(size_t i = 0; i<dim*dim; i++){
-    out[i] = a[i]*b[0];
+  for(size_t i = 0; i<dim; i++){
+    for(size_t j = 0; j<dim; j++){
+      out.get(i,j) = a.get(i,j)*b.get();
+    }
   }
   return out;
 }
@@ -707,18 +706,20 @@ STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STVector<T, dim> &b)
   return out;
 }
 
+// \TODO Is there a meaningful division operation with tensors we should implement?
+
 // Special functions
 // Provide any function taking dimensionless argument(s) like this
 // EXAMPLES ONLY
 template<typename T>
 T mysinfunction(const STScalar<T> &a){
-  return std::sin(a[0]);
+  return std::sin(a.get());
 }
 template<typename T>
 STVector<T, 3> mysinfunction(const STVector<T, 3> &a){
   STVector<T, 3> out;
   for(size_t i = 0; i<3; i++){
-    out[i] = std::sin(a[i]);
+    out[i] = std::sin(a.get(i));
   }
   return out;
 }
