@@ -147,13 +147,13 @@ class STScalar{
           return first.val>=other.val;
         }
 };
-///Stream output operator for Scalars
+///Stream output for Scalars
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const STScalar<T>& val_in){
   os <<val_in.get();
   return os;
 };
-///Stream input operator for Scalars
+///Stream input for Scalars
 template <typename T>
 std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
   is >>val_in.get();
@@ -164,7 +164,7 @@ std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
 template <typename T, int dim>
 class STTensor;
 
-/** @brief Vector (in linear algebra sense) storage
+/** @brief A Vector (in linear algebra sense) type
    *
    * Fixed length 1-D array of values
    * @tparam T The underlying numeric type of the values
@@ -399,6 +399,7 @@ class STVector{
 
 };
 
+///Stream output for Vectors
 /** Outputs the vector as a comma-separated list in brackets, e.g. (0.0, 1.0, 2.0)
 */
 template <typename T, int dim>
@@ -411,6 +412,7 @@ std::ostream& operator<<(std::ostream& os, const STVector<T, dim>& val_in){
   os<<")";
   return os;
 };
+///Stream input for Vectors
 /** Reads a vector from stream. Expects the format output by operator<< so e.g. (1.0, 2.0, 3.0) */
 template <typename T, int dim>
 std::istream& operator>>(std::istream& is, STVector<T, dim>& val_in){
@@ -678,7 +680,7 @@ class STTensor{
             return lhs/=other;
         }
 };
-/// Stream output for tensors
+/// Stream output for Tensors
 /** Outputs a bracketed, comma separated, and new-line broken array, e.g.
  * (1.0, 2.0)
  * (3.0, 4.0)
@@ -697,7 +699,7 @@ std::ostream& operator<<(std::ostream& os, const STTensor<T, dim>& val_in){
   return os;
 };
 
-///Stream input for tensors
+///Stream input for Tensors
 /** Expects the format output by operator<< so e.g.
  * (1.0, 2.0)
  * (3.0, 4.0)
@@ -720,7 +722,7 @@ std::istream& operator>>(std::istream& is, STTensor<T, dim>& val_in){
 
 
 
-///Element-wise multiplication of a scalar and a vector
+///Element-wise multiplication of a Scalar and a Vector
 template <typename T, int dim>
 STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
   STVector<T, dim> out;
@@ -729,7 +731,7 @@ STVector<T, dim> operator*(const STScalar<T> &a, const STVector<T, dim> &b){
   }
   return out;
 }
-///Element-wise multiplication of a vector and a scalar
+///Element-wise multiplication of a Vector and a Scalar
 template <typename T, int dim>
 STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   STVector<T, dim> out;
@@ -738,7 +740,7 @@ STVector<T, dim> operator*(const STVector<T, dim> &a, const STScalar<T> &b){
   }
   return out;
 }
-///Element-wise division of a scalar and a vector
+///Element-wise division of a Scalar and a Vector
 /** Implemented mostly for completeness, assumes we want the vector result where each element is the scalar divided by the corresponding element of the vector
 */
 template <typename T, int dim>
@@ -749,7 +751,7 @@ STVector<T, dim> operator/(const STScalar<T> &a, const STVector<T, dim> &b){
   }
   return out;
 }
-///Element-wise division of a vector and a scalar
+///Element-wise division of a Vector and a Scalar
 template <typename T, int dim>
 STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
   STVector<T, dim> out;
@@ -759,7 +761,7 @@ STVector<T, dim> operator/(const STVector<T, dim> &a, const STScalar<T> &b){
   return out;
 }
 
-///Element-wise multiplication of a scalar and a tensor
+///Element-wise multiplication of a Scalar and a Tensor
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
   STTensor<T, dim> out;
@@ -770,7 +772,7 @@ STTensor<T, dim> operator*(const STScalar<T> &a, const STTensor<T, dim> &b){
   }
   return out;
 }
-///Element-wise multiplication of a tensor and a scalar
+///Element-wise multiplication of a Tensor and a Scalar
 template <typename T, int dim>
 STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STScalar<T> &b){
   STTensor<T, dim> out;
@@ -782,7 +784,7 @@ STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STScalar<T> &b){
   return out;
 }
 
-///Vector-Tensor multiply, vector on left
+///Vector-Tensor multiply, Vector on left
 /** This is the operation where we treat the vector as a row vector and multiply it by the tensor on the right, i.e. vT. Note that we don't check/care if vector _is_ a row vector, we just treat it as such
  * \todo Consider adding co-contra variance to the vector type to make this more explicit. If so, implement transpose too
 */
@@ -796,7 +798,7 @@ STTensor<T, dim> operator*(const STVector<T, dim> &a, const STTensor<T, dim> &b)
   }
   return out;
 }
-///Vector-Tensor multiply, vector on right
+///Vector-Tensor multiply, Vector on right
 /** This is the operation where we treat the vector as a column vector and multiply it by the tensor on the left, i.e. Tv. Note that we don't check/care if vector _is_ a column vector, we just treat it as such
 */
 template <typename T, int dim>
@@ -810,15 +812,15 @@ STTensor<T, dim> operator*(const STTensor<T, dim> &a, const STVector<T, dim> &b)
   return out;
 }
 
-// \TODO Is there a meaningful division operation with tensors we should implement?
-
 // Special functions
 // Provide any function taking dimensionless argument(s) like this
 // EXAMPLES ONLY
+///Example of a Sin function on Scalars
 template<typename T>
 T mysinfunction(const STScalar<T> &a){
   return std::sin(a.get());
 }
+///Example of a Sin function on Vectors
 template<typename T>
 STVector<T, 3> mysinfunction(const STVector<T, 3> &a){
   STVector<T, 3> out;
