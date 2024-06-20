@@ -206,8 +206,6 @@ void basic_demo(){
   std::cout<<"As of version 2.0, all 7 SI base units are available: Energy, Charge, Voltage, Time, Length, Mass, Temperature\n";
   std::cout<<"For example Voltage = Energy/Charge = "<<V<<V.units()<<std::endl;
 
-
-
 };
 
 void initialisation_and_access_demo(){
@@ -229,7 +227,7 @@ void initialisation_and_access_demo(){
   // Scalar from vector makes no sense...
   Length l1{xl};
   // Can't set equal to scalar as escapes unit checking again
-  Length l2 = 0.2;
+  Length l3 = 0.2;
 #endif
 
   // Accessor functions
