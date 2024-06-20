@@ -416,9 +416,10 @@ void constexpr_checks(){
 };
 
 void last_bits(){
-#ifdef USE_FRACTIONAL_POWERS
 
   Length l{0.1};
+
+#ifdef USE_FRACTIONAL_POWERS
 
   // Creating your own custom physical type to use elsewhere
   using UnsquareM = UnitCheckedType<SF{1,2}, 0, 0, dblscalar>;
