@@ -330,7 +330,7 @@ class UnitCheckedTypeFull{
     template<typename Ts, typename Q=ST>
     using ReturnTypeDot = decltype((std::declval<Q>()).dot(std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi, typename Q=ST>
-        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeDot<Q,STi> > dot(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+    auto dot(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
         UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeDot<Q,STi> > tval;
         tval.val = this->val.dot(other.val);
         return tval;
@@ -339,7 +339,7 @@ class UnitCheckedTypeFull{
     template <typename Q=ST>
     using ReturnTypeMagnitude = decltype((std::declval<Q>()).magnitude());
     template <typename Q=ST>
-    UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ReturnTypeMagnitude<Q> > magnitude()const{
+    auto magnitude()const{
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ReturnTypeMagnitude<Q> > tval;
         tval.val = val.magnitude();
         return tval;
@@ -348,7 +348,7 @@ class UnitCheckedTypeFull{
     template<typename Ts, typename Q=ST>
     using ReturnTypeCross = decltype((std::declval<Q>()).cross(std::declval<Ts>()));
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi, typename Q=ST>
-        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi,ReturnTypeCross<Q,STi> > cross(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
+    auto cross(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
         UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi,ReturnTypeCross<Q,STi> > tval;
         tval.val = this->val.cross(other.val);
         return tval;
