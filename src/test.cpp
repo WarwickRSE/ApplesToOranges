@@ -422,8 +422,8 @@ void last_bits(){
 #ifdef USE_FRACTIONAL_POWERS
 
   // Creating your own custom physical type to use elsewhere
-  using UnsquareM = UnitCheckedType<SF{1,2}, 0, 0, dblscalar>;
-  UnsquareM lu{0.3};
+  using UnsquareMeters = UnitCheckedType<SF{1,2}, 0, 0, dblscalar>;
+  UnsquareMeters lu{0.3};
   std::cout<<"A quantity with fractional exponent units: lu = "<<lu<<lu.units()<<std::endl;
   std::cout<<" l+ lu^2 = "<<l + lu*lu<<l.units()<<std::endl;
 

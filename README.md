@@ -51,10 +51,11 @@ Fractional powers mostly arise due to square-rooting etc, but can be instantiate
 
 Note: Fraction equality is strict - "1/2" is not the same entity as "2/4". As long as you never instantiate an unsimplified fraction, they will never arise from arithmetic, so this should not matter. 
 
+To allow smooth fall-back to integer powers pre C++20, only use the SF{a,b} construction explicitly when b is not 1, wrap these inside a USE\_FRACTIONAL\_POWERS define, and just use plain integers otherwise (see PhysicalTypes.hpp and test.cpp for examples).
+
 ### Example code
+
 The provided src/test.cpp and Makefile builds an example code showing how to use the code and demonstrating many of the features. Build with `make` and run with `./Test`. A _failing_ example build is also given, which shows compile time errors such as trying to add incompatible units. Build this with `make clean && make FAIL=true` - note it _will not compile_.
-
-
 
 ### Storage types
 A storage type is a class handling data storage, which must implement any function that you want the resulting UnitChecked type to expose to a final user. Any other function can be omitted - they will not be available to use, but code that does not use them will compile and run fine. _HOWEVER_ it may give better/ more instructive compile errors to implement invalid functions and use something like a static\_assert or =delete to force non-compilation. 
