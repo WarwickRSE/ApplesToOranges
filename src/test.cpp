@@ -377,12 +377,24 @@ void comparison_demo(){
 
   std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
   std::cout<<"x == x? "<< (x == x)<<std::endl;
+  std::cout<<"x != x? "<< (x != x)<<std::endl;
 
   std::cout<<"x.magnitude()= "<<x.magnitude()<<std::endl;
   std::cout<<"l.magnitude()= "<<l.magnitude()<<std::endl;
 
   std::cout<< "x > l? (using magnitude) "<< (x.magnitude() > l.magnitude())<<std::endl;
   std::cout<< "x > l? (using scalar-vector comparator (magnitude behind the scenes))"<< (x > l)<<std::endl;
+
+  // The next block just checks resolution of all the comparisons for completeness
+  std::cout<<"Doing all the Scalar-Scalar combos: "<<(l < l)<<" "<<(l<=l)<<" "<<(l==l)<<" "<<(l!=l)<<" "<<(l>=l)<<" " <<(l > l)<<std::endl;
+  std::cout<<"Doing all the Vector-Vector combos: "<<(x < x)<<" "<<(x<=x)<<" "<<(x==x)<<" "<<(x!=x)<<" "<<(x>=x)<<" " <<(x > x)<<std::endl;
+  std::cout<<"Doing all the Scalar-vector combos: "<<(x < l)<<" "<<(x<=l)<<" "<<(x==l)<<" "<<(x!=l)<<" "<<(x>=l)<<" " <<(x > l)<<std::endl;
+  std::cout<<"And doing them the other way around: "<<(l < x)<<" "<<(l<=x)<<" "<<(l==x)<<" "<<(l!=x)<<" "<<(l>=x)<<" " <<(l > x)<<std::endl;
+
+  //Tensors only have element-wise equality defined
+  UCTensor t{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
+  std::cout<<"Doing Tensor-Tensor equality: "<<(t == t)<<" "<<(t!=t)<<std::endl;
+
 
   //Using casting in comparison
   std::cout<<"A dimensionless value can be compared to a double in two ways: \n";

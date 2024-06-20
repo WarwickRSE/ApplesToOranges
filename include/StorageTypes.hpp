@@ -311,9 +311,6 @@ class STVector{
           }
           return true;
         }
-        friend bool operator!=(const STVector & first, const STVector & other){
-          return ! (first == other);
-        }
         friend bool operator<(const STVector & first, const STVector & other){
           return first.normSq()<other.normSq();
         }
@@ -333,16 +330,20 @@ class STVector{
         }
 
         // Implement the rest in terms of < for easy tweaking/ expansion
-        template<typename T2>
-        friend bool operator>(const STVector & first, const T2 & other){
+        template<typename T1, typename T2, typename=std::enable_if_t<std::is_same_v<T1, STVector> || std::is_same_v<T2, STVector>, int> >
+        friend bool operator!=(const T1 & first, const T2 & other){
+          return !(first == other);
+        }
+        template<typename T1, typename T2, typename=std::enable_if_t<std::is_same_v<T1, STVector> || std::is_same_v<T2, STVector>, int> >
+        friend bool operator>(const T1 & first, const T2 & other){
           return other < first;
         }
-        template<typename T2>
-        friend bool operator<=(const STVector & first, const T2 & other){
+        template<typename T1, typename T2, typename=std::enable_if_t<std::is_same_v<T1, STVector> || std::is_same_v<T2, STVector>, int> >
+        friend bool operator<=(const T1 & first, const T2 & other){
           return !(first > other);
         }
-        template<typename T2>
-        friend bool operator>=(const STVector & first, const T2 & other){
+        template<typename T1, typename T2, typename=std::enable_if_t<std::is_same_v<T1, STVector> || std::is_same_v<T2, STVector>, int> >
+        friend bool operator>=(const T1 & first, const T2 & other){
           return !(first < other);
         }
 
