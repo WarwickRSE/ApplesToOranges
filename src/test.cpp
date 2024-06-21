@@ -99,9 +99,9 @@ void debug_checks(){
   // Check that we can't construct a type with fraction with a zero denominator
   UnitCheckedType<SF{1,0}, 0, 0, STDummy> dd;
   // Check that we can't construct a fraction in non-reduced terms
-  UnitCheckedType<SF{2,4}, 0, 0, STDummy> dd1;
+  UnitCheckedType<0, SF{2,4}, 0, STDummy> dd1;
   //Check that we can't have negative denominator
-  UnitCheckedType<SF{1,-1}, 0, 0, STDummy> dd2;
+  UnitCheckedType<0, 0, SF{1,-1}, STDummy> dd2;
 #endif
 #endif
 #endif
