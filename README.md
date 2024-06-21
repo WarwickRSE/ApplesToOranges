@@ -55,7 +55,7 @@ C++20 introduces support which allows us to cleanly implement such fractional ex
 
 Fractional powers mostly arise due to square-rooting etc, but can be instantiated directly if desired by creating an SF (a simple fraction type) type with 2 parameters, the numerator and the denominator, such as SF{1,2} for 1/2, and creating a UnitChecked type with this as the relevant parameter. See example code for an example.
 
-Note: Fraction equality is strict - "1/2" is not the same entity as "2/4". As long as you never instantiate an unsimplified fraction, they will never arise from arithmetic, so this should not matter.
+Note: Fraction equality is strict - "1/2" is not the same entity as "2/4", nor is "(-1)/2" the same as 1/(-2). As long as you never instantiate an unsimplified or wonky fraction, they will never arise from arithmetic, so this should not matter - moreover UnitCheckedTypeFull will reject a fraction which is not in the simplest terms, with strictly positive (>0) denominator.
 
 To allow smooth fall-back to integer powers pre C++20, only use the SF{a,b} construction explicitly when b is not 1, wrap these inside a USE\_FRACTIONAL\_POWERS define, and just use plain integers otherwise (see PhysicalTypes.hpp and test.cpp for examples).
 

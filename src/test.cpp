@@ -95,6 +95,14 @@ void debug_checks(){
   std::cout<<"aa > cc? "<<is_greater(aa,cc)<<std::endl;
 
   std::cout<<"___________________________________________________________"<<std::endl;
+#ifdef FAIL_DEMO
+  // Check that we can't construct a type with fraction with a zero denominator
+  UnitCheckedType<SF{1,0}, 0, 0, STDummy> dd;
+  // Check that we can't construct a fraction in non-reduced terms
+  UnitCheckedType<SF{2,4}, 0, 0, STDummy> dd1;
+  //Check that we can't have negative denominator
+  UnitCheckedType<SF{1,-1}, 0, 0, STDummy> dd2;
+#endif
 #endif
 #endif
 

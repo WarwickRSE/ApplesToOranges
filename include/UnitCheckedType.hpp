@@ -49,7 +49,10 @@ class UnitCheckedTypeFull{
 
     // Verify anything necessary about fractions
 #ifdef USE_FRACTIONAL_POWERS
- static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0 && K.denom !=0 && A.denom !=0 && MO.denom !=0 && CD.denom !=0, "Fraction cannot have zero denom");
+  static_assert(L.denom !=0 && M.denom !=0 && T.denom !=0 && K.denom !=0 && A.denom !=0 && MO.denom !=0 && CD.denom !=0, "Fraction cannot have zero denom");
+  static_assert(L.denom > 0 && M.denom > 0 && T.denom > 0 && K.denom > 0 && A.denom > 0 && MO.denom > 0 && CD.denom > 0, "Denominator must be positive");
+  static_assert(!simplifiable(L) && !simplifiable(M) && !simplifiable(T) && !simplifiable(K) && !simplifiable(A) && !simplifiable(MO) && !simplifiable(CD),
+  "Fraction must be defined in simplest form");
 #endif
 
 #ifndef NO_SUPPORT_TEMPLATE_FRIENDSHIP
