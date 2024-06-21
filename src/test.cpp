@@ -371,7 +371,7 @@ void more_initialisation_demo(){
   double tmp2{l};
   std::cout<<"Casting to double from type with no units: "<< typeid(tmp2).name()<<std::endl;
 #if !defined NO_NARROWING_CONVERSIONS || defined FAIL_DEMO
-  float tmp1{il};  //Disallowed by -DNO_NARROWING_CONVERSIONS
+  float tmp1{tmp2};  //Disallowed by -DNO_NARROWING_CONVERSIONS: Error in Clang, Warning in GCC
   std::cout<<"Narrowing to float: "<< typeid(tmp1).name()<<std::endl;
 #endif
 
