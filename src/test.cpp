@@ -642,6 +642,7 @@ void internal_checks(){
   // Checks on stuff user shouldn't need to know about but that should be done somewhere
 
   // Mostly to do with constness, constexpr, and references (lval, rval etc)
+  // Finishes up the code coverage too
 
   std::cout<<"Checking if Time is Unitchecked "<<is_unitchecked_v<Time><<std::endl;
   std::cout<<"Checking if double is Unitchecked "<<is_unitchecked_v<double><<std::endl;
@@ -651,9 +652,10 @@ void internal_checks(){
   std::cout<<"Checking a non-numeric storage type "<<is_unitchecked_numeric_v<decltype(uct)><<std::endl;
 
 
-  //Verifying all of the initialiser list options
+  //Verifying all of the initialiser list options compile
   Length l{0.0}; // From underlying numeric type
   Length l2{l}; // From self-type
+  assert(l == l2);
   Position x{l, l, l}; // From smaller storage, same units
   dbl3vec d{1.0, 1.0, 1.0};
   Position x2{d}; // From storage type, no units
@@ -664,7 +666,50 @@ void internal_checks(){
   UCTensor t2{tt};
   UCScalar s{1.0};
   UCTensor t3{{s, s, s}, {s, s, s}, {s, s, s}};
- 
+
+  //Checking undersized lists - check values and zeros
+  UCVector shrt{s, s};
+  for(int i = 0; i < 3; i++){
+    if(i < 2){
+      assert(shrt.get(i) == s.get());
+    }else{
+      assert(shrt.get(i) == 0.0);
+    }
+  }
+  UCTensor t4{shrt, shrt, shrt}, t5{shrt, shrt};
+  for(int i = 0; i < 3; i++){
+    for(int j = 0; j < 3; j++){
+      if(j < 2){
+        assert(t4.get(i, j) == s.get());
+      }else{
+        assert(t4.get(i, j) == 0.0);
+      }
+      if(i < 2 && j < 2){
+        assert(t5.get(i, j) == s.get());
+      }else{
+        assert(t5.get(i, j) == 0.0);
+      }
+    }
+  }
+  UCVector shrt2{1.0};
+  for(int i = 0; i < 3; i++){
+    if(i < 2){
+      assert(shrt.get(i) == s.get());
+    }else{
+      assert(shrt.get(i) == 0.0);
+    }
+  }
+  UCTensor t4_2{{1.0, 1.0}, {1.0, 1.0}};
+  for(int i = 0; i < 3; i++){
+    for(int j = 0; j < 3; j++){
+      if(i < 2 && j < 2){
+        assert(t4_2.get(i, j) == 1.0);
+      }else{
+        assert(t4_2.get(i, j) == 0.0);
+      }
+    }
+  }
+
 #ifdef FAIL
   Position x2{l}; // No - one length is not OK
   //UCTensor t33{s, s, s}; // Works, so that we can allow single nest with correct total number
