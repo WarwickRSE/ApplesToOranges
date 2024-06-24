@@ -14,6 +14,7 @@ INCLUDE = -I ./include/
 SRCDIR = src
 OBJDIR = obj
 
+LFLAGS =
 CFLAGS = -g -c $(INCLUDE) -O3
 CFLAGS += -DNO_NARROWING_CONVERSIONS
 ifeq ($(strip $(USE_FRACTIONAL_POWERS)),1)
@@ -65,7 +66,7 @@ INCLS := $(addprefix include/, $(INCLS))
 VPATH = include/
 
 default : $(OBJS)
-	$(CC) $(OBJS) -o $(EXENAME)
+	$(CC) $(OBJS) $(LFLAGS) -o $(EXENAME)
 
 .PHONY: deps
 deps: clean
