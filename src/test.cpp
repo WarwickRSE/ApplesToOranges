@@ -126,39 +126,51 @@ void debug_checks(){
 
 #ifdef DEBUG
   // Initialization checks etc on Storage types
-  std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Storage type checks"<<std::endl;
 
   STScalar s1{1.5};
-  std::cout<<"s1 = "<<s1<<std::endl;
   STScalar s2{s1};
-  std::cout<<"s2 = "<<s2<<std::endl;
   assert(s1 == s2);
   assert(s1 != -s2);
+  STScalar<double> s3;
+  s3 = s1;
 
   STVector<double, 3> v1{1.0, 2.0, 3.0};
-  std::cout<<"v1 = "<<v1<<std::endl;
   STVector v2{v1};
   assert(v1 == v2);
-  std::cout<<"v2 = "<<v2<<std::endl;
   STVector<double, 3> v3{s1, s1, s1};
-  std::cout<<"v3 = "<<v3<<std::endl;
   assert(v3[0] == s1 && v3[1] == s1 && v3[2] == s1);
+  STVector<double, 3> v4;
+  v4 = v1;
 
-  STTensor<double, 3> test_t1{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
-  std::cout<<"test_t1 = "<<test_t1<<std::endl;
-  STTensor<double, 3> test_t11{1.0, 2.0, 3.0, 4.0, 5.0, 6.0,  7.0, 8.0, 9.0};
-  std::cout<<"test_t11 = "<<test_t11<<std::endl;
-  STTensor test_t2{test_t1};
-  std::cout<<"test_t2 = "<<test_t2<<std::endl;
-  assert(test_t1 == test_t11);
-  assert(test_t1 == test_t2);
-  STTensor test_t3{v1, v1, v1};
-  std::cout<<"test_t3 = "<<test_t3<<std::endl;
-  assert(test_t3.get(0,0) == v1[0] && test_t3.get(1,0) == v1[0] && test_t3.get(2,0) == v1[0]);
-  assert(test_t3.get(0,1) == v1[1] && test_t3.get(1,1) == v1[1] && test_t3.get(2,1) == v1[1]);
-  assert(test_t3.get(0,2) == v1[2] && test_t3.get(1,2) == v1[2] && test_t3.get(2,2) == v1[2]);
-  std::cout<<"___________________________________________________________"<<std::endl;
+  STTensor<double, 3> t1{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
+  STTensor<double, 3> t11{1.0, 2.0, 3.0, 4.0, 5.0, 6.0,  7.0, 8.0, 9.0};
+  STTensor t2{t1};
+  assert(t1 == t11);
+  assert(t1 == t2);
+  STTensor t3{v1, v1, v1};
+  assert(t3.get(0,0) == v1[0] && t3.get(1,0) == v1[0] && t3.get(2,0) == v1[0]);
+  assert(t3.get(0,1) == v1[1] && t3.get(1,1) == v1[1] && t3.get(2,1) == v1[1]);
+  assert(t3.get(0,2) == v1[2] && t3.get(1,2) == v1[2] && t3.get(2,2) == v1[2]);
+  STTensor<double, 3> t4;
+  t4 = t1;
+
+  // Quick plus and minus - these get touched later once wrapped but are useful to check here too
+  s3 = s1 + s2;
+  assert(s3 - s2 == s1);
+  s3 += s2;
+  s3 -= s1;
+  assert(s3 == 2.0 * s2);
+  v4 = v1 + v2;
+  assert(v4 - v2 == v1);
+  v4 += v1;
+  v4 -= v2;
+  assert(v4 == 2.0 * v2);
+  t4 = t1 + t2;
+  assert(t4 - t2 == t1);
+  t4 += t2;
+  t4 -= t1;
+  assert(t4 == 2.0 * t2);
 
   //Scalar
   STScalar ss = s1 * -s1;
@@ -169,9 +181,9 @@ void debug_checks(){
   STVector vvd = vv / v1;
   assert(vvd == -v1);
   //Tensor
-  STTensor tt = test_t1 * -test_t1;
-  STTensor ttd = tt / test_t1;
-  assert(ttd == -test_t1);
+  STTensor tt = t1 * -t1;
+  STTensor ttd = tt / t1;
+  assert(ttd == -t1);
   //Scalar-vector
   STVector m1 = ssd * vvd;
   STVector m2 = m1 * s1;
@@ -180,14 +192,82 @@ void debug_checks(){
   assert(m3 == m1);
   assert(m4[0] == s1.get()/m3[0] && m4[1] == s1.get()/m3[1] && m4[2] == s1.get()/m3[2]);
   //Scalar-tensor - only multiply implemented
-  STTensor m5 = s1 * test_t1;
+  STTensor m5 = s1 * t1;
   STTensor m6 = m5 * s1;
-  assert(m6.get(0,0) == s1.get()*s1.get()*test_t1.get(0,0) && m6.get(1,2) == s1.get()*s1.get()*test_t1.get(1,2));
+  assert(m6.get(0,0) == s1.get()*s1.get()*t1.get(0,0) && m6.get(1,2) == s1.get()*s1.get()*t1.get(1,2));
   // m6.magnitude() == s1.get()*s1.get()*test_t1.magnitude());
   //Vector-tensor - only multiply implemented
   STTensor m9 = v1 * m6;
   STTensor m10 = m9 * v1;
   assert(m10.get(0,0) == m6.get(0,0)*v1[0]*v1[0] && m10.get(1,2) == m6.get(1,2)*v1[1]*v1[1]);
+
+  //Casting checks. Use a float since generally exclude narrowing conversions
+  STScalar<float> sf = 2.3;
+  double d = (double)sf;
+  float f = (float)sf;
+  assert(d == f);
+
+  //Some other functions for Scalars
+  STScalar sabs = s1.magnitude();
+  assert(sabs == s1);
+  auto rt_s = s1.sqrt();
+  auto pow_s = rt_s.pow(2.0);
+  assert((pow_s - sabs) < 1e-15);//Can only be approx...
+  rt_s = s1.cbrt();
+  pow_s = rt_s.pow(3.0);
+  assert((pow_s - sabs) < 1e-15);//Ditto
+
+  //And for Vectors
+  v1[1] = v1[0];// Write access
+  assert(v1[0] == v1[1]);
+  v1.normalize();
+  assert(v1.magnitude() == 1.0); // Normalise and magnitude
+  //Make sure its representible exactly and a nice value
+  v1 = {2.0, 3.0, 4.0};
+  v2 = {3.0, 4.0, 5.0};
+  auto v_dot = v1.dot(v2);
+  assert(v_dot == 38.0);
+  auto v_cross = v1.cross(v2);
+  assert(v_cross[0] == -1.0 && v_cross[1] == 2.0 && v_cross[2] == -1.0);
+  auto v_outer = v1.outer(v2);
+  assert(v_outer.get(0,0) == 6.0 && v_outer.get(1,2) == 15.0);
+
+  //And for Tensors
+  t1.get(1,0) = t1.get(0, 0);// Write access
+  assert(t1.get(1,0) == t1.get(0, 0));
+  auto t1_t = t1.transpose();
+  assert(t1_t != t1);
+  assert(t1_t.get(0,0) ==t1.get(0,0) && t1_t.get(0,1) == t1.get(1,0) && t1_t.get(2,2) == t1.get(2,2) && t1_t.get(2,1) == t1.get(1,2));
+
+  //Rest of the comparators on Scalars
+  s2 = s1/2.0;
+  assert( s2 != s1 && s2 < s1 && !(s2 >= s1) && s2 <= s1 && !(s2 > s1));
+  // And vectors
+  v2 = v1/2.0;
+  assert(v2 != v1 && v2 < v1 && !(v2 >= v1) && v2 <= v1 && !(v2 > v1));
+  // And cross compare
+  s1 = v1.magnitude() * 2.0;
+  assert(s1 != v1 && s1 > v1 && !(s1 <= v1) && s1 >= v1 && !(s1 < v1));
+
+  //Streaming
+  std::stringstream str_s;
+  s1 = 1.5;
+  str_s<<s1;
+  STScalar<double> sst;
+  str_s>>sst;
+  assert(s1 == sst);
+
+  str_s.clear();
+  str_s<<v1;
+  STVector<double, 3> vst;
+  str_s>>vst;
+  assert(v1 == vst);
+
+  str_s.clear();
+  str_s<<t1;
+  STTensor<double, 3> tst;
+  str_s>>tst;
+  assert(t1 == tst);
 
 #endif
 
@@ -196,6 +276,8 @@ void debug_checks(){
   UnitCheckedType<0, 0, 0, STDummy> dummy;
 #endif
 
+  std::cout<<"Done"<<std::endl;
+  std::cout<<"___________________________________________________________"<<std::endl;
 
 };
 
