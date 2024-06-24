@@ -85,14 +85,27 @@ void debug_checks(){
   std::cout<<"___________________________________________________________"<<std::endl;
   // Quick test of fractions
   SimpleFrac aa{1,2}, bb{2,4}, cc{1,3};
+  assert(SimpleFrac{3} == (SimpleFrac{3,1}));
   std::cout<<"aa = "<<aa<<std::endl;
   std::cout<<"bb = "<<bb<<std::endl;
   std::cout<<"cc = "<<cc<<std::endl;
   std::cout<<"aa == bb? "<<(aa==bb)<<std::endl;
+  assert(aa != bb);
   std::cout<<"aa equal bb? "<<is_equal(aa, bb)<<std::endl;
-
+  assert(is_equal(aa, bb));
+  std::cout<<"bb is simplifiable? "<<simplifiable(bb)<<std::endl;
+  assert(simplifiable(bb) && !simplifiable(aa));
+  SimpleFrac dd{3,2};
+  assert(is_greater(dd, 1) && is_less(dd, 2));
+  assert(is_equal(dd*2, 3));
   std::cout<<"aa < cc? "<<is_less(aa,cc)<<std::endl;
   std::cout<<"aa > cc? "<<is_greater(aa,cc)<<std::endl;
+  assert(is_greater(aa, cc));
+  std::cout<<"aa + bb - cc = "<<aa+bb-cc<<std::endl;
+  assert(aa+bb-cc == (SimpleFrac{2,3}));
+  assert(aa + (-cc) == aa - cc);
+  std::cout<<"aa*bb/cc = "<<aa*bb/cc<<std::endl;
+  assert(aa*bb/cc == (SimpleFrac{3,4}));
 
   std::cout<<"___________________________________________________________"<<std::endl;
 #ifdef FAIL_DEMO
@@ -111,17 +124,21 @@ void debug_checks(){
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Storage type checks"<<std::endl;
 
-  STScalar s1{1.0};
+  STScalar s1{1.5};
   std::cout<<"s1 = "<<s1<<std::endl;
   STScalar s2{s1};
   std::cout<<"s2 = "<<s2<<std::endl;
+  assert(s1 == s2);
+  assert(s1 != -s2);
 
   STVector<double, 3> v1{1.0, 2.0, 3.0};
   std::cout<<"v1 = "<<v1<<std::endl;
   STVector v2{v1};
+  assert(v1 == v2);
   std::cout<<"v2 = "<<v2<<std::endl;
   STVector<double, 3> v3{s1, s1, s1};
   std::cout<<"v3 = "<<v3<<std::endl;
+  assert(v3[0] == s1 && v3[1] == s1 && v3[2] == s1);
 
   STTensor<double, 3> test_t1{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
   std::cout<<"test_t1 = "<<test_t1<<std::endl;
@@ -129,31 +146,43 @@ void debug_checks(){
   std::cout<<"test_t11 = "<<test_t11<<std::endl;
   STTensor test_t2{test_t1};
   std::cout<<"test_t2 = "<<test_t2<<std::endl;
+  assert(test_t1 == test_t11);
+  assert(test_t1 == test_t2);
   STTensor test_t3{v1, v1, v1};
   std::cout<<"test_t3 = "<<test_t3<<std::endl;
+  assert(test_t3.get(0,0) == v1[0] && test_t3.get(1,0) == v1[0] && test_t3.get(2,0) == v1[0]);
+  assert(test_t3.get(0,1) == v1[1] && test_t3.get(1,1) == v1[1] && test_t3.get(2,1) == v1[1]);
+  assert(test_t3.get(0,2) == v1[2] && test_t3.get(1,2) == v1[2] && test_t3.get(2,2) == v1[2]);
   std::cout<<"___________________________________________________________"<<std::endl;
 
   //Scalar
-  STScalar ss = s1 * s1;
+  STScalar ss = s1 * -s1;
   STScalar ssd = ss / s1;
+  assert(ssd == -s1);
   //Vector
-  STVector vv = v1 * v1;
+  STVector vv = v1 * -v1;
   STVector vvd = vv / v1;
+  assert(vvd == -v1);
   //Tensor
-  STTensor tt = test_t1 * test_t1;
+  STTensor tt = test_t1 * -test_t1;
   STTensor ttd = tt / test_t1;
+  assert(ttd == -test_t1);
   //Scalar-vector
   STVector m1 = ssd * vvd;
   STVector m2 = m1 * s1;
-  STVector m3 = s1 / m2;
-  STVector m4 = m3 / s1;
+  STVector m3 = m2 / s1;
+  STVector m4 = s1 / m3;
+  assert(m3 == m1);
+  assert(m4[0] == s1.get()/m3[0] && m4[1] == s1.get()/m3[1] && m4[2] == s1.get()/m3[2]);
   //Scalar-tensor - only multiply implemented
   STTensor m5 = s1 * test_t1;
   STTensor m6 = m5 * s1;
+  assert(m6.get(0,0) == s1.get()*s1.get()*test_t1.get(0,0) && m6.get(1,2) == s1.get()*s1.get()*test_t1.get(1,2));
+  // m6.magnitude() == s1.get()*s1.get()*test_t1.magnitude());
   //Vector-tensor - only multiply implemented
-  STTensor m9 = m4 * m6;
+  STTensor m9 = v1 * m6;
   STTensor m10 = m9 * v1;
-  std::cout<<"Squashing some unused variable flags: "<<m10<<" "<<ttd<<std::endl;
+  assert(m10.get(0,0) == m6.get(0,0)*v1[0]*v1[0] && m10.get(1,2) == m6.get(1,2)*v1[1]*v1[1]);
 
 #endif
 
