@@ -84,11 +84,15 @@ void debug_checks(){
 
   std::cout<<"___________________________________________________________"<<std::endl;
   // Quick test of fractions
+  std::cout<<"Checking fractions"<<std::endl;
   SimpleFrac aa{1,2}, bb{2,4}, cc{1,3};
   assert(SimpleFrac{3} == (SimpleFrac{3,1}));
+  SimpleFrac zero{0,0}; // A bad number, but make sure we can construct it
+  assert(zero + zero == zero); //Catches that final branch
   std::cout<<"aa = "<<aa<<std::endl;
   std::cout<<"bb = "<<bb<<std::endl;
   std::cout<<"cc = "<<cc<<std::endl;
+  std::cout<<"cc as a double "<<(double)cc<<std::endl;
   std::cout<<"aa == bb? "<<(aa==bb)<<std::endl;
   assert(aa != bb);
   std::cout<<"aa equal bb? "<<is_equal(aa, bb)<<std::endl;
@@ -98,6 +102,7 @@ void debug_checks(){
   SimpleFrac dd{3,2};
   assert(is_greater(dd, 1) && is_less(dd, 2));
   assert(is_equal(dd*2, 3));
+  std::cout<<dd<<" + "<<aa<<" = "<<dd+aa<<std::endl; // Output for integer
   std::cout<<"aa < cc? "<<is_less(aa,cc)<<std::endl;
   std::cout<<"aa > cc? "<<is_greater(aa,cc)<<std::endl;
   assert(is_greater(aa, cc));
