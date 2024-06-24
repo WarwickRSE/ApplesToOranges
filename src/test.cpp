@@ -3,6 +3,7 @@
 #include <sstream>
 #include <vector>
 #include <chrono>
+#include <cassert>
 #include "PhysicalTypes.hpp"
 
 void debug_checks();
@@ -273,12 +274,13 @@ void debug_checks(){
 
 #ifdef DEBUG
   // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
-  UnitCheckedType<0, 0, 0, STDummy> dummy;
-#endif
+  const UnitCheckedType<0, 0, 0, STDummy> dummy;
+  assert(dummy.get()==0);
 
   std::cout<<"Done"<<std::endl;
   std::cout<<"___________________________________________________________"<<std::endl;
 
+#endif
 };
 
 void basic_demo(){

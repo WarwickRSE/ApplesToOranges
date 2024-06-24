@@ -30,6 +30,7 @@
 class STDummy{
   public:
     STDummy()=default;
+    int get()const{return 0;}
 };
 #endif
 
