@@ -626,6 +626,9 @@ void last_bits(){
 
   UnitChecked::registerUnits<Length>("mic");
   std::cout<<"Units can be customised: Length will now show as "<<l<<l.units()<<" and in compounds such as Force as "<<f.units()<<std::endl;
+  //Or with the convenience function like this
+  UnitChecked::registerUnitsForTypeOf(l, "mm");
+  std::cout<<"And now Length will show as "<<l<<l.units()<<" and Force as "<<f.units()<<std::endl;
 
   // Or for compound types can provide a fully custom string per TYPE (not instance) used from now on
   // NOTE: this is for this type and ONLY this type, not any further compounded types
