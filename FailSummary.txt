@@ -1,29 +1,30 @@
 In Non-Debug mode:
 Failure 1: 
-    Cannot add Position to Velocity (Line 214)
+    Cannot add Position to Velocity (Line 338)
     Error messages such as:
         "error: invalid operands to binary expression"
         "error: no match for ‘operator+’"
 
 Failure 2:
-    Multiple assertion fails - trying to initialise with wrong types (Lines 255, 257, 259)
+    Multiple assertion fails - trying to initialise with wrong types (Lines 380, 382, 384)
     Error messages such as:
         "error: static_assert failed due to requirement 'std::is_same_v<double, int>' "Initialiser list type must match storage data-type or units" "
         "error: static assertion failed: Initialiser list type must match storage data-type or units"
 
 Failure 3:
-    Conversion error (Line 261) - trying to set equal to a plain double
+    Conversion error (Line 386) - trying to set equal to a plain double
         "error: no viable conversion from 'double' to 'Length'"
         "error: conversion from ‘double’ to non-scalar type ‘Length’"
 
 Failure 4:
-    Trying to use power at runtime when value has units (Line 310)
+    a. Trying to use plain get on a value with units (Line 397)
+    b. Trying to use power at runtime when value has units (Line 443)
         "error: static_assert failed due to requirement 'hasNoUnits()'"
         "error: static assertion failed
             static_assert(hasNoUnits());"
 
 Failure 5:
-    Using a Narrowing conversion (Line 374)
+    Using a Narrowing conversion (Line 512)
     NOTE: this is only a warning in GCC
         "error: non-constant-expression cannot be narrowed from type 'double' to 'float' in initializer list" [Clang]
-        "warning: narrowing conversion of ‘tmp2’ from ‘double’ to ‘float’" [GCC}]
+        "warning: narrowing conversion of ‘tmp2’ from ‘double’ to ‘float’" [GCC]

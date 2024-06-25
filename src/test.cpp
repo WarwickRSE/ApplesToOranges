@@ -87,6 +87,7 @@ void debug_checks(){
   // Quick test of fractions
   std::cout<<"Checking fractions"<<std::endl;
   SimpleFrac aa{1,2}, bb{2,4}, cc{1,3};
+  assert(divides(aa, 2));
   assert(SimpleFrac{3} == (SimpleFrac{3,1}));
   SimpleFrac zero{0,0}; // A bad number, but make sure we can construct it
   assert(zero + zero == zero); //Catches that final branch
@@ -116,11 +117,11 @@ void debug_checks(){
   std::cout<<"___________________________________________________________"<<std::endl;
 #ifdef FAIL_DEMO
   // Check that we can't construct a type with fraction with a zero denominator
-  UnitCheckedType<SF{1,0}, 0, 0, STDummy> dd;
+  UnitCheckedType<SF{1,0}, 0, 0, STDummy> dd1;
   // Check that we can't construct a fraction in non-reduced terms
-  UnitCheckedType<0, SF{2,4}, 0, STDummy> dd1;
+  UnitCheckedType<0, SF{2,4}, 0, STDummy> dd2;
   //Check that we can't have negative denominator
-  UnitCheckedType<0, 0, SF{1,-1}, STDummy> dd2;
+  UnitCheckedType<0, 0, SF{1,-1}, STDummy> dd3;
 #endif
 #endif
 #endif
@@ -312,6 +313,7 @@ void basic_demo(){
   Time t2 = t;
   std::cout<<"Two times are the same type?: "<<t.isSameType(t2)<<std::endl;
   std::cout<<"Position and Velocity are not?: "<<x.isSameType(v)<<std::endl;
+  assert(t.isSameType(t2) && !x.isSameType(v));
 
   // Update position using x = x_0 + v * t
   std::cout<<"Using SUVAT equations, update position using x = x_0 + v * t"<<std::endl;
@@ -325,6 +327,10 @@ void basic_demo(){
   // Subtraction test
   auto x_sub = x - x/2.0;
   std::cout<<"For x="<<x<<", x - x/2 = "<<x_sub<<std::endl;
+
+  //Quick results check
+  assert( x+x == x*2);
+  assert(x_sub == x/2.0);
 
 
 #ifdef FAIL_DEMO
@@ -367,6 +373,7 @@ void initialisation_and_access_demo(){
   Position xl{l, l, l};
   Position x2{xl};
   Position x3{0.0, 0.0, 0.0};
+  assert(x3+x3 == x3);//Using the value
   std::cout<<"Initialising from the wrong units is not allowed, nor is setting _equal_ to a number, such as x = 0.1;"<<std::endl;
 #ifdef FAIL_DEMO
   // Initialising from wrong numeric underlying type not allowed
@@ -385,6 +392,12 @@ void initialisation_and_access_demo(){
   auto scal = UCScalar{7.5};
   std::cout<<"A type without units safely allows getting of the value: "<<scal.get()<<std::endl;
 
+#ifdef FAIL_DEMO
+  // Can't access the value of a type with units
+  auto val = l.get();
+#endif
+
+
 };
 
 void exponents_and_roots(){
@@ -398,6 +411,7 @@ void exponents_and_roots(){
   std::cout<<"t^2= "<<tsq<<tsq.units()<<std::endl;
   auto tsqsqrt = sqrt(tsq);
   std::cout<<"sqrt(t^2)= "<<tsqsqrt<<tsqsqrt.units()<<std::endl;
+  assert((tsqsqrt-t).magnitude() < Time{1e-15});
 
 #ifdef USE_FRACTIONAL_POWERS
   // Here we need FRACTIONAL_POWERS to be able to specify the power as a fraction
@@ -417,10 +431,11 @@ std::cout<<"Note that non-integer units can only occur if the precompiler define
   std::cout<<"5th root of t= "<<fifthroot_t<<fifthroot_t.units()<<std::endl;
 #endif
   // But this is always valid as we make sure to have integral units
-  std::cout<<"Otherwise we can only do ones where the units are come out to integer powers\n";
+  std::cout<<"Otherwise we can only do ones where the units come out to integer powers\n";
   auto fifthpow = pow<5>(t);
   auto fifthroot = nthrt<5>(fifthpow);
   std::cout<<"5th root of t^5= "<<fifthroot<<fifthroot.units()<<std::endl;
+  assert((fifthroot - t).magnitude() < Time{1e-15});
 
 
 #ifdef FAIL_DEMO
@@ -439,7 +454,7 @@ void products_and_functions(){
   Position x{1.0, 2.0, 3.0};
   Velocity v{1.0, 1.0, 1.0};
 
-  std::cout<<"A variety of linear algrbra type operations are defined: \n";
+  std::cout<<"A variety of linear algebra type operations are defined: \n";
   // Dot product
   auto dt = x.dot(v);
   std::cout<<"x.v="<<dt<<dt.units()<<std::endl;
@@ -452,6 +467,10 @@ void products_and_functions(){
   auto out = x.outer(v);
   std::cout<<"x outer v="<<out<<out.units()<<std::endl;
 
+  //All of the above multiply the units, hence:
+  assert(crs.isSameUnits(out) && crs.isSameUnits(dt));
+  //Note numeric results have been checked by StorageType already
+
 
   //Normalize, two ways
   auto x2 = x.normalized();
@@ -459,6 +478,7 @@ void products_and_functions(){
   std::cout <<"x normalised is " << x << std::endl;
   std::cout <<"              or " << x2 << std::endl;
   std::cout << "magnitude of x normalised is " << x.magnitude() << std::endl;
+  assert(x.isSameType(x2));
 
   std::cout<<"Using special functions can be done two ways, depending on what is defined by the stored data types\n";
   // Using special functions on dimensionless values
@@ -502,8 +522,10 @@ void comparison_demo(){
   std::cout<<"We can compare values of the same units\n";
 
   std::cout<<"l > 0? "<< (l > Length{0.0})<<std::endl;
+  assert(l > Length{0.0});
   std::cout<<"x == x? "<< (x == x)<<std::endl;
   std::cout<<"x != x? "<< (x != x)<<std::endl;
+  assert(x == x && !(x != x));
 
   std::cout<<"x.magnitude()= "<<x.magnitude()<<std::endl;
   std::cout<<"l.magnitude()= "<<l.magnitude()<<std::endl;
@@ -512,14 +534,15 @@ void comparison_demo(){
   std::cout<< "x > l? (using scalar-vector comparator (magnitude behind the scenes))"<< (x > l)<<std::endl;
 
   // The next block just checks resolution of all the comparisons for completeness
-  std::cout<<"Doing all the Scalar-Scalar combos: "<<(l < l)<<" "<<(l<=l)<<" "<<(l==l)<<" "<<(l!=l)<<" "<<(l>=l)<<" " <<(l > l)<<std::endl;
-  std::cout<<"Doing all the Vector-Vector combos: "<<(x < x)<<" "<<(x<=x)<<" "<<(x==x)<<" "<<(x!=x)<<" "<<(x>=x)<<" " <<(x > x)<<std::endl;
-  std::cout<<"Doing all the Scalar-vector combos: "<<(x < l)<<" "<<(x<=l)<<" "<<(x==l)<<" "<<(x!=l)<<" "<<(x>=l)<<" " <<(x > l)<<std::endl;
-  std::cout<<"And doing them the other way around: "<<(l < x)<<" "<<(l<=x)<<" "<<(l==x)<<" "<<(l!=x)<<" "<<(l>=x)<<" " <<(l > x)<<std::endl;
+  assert(!(l<l) && (l<=l) && (l==l) && !(l!=l) && (l>=l) && !(l>l));
+  assert(!(x<x) && (x<=x) && (x==x) && !(x!=x) && (x>=x) && !(x>x));
+  assert(!(x<l) && !(x<=l) && !(x==l) && (x!=l) && (x>=l) && (x>l));
+  assert((l<x) && (l<=x) && !(l==x) && (l!=x) && !(l>=x) && !(l>x));
 
   //Tensors only have element-wise equality defined
   UCTensor t{{1.0, 2.0, 3.0},{4.0, 5.0, 6.0},{7.0, 8.0, 9.0}};
   std::cout<<"Doing Tensor-Tensor equality: "<<(t == t)<<" "<<(t!=t)<<std::endl;
+  assert(t == t && !(t != t));
 
 
   //Using casting in comparison
@@ -647,27 +670,32 @@ void internal_checks(){
   // Finishes up the code coverage too
 
   std::cout<<"Checking if Time is Unitchecked "<<is_unitchecked_v<Time><<std::endl;
+  static_assert(is_unitchecked_v<Time>);
   std::cout<<"Checking if double is Unitchecked "<<is_unitchecked_v<double><<std::endl;
+  static_assert(!is_unitchecked_v<double>);
   std::cout<<"Checking if Time is numeric (storage type) "<<is_unitchecked_numeric_v<Time><<std::endl;
+  static_assert(is_unitchecked_numeric_v<Time>);
 
   UnitCheckedType<0, 0, 0, std::string> uct;
   std::cout<<"Checking a non-numeric storage type "<<is_unitchecked_numeric_v<decltype(uct)><<std::endl;
-
+  static_assert(!is_unitchecked_numeric_v<decltype(uct)>);
 
   //Verifying all of the initialiser list options compile
-  Length l{0.0}; // From underlying numeric type
+  Length l{1.5}; // From underlying numeric type
   Length l2{l}; // From self-type
   assert(l == l2);
   Position x{l, l, l}; // From smaller storage, same units
-  dbl3vec d{1.0, 1.0, 1.0};
+  dbl3vec d{1.5, 1.5, 1.5};
   Position x2{d}; // From storage type, no units
+  assert(x == x2);
   constexpr UCVector v{1.0}; // Convenience - from scalar
-  static_assert(v.get(1) == 1.0);
+  static_assert(v.get(1) == 1.0); // Checks constexpr-ness - else can't static_assert
   UCTensor t{v, v, v};
   dbl3tens tt{tens3_ident};
   UCTensor t2{tt};
   UCScalar s{1.0};
   UCTensor t3{{s, s, s}, {s, s, s}, {s, s, s}};
+  assert(t == t3);
 
   //Checking undersized lists - check values and zeros
   UCVector shrt{s, s};
@@ -693,13 +721,9 @@ void internal_checks(){
       }
     }
   }
-  UCVector shrt2{1.0};
+  UCVector shrt2{1.0}; // Single element sets all
   for(int i = 0; i < 3; i++){
-    if(i < 2){
-      assert(shrt.get(i) == s.get());
-    }else{
-      assert(shrt.get(i) == 0.0);
-    }
+    assert(shrt2.get(i) == s.get());
   }
   UCTensor t4_2{{1.0, 1.0}, {1.0, 1.0}};
   for(int i = 0; i < 3; i++){
@@ -713,10 +737,20 @@ void internal_checks(){
   }
 
 #ifdef FAIL
-  Position x2{l}; // No - one length is not OK
+  Position x2{l}; // \todo Should this be disallowed? No - one length is not OK
   //UCTensor t33{s, s, s}; // Works, so that we can allow single nest with correct total number
-  UCTensor t4{v}; // Ditto - too small
+  UCTensor t4{v}; // \todo Ditto - too small allowed?
 #endif
+
+  // This line is just for coverage purposes, we already checked this works
+  // but it seems we have to forcibly use it to trigger the coverage checker
+  std::cout<<l.hasNoUnits()<<std::endl;
+  // These cover some more branches of the units construction/print
+  UnitCheckedTypeFull<1, 1, 1, 1, 1, 1, 1, dblscalar> allOne;
+  UnitCheckedTypeFull<2, 2, 2, 2, 2, 2, 2, dblscalar> allTwo;
+  UnitCheckedTypeFull<-1, -1, -1, -1, -1, -1, -1, dblscalar> allMinus;
+  std::cout<<allOne.units()<<" "<<allTwo.units()<<" "<<allMinus.units()<<std::endl;
+
 }
 
 

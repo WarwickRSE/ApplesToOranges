@@ -220,6 +220,7 @@ class UnitCheckedTypeFull{
 
 
     std::string units()const{
+        /// \todo Refactor this to be more compact. Decide how to order
       using namespace UnitChecked;
       std::stringstream ss;
       if constexpr(is_greater(M, 0) && ! is_equal(M, 1)) ss<<unitNames[1]<<"^(" << M << ")";
