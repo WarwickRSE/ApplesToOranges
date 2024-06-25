@@ -793,12 +793,19 @@ void performance_tests(){
 
   std::cout<<"___________________________________________________________"<<std::endl;
   std::cout<<"Performance tests"<<std::endl;
-  UCScalar Arr3[100];
-  auto sz = sizeof(Arr3)/sizeof(double);
+  Length Arr1[100];
+  auto sz = sizeof(Arr1)/sizeof(double);
   if(sz == 100){
-    std::cout<<"There is no storage overhead, a 100 element array of UCScalar is the size of "<<sz<<" doubles"<<std::endl;
+    std::cout<<"Case 1: There is no storage overhead, a 100 element array of Lengths is the size of "<<sz<<" doubles"<<std::endl;
   }else{
-    std::cout<<"There is storage overhead, a 100 element array of UCScalar is the size of "<<sz<<" doubles"<<std::endl;
+    std::cout<<"Case 1: There is storage overhead, a 100 element array of Lengths is the size of "<<sz<<" doubles"<<std::endl;
+  }
+  Position Arr2[100];
+  sz = sizeof(Arr2)/(sizeof(double));
+  if(sz == 300){
+    std::cout<<"Case 2: There is no storage overhead, a 100 element array of Positions is the size of "<<sz<<" doubles"<<std::endl;
+  }else{
+    std::cout<<"Case 2: There is storage overhead, a 100 element array of Positions is the size of "<<sz<<" doubles"<<std::endl;
   }
 
 #ifdef RUN_TIMER_TEST
