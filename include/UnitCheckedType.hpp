@@ -275,15 +275,15 @@ class UnitCheckedTypeFull{
     static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0) && is_equal(K, 0) && is_equal(A, 0) && is_equal(MO, 0) && is_equal(CD, 0);}///<Check if this type has all Unit exponents zero
 
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
-    bool isSameUnits(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
+    constexpr bool isSameUnits(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
         return is_equal(L, Li) && is_equal(M, Mi) && is_equal(T, Ti) && is_equal(K, Ki) && is_equal(A, Ai) && is_equal(MO, MOi) && is_equal(CD, CDi);
     }///<Compare units with another type
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
-    bool isSameRank(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
+    constexpr bool isSameRank(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
         return std::is_same_v<ST, STi>;
     }///<Compare storage types with another type
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
-    bool isSameType(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
+    constexpr bool isSameType(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
         return isSameUnits(other) && isSameRank(other);
     }///<Compare Units and StorageType
 ///@}
