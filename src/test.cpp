@@ -618,9 +618,25 @@ void last_bits(){
 
 #endif
 
+  Force f{1.0};
   //If we want to have different names for our units, we can manipulate the _strings used for display_
-  UnitChecked::unitNames[0] = "mic";
-  std::cout<<"Units can be customised: Length will now show as "<<l<<l.units()<<std::endl;
+  //Fundamental types can be changed, and will print this way for ALL compounds
+  std::cout<<"Length is Fundamental? "<<l.isFundamentalType()<<" or "<<Length::isFundamentalType()<<std::endl;
+  std::cout<<"Force is not? "<<f.isFundamentalType()<<" or "<<Force::isFundamentalType()<<std::endl;
+
+  UnitChecked::registerUnits<Length>("mic");
+  std::cout<<"Units can be customised: Length will now show as "<<l<<l.units()<<" and in compounds such as Force as "<<f.units()<<std::endl;
+
+  // Or for compound types can provide a fully custom string per TYPE (not instance) used from now on
+  // NOTE: this is for this type and ONLY this type, not any further compounded types
+  UnitChecked::registerUnits<Force>("N");
+  std::cout<<"Force will now show as "<<f<<f.units()<<std::endl;
+  //Or use the "helper"
+  UnitChecked::registerUnitsForTypeOf(f, "kN ");
+  Force f2{2.0};
+  std::cout<<"Similarly ALL forces will now show as "<<f2<<f2.units()<<std::endl;
+  auto fl = f*l;
+  std::cout<<"But compounded types will still show as "<<fl.units()<<std::endl;
 };
 
 void io_checks(){

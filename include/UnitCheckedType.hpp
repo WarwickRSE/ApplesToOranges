@@ -4,6 +4,8 @@
 #include <sstream>
 #include <numeric>
 #include <initializer_list>
+#include <map>
+#include <typeindex>
 
 #include "helper.hpp"
 #include "SimpleFrac.hpp"
@@ -48,7 +50,25 @@ If you do change this, probably do it once, at the start of a program, and then 
 /// Extra stuff for display
 namespace UnitChecked{
     /// Strings for printing unit names
-    inline std::string unitNames[7] = {"m", "kg", "s", "K", "A", "mol", "cd"};
+    inline std::string unitNames[7] = {"kg", "m", "s", "K", "A", "mol", "cd"};
+    inline std::map<std::type_index, std::string> customUnitStrings;
+    template<typename T>
+    inline void registerUnits(std::string newUnits){
+        if constexpr (T::isFundamentalType()){
+          unitNames[T::whichFundamentalType()] = newUnits;
+        }else{
+          customUnitStrings[std::type_index(typeid(T))] = newUnits;
+        }
+    }
+    //Convenience function to set based on an instance
+    template<typename T>
+    inline void registerUnitsForTypeOf(const T & theType, std::string newUnits){
+        if constexpr (T::isFundamentalType()){
+          unitNames[T::whichFundamentalType()] = newUnits;
+        }else{
+          customUnitStrings[std::type_index(typeid(theType))] = newUnits;
+        }
+    }
 };
 /** @brief The basic Unit Checked wrapper type
  *
@@ -226,18 +246,24 @@ class UnitCheckedTypeFull{
       return ss.str();
     }///<Stringify using stream operator
 
+    static std::string units(){
+      std::string theUnits = make_unit_str();
+      if(UnitChecked::customUnitStrings.count(std::type_index(typeid(UnitCheckedTypeFull)))>0)
+        return UnitChecked::customUnitStrings[std::type_index(typeid(UnitCheckedTypeFull))];
+      return theUnits;
+    }
 
-    std::string units()const{
+    static std::string make_unit_str(){
       using namespace UnitChecked;
       std::stringstream ss;
       // Positive exponents first, then negative, ommitted if zero
       if constexpr(is_greater(M, 0)){
-        ss<<unitNames[1];
+        ss<<unitNames[0];
         if constexpr(is_equal(M, 1)) ss<<" ";
         else ss<<"^(" << M << ")";
       }
       if constexpr(is_greater(L, 0)){
-        ss<<unitNames[0];
+        ss<<unitNames[1];
         if constexpr(is_equal(L, 1)) ss<<" ";
         else ss<<"^(" << L << ")";
       }
@@ -266,8 +292,8 @@ class UnitCheckedTypeFull{
         if constexpr(is_equal(CD, 1)) ss<<" ";
         else ss<<"^(" << CD << ")";
       }
-      if constexpr(is_less(M, 0)) ss<<unitNames[1]<<"^(" << M << ")";
-      if constexpr(is_less(L, 0)) ss<<unitNames[0]<<"^(" << L << ")";
+      if constexpr(is_less(M, 0)) ss<<unitNames[0]<<"^(" << M << ")";
+      if constexpr(is_less(L, 0)) ss<<unitNames[1]<<"^(" << L << ")";
       if constexpr(is_less(T, 0)) ss<<unitNames[2]<<"^(" << T << ")";
       if constexpr(is_less(K, 0)) ss<<unitNames[3]<<"^(" << K << ")";
       if constexpr(is_less(A, 0)) ss<<unitNames[4]<<"^(" << A << ")";
@@ -281,6 +307,11 @@ class UnitCheckedTypeFull{
  *@{
 */
     static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0) && is_equal(K, 0) && is_equal(A, 0) && is_equal(MO, 0) && is_equal(CD, 0);}///<Check if this type has all Unit exponents zero
+
+    static constexpr bool isFundamentalType(){return ((L==1) + (M==1) + (T==1) + (K==1) + (A==1) + (MO==1) + (CD==1))==1;}///<Check if this type is a fundamental unit type (only one exponent is 1, all others are zero)
+    static constexpr size_t whichFundamentalType(){
+        //I am sorry, but the compiler parameter order and the usual SI units order do not match and it's too late to fix. These are the order of the strings in unitNames
+        return (L==1)? 1 : (M==1)? 0 : (T==1)? 2 : (K==1)? 3 : (A==1)? 4 : (MO==1)? 5 : 6;}///<Get the index of the fundamental unit type (0-6), junk if not fundamental
 
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
     constexpr bool isSameUnits(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
