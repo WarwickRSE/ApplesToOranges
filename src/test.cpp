@@ -774,6 +774,29 @@ void internal_checks(){
   UnitCheckedTypeFull<-1, -1, -1, -1, -1, -1, -1, dblscalar> allMinus;
   std::cout<<allOne.units()<<" "<<allTwo.units()<<" "<<allMinus.units()<<std::endl;
 
+  //Verify that hasNoUnits and isSameUnits catch "all" the cases (first mismatch)
+  UnitCheckedTypeFull<0, 1, 1, 1, 1, 1, 1, dblscalar> U1;
+  UnitCheckedTypeFull<0, 0, 1, 1, 1, 1, 1, dblscalar> U2;
+  UnitCheckedTypeFull<0, 0, 0, 1, 1, 1, 1, dblscalar> U3;
+  UnitCheckedTypeFull<0, 0, 0, 0, 1, 1, 1, dblscalar> U4;
+  UnitCheckedTypeFull<0, 0, 0, 0, 0, 1, 1, dblscalar> U5;
+  UnitCheckedTypeFull<0, 0, 0, 0, 0, 0, 1, dblscalar> U6;
+  assert(!U1.hasNoUnits() && !U2.hasNoUnits() && !U3.hasNoUnits() && !U4.hasNoUnits() && !U5.hasNoUnits() && !U6.hasNoUnits());
+  assert(!U1.isSameUnits(U2) && !U2.isSameUnits(U3) && !U3.isSameUnits(U4) && !U4.isSameUnits(U5));
+  std::cout<<U1.hasNoUnits()<<" "<<U2.hasNoUnits()<<" "<<U3.hasNoUnits()<<" "<<U4.hasNoUnits()<<" "<<U5.hasNoUnits()<<" "<<U6.hasNoUnits()<<std::endl;
+  std::cout<<U1.isSameUnits(U2)<<" "<<U2.isSameUnits(U3)<<" "<<U3.isSameUnits(U4)<<" "<<U4.isSameUnits(U5)<<" "<<U5.isSameUnits(U6)<<std::endl;
+  std::cout<<"Internal checks OK\n";
+
+  //Ditto for isFundamentalType
+  assert(!U1.isFundamentalType() && !U2.isFundamentalType() && !U3.isFundamentalType() && !U4.isFundamentalType() && !U5.isFundamentalType() && U6.isFundamentalType());
+  // And check we get the right index from whichFundamentalType
+  assert(l.whichFundamentalType() == 1 && (U1/U2).whichFundamentalType() == 0 && (U2/U3).whichFundamentalType() == 2 && (U3/U4).whichFundamentalType() == 3 && (U4/U5).whichFundamentalType() == 4 && (U5/U6).whichFundamentalType() == 5 && U6.whichFundamentalType() == 6);
+
+
+  //Verify default init behaviour
+  UCScalar def{};
+  assert(def.get() == 0.0);
+
   //Fully Verify getElement
   auto el = x.getElement(0);
   assert(x.isSameUnits(el) && !x.isSameType(el));
