@@ -220,23 +220,44 @@ class UnitCheckedTypeFull{
 
 
     std::string units()const{
-        /// \todo Refactor this to be more compact. Decide how to order
       using namespace UnitChecked;
       std::stringstream ss;
-      if constexpr(is_greater(M, 0) && ! is_equal(M, 1)) ss<<unitNames[1]<<"^(" << M << ")";
-      if constexpr(is_greater(L, 0) && ! is_equal(L, 1)) ss<<unitNames[0]<<"^(" << L << ")";
-      if constexpr(is_greater(T, 0) && ! is_equal(T, 1)) ss<<unitNames[2]<<"^(" << T << ")";
-      if constexpr(is_greater(K, 0) && ! is_equal(K, 1)) ss<<unitNames[3]<<"^(" << K << ")";
-      if constexpr(is_greater(A, 0) && ! is_equal(A, 1)) ss<<unitNames[4]<<"^(" << A << ")";
-      if constexpr(is_greater(MO, 0) && ! is_equal(MO, 1)) ss<<unitNames[5]<<"^(" << MO << ")";
-      if constexpr(is_greater(CD, 0) && ! is_equal(CD, 1)) ss<<unitNames[6]<<"^(" << CD << ")";
-      if constexpr(is_equal(M, 1)) ss<<unitNames[1]<<" ";
-      if constexpr(is_equal(L, 1)) ss<<unitNames[0]<<" ";
-      if constexpr(is_equal(T, 1)) ss<<unitNames[2]<<" ";
-      if constexpr(is_equal(K, 1)) ss<<unitNames[3]<<" ";
-      if constexpr(is_equal(A, 1)) ss<<unitNames[4]<<" ";
-      if constexpr(is_equal(MO, 1)) ss<<unitNames[5]<<" ";
-      if constexpr(is_equal(CD, 1)) ss<<unitNames[6]<<" ";
+      // Positive exponents first, then negative, ommitted if zero
+      if constexpr(is_greater(M, 0)){
+        ss<<unitNames[1];
+        if constexpr(is_equal(M, 1)) ss<<" ";
+        else ss<<"^(" << M << ")";
+      }
+      if constexpr(is_greater(L, 0)){
+        ss<<unitNames[0];
+        if constexpr(is_equal(L, 1)) ss<<" ";
+        else ss<<"^(" << L << ")";
+      }
+      if constexpr(is_greater(T, 0)){
+        ss<<unitNames[2];
+        if constexpr(is_equal(T, 1)) ss<<" ";
+        else ss<<"^(" << T << ")";
+      }
+      if constexpr(is_greater(K, 0)){
+        ss<<unitNames[3];
+        if constexpr(is_equal(K, 1)) ss<<" ";
+        else ss<<"^(" << K << ")";
+      }
+      if constexpr(is_greater(A, 0)){
+        ss<<unitNames[4];
+        if constexpr(is_equal(A, 1)) ss<<" ";
+        else ss<<"^(" << A << ")";
+      }
+      if constexpr(is_greater(MO, 0)){
+        ss<<unitNames[5];
+        if constexpr(is_equal(MO, 1)) ss<<" ";
+        else ss<<"^(" << MO << ")";
+      }
+      if constexpr(is_greater(CD, 0)){
+        ss<<unitNames[6];
+        if constexpr(is_equal(CD, 1)) ss<<" ";
+        else ss<<"^(" << CD << ")";
+      }
       if constexpr(is_less(M, 0)) ss<<unitNames[1]<<"^(" << M << ")";
       if constexpr(is_less(L, 0)) ss<<unitNames[0]<<"^(" << L << ")";
       if constexpr(is_less(T, 0)) ss<<unitNames[2]<<"^(" << T << ")";
