@@ -192,6 +192,14 @@ class UnitCheckedTypeFull{
       return static_cast<num>(val);
     }
 
+    /// Value access preserving units but making a COPY of the value
+    template <typename... Args>
+    auto getElement(Args ... args_in)const{
+        UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ReturnTypeElement<ST, Args...> > tval;
+        tval.set(val.getElement(args_in...));
+        return tval;
+    }
+
     /// "Unsafe" value access - ignores units
     template <typename... Args>
     auto& unsafeGet(Args ... args_in){
@@ -293,6 +301,8 @@ class UnitCheckedTypeFull{
  * Typedefs used to get the return types of operations implemented by the Storage Type ST, so that we can construct the UnitCheckedFull entity with the correct type to return. NOTE: the template parameter Q is essential so that we do not require any of these operations to be present unless they are used.  \todo Add Q to mult and dvide for consistency
  * @{
  */
+    template <typename Q, typename...Args>
+    using ReturnTypeElement = decltype(std::declval<Q>().getElement(std::declval<Args>()...));
     template<typename Ts>
     using ReturnTypeMultiply = decltype(operator*(std::declval<ST>(), std::declval<Ts>()));
     template<typename Ts>

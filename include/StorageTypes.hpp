@@ -67,6 +67,10 @@ class STScalar{
             return val;
         }///<Get the value (by copy)
 
+        constexpr auto getElement()const{
+            return *this;
+        }///< Get element (as a valid StorageType)
+
         constexpr explicit operator T() const{return val;}///<Cast to stored type
 
         template<typename num, typename=std::enable_if_t<std::is_arithmetic_v<num> > >
@@ -259,6 +263,11 @@ class STVector{
         /// Get by copy
         constexpr T get(size_t i)const{
             return val[i];
+        }
+
+        /// Get element (as a valid StorageType)
+        constexpr auto getElement(size_t i)const{
+            return STScalar<T>{val[i]};
         }
 
         /// Identity entity
@@ -605,6 +614,19 @@ class STTensor{
         /// 2-D access (0<=i,j<dim) by copy
         constexpr T get(size_t i, size_t j)const{
             return val[i*dim+j];
+        }
+
+        /// Get element (as a valid StorageType) - both indices -> scalar
+        constexpr STScalar<T> getElement(size_t i, size_t j)const{
+            return STScalar<T>{val[i*dim+j]};
+        }
+        /// Get element (as a valid StorageType) - single index -> vector \todo Is this the right way round (column vs row)
+        constexpr STVector<T, dim> getElement(size_t i)const{
+            STVector<T, dim> out;
+            for(size_t j=0; j<dim; j++){
+              out[j]=val[i*dim+j];
+            }
+            return out;
         }
 
         /// Identity entity (i.e. diagonal ones)

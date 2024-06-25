@@ -367,7 +367,7 @@ void initialisation_and_access_demo(){
   // Construct a vector from a scalar
   std::cout<<"Values can be constructed or uniform initialised ({}-idiom) from underlying data type (here double) \n";
   std::cout<<" Or they can be set equal to other values of correct units\n";
-  Length l = Length{1.0};
+  Length l = Length{1.7};
   Length l2{l};
   std::cout<<"Vectors can be set from numbers, scalars of the same units, or other vectors\n";
   Position xl{l, l, l};
@@ -385,6 +385,13 @@ void initialisation_and_access_demo(){
   // Can't set equal to scalar as escapes unit checking again
   Length l3 = 0.2;
 #endif
+
+  //Sometimes we want to access an element of a longer type RETAINING units
+  // Currently this WILL produce a copy, so use with caution in performance critical code
+  auto l0 = xl.getElement(0);
+  std::cout<<"Accessing an element of a vector, retaining units: l0 = "<<l0<<l0.units()<<std::endl;
+  std::cout<<"This is useful sometimes for comparisons etc, avoiding the unsafe Idiom below. E.g. compare l and xl[0]: "<<(l == l0)<<std::endl;
+
 
   // Accessor functions
   std::cout<<"It is not recommended, but units can be ignored like this:\n";
@@ -751,6 +758,18 @@ void internal_checks(){
   UnitCheckedTypeFull<-1, -1, -1, -1, -1, -1, -1, dblscalar> allMinus;
   std::cout<<allOne.units()<<" "<<allTwo.units()<<" "<<allMinus.units()<<std::endl;
 
+  //Fully Verify getElement
+  auto el = x.getElement(0);
+  assert(x.isSameUnits(el) && !x.isSameType(el));
+  assert(el.unsafeGet() == x.unsafeGet(0));
+  //Tensor getting vector \todo Is this the useful way round?
+  auto el2 = t.getElement(0);
+  assert(t.isSameUnits(el2) && !t.isSameType(el2));
+  assert(el2.unsafeGet(0) == t.unsafeGet(0, 0));
+  //Tensor getting Scalar
+  auto el3 = t.getElement(1, 2);
+  assert(t.isSameUnits(el3) && !t.isSameType(el3));
+  assert(el3.unsafeGet() == t.unsafeGet(1, 2));
 }
 
 
