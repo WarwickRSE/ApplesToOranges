@@ -321,17 +321,28 @@ void basic_demo(){
   std::cout<<"Position at t ="<<t<<t.units()<<" is "<<x<<x.units()<<std::endl;
 
   // Update position using x += v * t
+  t += t;
   x += v * (t + t2);
-  std::cout<<"Position at t ="<<t*2+t2<<t.units()<<" is "<<x<<x.units()<<std::endl;
+  std::cout<<"Position at t ="<<(t+t2)<<t2.units()<<" is "<<x<<x.units()<<std::endl;
+  std::cout<<(Position{1.0, 2.0, 3.0} + 4.0*v*Time{0.1})<<std::endl;
+  assert((x - (Position{1.0, 2.0, 3.0} + 4.0*v*Time{0.1})).magnitude() < Length{1e-15});
 
   // Subtraction test
   auto x_sub = x - x/2.0;
   std::cout<<"For x="<<x<<", x - x/2 = "<<x_sub<<std::endl;
 
-  //Quick results check
+  //Quick results check on operators
   assert( x+x == x*2);
   assert(x_sub == x/2.0);
-
+  t -= Time{0.1};
+  assert(t == Time{0.1});
+  t /= 2.0;
+  assert(t == Time{0.05});
+  auto y = Position{1.0, 2.0, 3.0};
+  y -= Position{0.5, 1.0, 1.5};
+  assert(y == (Position{0.5, 1.0, 1.5}));
+  y /= 5.0;
+  assert(y == (Position{0.1, 0.2, 0.3}));
 
 #ifdef FAIL_DEMO
   // Invalid - trying to add a position to a velocity
