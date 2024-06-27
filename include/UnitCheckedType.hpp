@@ -127,6 +127,12 @@ class UnitCheckedTypeFull{
         val=src.val;
         return *this;
     }///<Copy assignment
+    template<typename U, typename=std::enable_if<std::is_convertible_v<U, ST> > >
+    const UnitCheckedTypeFull& operator=(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD, U>& src){
+        val=src.val;
+        return *this;
+    }///<Assignment from a related type (different but convertible storage type)
+
 ///@}
     // Initializer list type deduction requires that we have
     // a constructor for each layer of nesting we want to accept
@@ -223,6 +229,12 @@ class UnitCheckedTypeFull{
     auto getElement(Args ... args_in)const{
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ReturnTypeElement<ST, Args...> > tval;
         tval.set(val.getElement(args_in...));
+        return tval;
+    }
+    template <typename... Args>
+    auto getElementRef(Args ... args_in){
+        using STm = typename extract_modified_type<ST, ReturnTypeElementRef<ST, Args...> >::modified_type;
+        UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;
     }
 
@@ -347,6 +359,10 @@ class UnitCheckedTypeFull{
  */
     template <typename Q, typename...Args>
     using ReturnTypeElement = decltype(std::declval<Q>().getElement(std::declval<Args>()...));
+    template<typename Q, typename...Args>
+    using ReturnTypeElementRef = decltype(std::declval<Q>().getElementRef(std::declval<Args>()...));
+    template<typename Q=ST>
+    using ReturnTypeStripRef = decltype(STStripReference(std::declval<Q>()));
     template<typename Ts>
     using ReturnTypeMultiply = decltype(operator*(std::declval<ST>(), std::declval<Ts>()));
     template<typename Ts>
@@ -373,32 +389,72 @@ class UnitCheckedTypeFull{
         tval.val = -val;
         return tval;
     }
-    UnitCheckedTypeFull operator+=(const UnitCheckedTypeFull & other){
-        val += other.val;
-        return *this;
-    }
-    friend UnitCheckedTypeFull operator+(UnitCheckedTypeFull lhs, const UnitCheckedTypeFull & other){
-        return lhs+=other;
-    }
-    UnitCheckedTypeFull operator-=(const UnitCheckedTypeFull & other){
-        val -= other.val;
-        return *this;
-    }
-    friend UnitCheckedTypeFull operator-(UnitCheckedTypeFull lhs, const UnitCheckedTypeFull & other){
-        return lhs-=other;
-    }
 
+    /*Lets use Addition as the model describing what is going on here.
+    For +=, we just modify in place and return the reference, as always
+    But to avoid implementing all the operators on reference types, we avoid the $= operators and use the binary ones, which will allow the casting to convert away from Reference types. 
+    Since ST should really be "numerical" we entirely expect += and  + to do the same thing, so we only lose a little efficiency by introducing the additional equals operation (I am not sure how far the optimiser will fix this) and we save a lot of code duplication.
+    For binary addition, we have to pass both arguments by const ref (can no longer use the nice pass-by-value-to-maximise-copy-elision) because a copy wrong in the reference case. Instead we pass by const ref and construct the return type by stripping off any reference-hood.
+    We also use is_convertible_v to restrict to storage types which can convert to ours, although this is mostly to try and get nicer errors, because the storage type wont implement addition in that case.
+    */
+    template<typename U, typename=std::enable_if<std::is_convertible_v<U, ST> > >
+    UnitCheckedTypeFull operator+=(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD,U> & other){
+        val = val + other.val;
+        return *this;
+    }
+    template<typename U, typename=std::enable_if<std::is_convertible_v<U, ST> > >
+    friend UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > operator+(const UnitCheckedTypeFull & lhs, const UnitCheckedTypeFull<L,M,T,K,A,MO,CD,U> & other){
+        //Case where StripRef has an effect - implies it's a ref...
+        if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
+          UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > tval;
+          tval.val = STStripReference(lhs.val) + other.val;
+          return tval;
+        }else{
+          UnitCheckedTypeFull tval;
+          tval.val = lhs.val + other.val;
+          return tval;
+        }
+    }
+    template<typename U, typename=std::enable_if<std::is_convertible_v<U, ST> > >
+    UnitCheckedTypeFull operator-=(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD,U> & other){
+        val = val - other.val;
+        return *this;
+    }
+    template<typename U, typename=std::enable_if<std::is_convertible_v<U, ST> > >
+    friend UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > operator-(const UnitCheckedTypeFull & lhs, const UnitCheckedTypeFull<L,M,T,K,A,MO,CD,U> & other){
+        if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
+          UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > tval;
+          tval.val = STStripReference(lhs.val) - other.val;
+          return tval;
+        }else{
+          UnitCheckedTypeFull tval;
+          tval.val = lhs.val - other.val;
+          return tval;
+        }
+    }
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
     auto operator*(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
-        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > tval;
-        tval.val = this->val*other.val;
+      if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<ReturnTypeStripRef<STi> > > tval;
+        tval.val = STStripReference(val)*other.val;
         return tval;
+      }else{
+        UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > tval;
+        tval.val = val*other.val;
+        return tval;
+      }
     }
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
     auto operator/(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
-        UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > tval;
-        tval.val = this->val/other.val;
+      if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
+        UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeMultiply<ReturnTypeStripRef<STi> > > tval;
+        tval.val = STStripReference(val)/other.val;
         return tval;
+      }else{
+        UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > tval;
+        tval.val = val/other.val;
+        return tval;
+      }
     }
 ///@}
 

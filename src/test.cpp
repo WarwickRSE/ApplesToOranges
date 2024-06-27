@@ -848,6 +848,44 @@ void internal_checks(){
   assert(t.isSameUnits(el3) && !t.isSameType(el3));
   assert(el3.unsafeGet() == t.unsafeGet(1, 2));
 
+  // Trying out a reference getter
+  auto el4 = x.getElementRef(1), el5 = x.getElementRef(2);
+  el4=Length{2.0};
+  el5 = el4+Length{1.0};
+  el4 += Length{0.2};
+  std::cout<<"Now we have set x using a reference "<<x<<std::endl;
+  assert(x == (Position{1.5, 2.2, 3.0}));
+  el4 -= Length{0.2};
+  el5 = el5 - Length{1.0};
+  std::cout<<"And we've changed x some more "<<x<<std::endl;
+  assert(x == (Position{1.5, 2.0, 2.0}));
+
+  //Testing some other things
+  //Summing multiple references
+  auto el_sum = el4 + el5;
+  assert(el_sum == Length{4.0});
+  //Subtraction
+  auto el_sub = el4 - el5;
+  assert(el_sub == Length{0.0});
+
+  using LengthSq = UnitCheckedType<2, 0, 0, dblscalar>;
+  using LengthInv = UnitCheckedType<-1, 0, 0, dblscalar>;
+
+  auto el_mult = el4 * el5; //Multiplying references
+  auto el_mult2 = el * el4; //Multiplying reference and value
+  auto el_mult3 = el4 * el; //Multiplying value and reference
+  assert(el_mult == LengthSq{4.0} && el_mult2 == LengthSq{3.0} && el_mult3 == LengthSq{3.0});
+  auto el_div = el4 / el5; //Dividing references
+  auto el_div2 = el_mult / el4; //Dividing reference and value
+  auto el_div3 = el4 / el_mult; //Dividing value and reference
+  assert(el_div == UCScalar{1.0} && el_div2 == Length{2.0} && el_div3 == LengthInv{0.5});
+
+  //Cursory check with tensors
+  auto el6 = t.getElementRef(1, 2);
+  el6 = UCScalar{1.7};
+  std::cout<<"And now we have modified t using a reference-to-element\n "<<t<<std::endl;
+  assert(t.get(1, 2) == 1.7);
+
   std::cout<<"Internal checks OK\n";
 }
 

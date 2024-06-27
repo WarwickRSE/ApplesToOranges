@@ -165,6 +165,43 @@ std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
   return is;
 };
 
+/// A special scalar reference type
+/* This is needed for the LHS of reference assignments etc, but mostly
+silently converts to a scalar in other operations
+*/
+template <typename T>
+class STScalarRef{
+  public:
+    T &val;
+    STScalarRef(T &val_in):val(val_in){}
+    STScalarRef(const STScalarRef &a) = default;
+
+    STScalarRef operator=(const STScalarRef &a){
+      val=a.val;
+      return *this;
+    }
+    template<typename U>
+    STScalarRef operator=(const U &a){
+      val=a.get();
+      return *this;
+    }
+    operator STScalar<T>()const{
+      return STScalar<T>(val);
+    }
+};
+
+///Generic function to "strip reference" from a type - no-op for most Storage types
+template<typename ST>
+ST STStripReference(const ST& a){
+  return a;
+}
+///Specialisation for STScalarRef decaying to STScalar
+template<typename T>
+STScalar<T> STStripReference(const STScalarRef<T> &a){
+  return STScalar<T>(a);
+}
+
+
 //Forward declare for use in outer product
 template <typename T, int dim>
 class STTensor;
@@ -267,7 +304,11 @@ class STVector{
 
         /// Get element (as a valid StorageType)
         constexpr auto getElement(size_t i)const{
-            return STScalar<T>{val[i]};
+            return STScalar<T>(val[i]);
+        }
+        /// Get reference to element (as a valid reference StorageType)
+        constexpr STScalarRef<T> getElementRef(size_t i){
+            return STScalarRef<T>(val[i]);
         }
 
         /// Identity entity
@@ -627,6 +668,10 @@ class STTensor{
               out[j]=val[i*dim+j];
             }
             return out;
+        }
+        ///Get reference to an element
+        constexpr STScalarRef<T> getElementRef(size_t i, size_t j){
+            return STScalarRef<T>(val[i*dim+j]);
         }
 
         /// Identity entity (i.e. diagonal ones)

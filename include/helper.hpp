@@ -26,4 +26,15 @@ struct extract_value_type<X<T, dim_>>
     static const int dim = dim_;
 };
 
+template<typename T, typename T2>
+struct extract_modified_type
+{
+    typedef T2 modified_type;
+};
+template<template<typename> class X, typename ST, typename STm>
+struct extract_modified_type<X<ST>, STm>
+{
+    typedef X<STm> modified_type;
+};
+
 #endif
