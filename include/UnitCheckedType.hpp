@@ -308,10 +308,17 @@ class UnitCheckedTypeFull{
 */
     static constexpr bool hasNoUnits(){return is_equal(L, 0) && is_equal(M, 0) && is_equal(T, 0) && is_equal(K, 0) && is_equal(A, 0) && is_equal(MO, 0) && is_equal(CD, 0);}///<Check if this type has all Unit exponents zero
 
-    static constexpr bool isFundamentalType(){return ((int)(L==1) + (int)(M==1) + (int)(T==1) + (int)(K==1) + (int)(A==1) + (int)(MO==1) + (int)(CD==1))==1;}///<Check if this type is a fundamental unit type (only one exponent is 1, all others are zero)
+    static constexpr bool isFundamentalType(){
+        // First check only one is non-zero
+        constexpr bool tmp = ((int)(!is_equal(L,0)) + (int)(!is_equal(M,0)) + (int)(!is_equal(T,0)) + (int)(!is_equal(K,0)) + (int)(!is_equal(A,0)) + (int)(!is_equal(MO,0)) + (int)(!is_equal(CD,0)))!=1;
+        if constexpr(tmp) return false;
+        //Now check that that one is 1
+        else return (L+M+T+K+A+MO+CD)==1;
+    }///<Check if this type is a fundamental unit type (only one exponent is 1, all others are zero)
+
     static constexpr size_t whichFundamentalType(){
         //I am sorry, but the compiler parameter order and the usual SI units order do not match and it's too late to fix. These are the order of the strings in unitNames
-        return (L==1)? 1 : (M==1)? 0 : (T==1)? 2 : (K==1)? 3 : (A==1)? 4 : (MO==1)? 5 : 6;}///<Get the index of the fundamental unit type (0-6), junk if not fundamental
+        return is_equal(L,1)? 1 : is_equal(M,1)? 0 : is_equal(T,1)? 2 : is_equal(K,1)? 3 : is_equal(A,1)? 4 : is_equal(MO,1)? 5 : 6;}///<Get the index of the fundamental unit type (0-6), junk if not fundamental
 
     template<SF Li, SF Mi, SF Ti, SF Ki, SF Ai, SF MOi, SF CDi, typename STi>
     constexpr bool isSameUnits(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
