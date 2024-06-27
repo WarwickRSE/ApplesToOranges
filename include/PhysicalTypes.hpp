@@ -62,5 +62,16 @@ using MagneticFluxDensity = UnitCheckedTypeElectrodynamic<0, 1, -2, 0, -1, dblsc
 
 using Illuminance = UnitCheckedTypeFull<-2, 0, 0, 0, 0, 0, 1, dblscalar>;
 
+//For convenience, a function to set nice unit strings for commonest SI compounds
+void registerSIUnitStrings(){
+    UnitChecked::registerUnits<Force>("N");
+    UnitChecked::registerUnits<Pressure>("Pa");
+    UnitChecked::registerUnits<Power>("W");
+    UnitChecked::registerUnits<Energy>("J");
+    UnitChecked::registerUnits<Charge>("C");
+    UnitChecked::registerUnits<Voltage>("V");
+    UnitChecked::registerUnits<Capacitance>("F");
+    UnitChecked::registerUnits<Resistance>("Ohm");
+}
 
 #endif

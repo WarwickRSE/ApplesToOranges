@@ -28,16 +28,16 @@
 /** @file
  * Physical Units checked types, wrapping some sort of data storage type
  *
- * Units are in order with short names:
- *- L Length (m)
+ * SI Units are based on expressing the units for any physical quantity as a product of powers of the fundamental units. The fundamental units and their short names are:
  *- M Mass (kg)
+ *- L Length (m)
  *- T Time (s)
  *- K Temperature (K)
  *- A Current (A)
  *- MO Amount (mole)
  *- CD Luminous intensity (cd)
 *
-* NOTE: For clarity, we use "Unitless" to mean "a UnitCheckedTypeFull" for which all exponents are zero, and use phrases such as "numeric type" or "ordinary type" to mean types which are not UnitCheckedTypeFull at all.
+* NOTE: For clarity, we use "Unitless" to mean "a UnitCheckedTypeFull" for which all exponents are zero, and use phrases such as "numeric type" or "ordinary type" to mean types which are not UnitCheckedTypeFull at all. We also use "Fundamental" to mean one of the SI base units above (exactly one of these has an exponent of exactly one, all others are zero), and "Compound" to describe any other combination or power of these.
 *
 * NOTE 2: Prefixes (e.g. milli, kilo etc) are not included in this code. Mixing prefixes is risky and can lead to numerical unexpectedness, so we do not implement it.
 But if you use, for example, microns for length, and then use microns everywhere, in all compounds, then your results will correctly come out in microns too. See unitNames for how you can change the displayed unit names for this and other purposes.
@@ -49,25 +49,31 @@ If you do change this, probably do it once, at the start of a program, and then 
 */
 /// Extra stuff for display
 namespace UnitChecked{
-    /// Strings for printing unit names
+    /// Strings for printing Fundamental names
     inline std::string unitNames[7] = {"kg", "m", "s", "K", "A", "mol", "cd"};
+    /// Strings for printing Compound names
     inline std::map<std::type_index, std::string> customUnitStrings;
     template<typename T>
-    inline void registerUnits(std::string newUnits){
-        if constexpr (T::isFundamentalType()){
+    inline constexpr void registerUnits(std::string_view newUnits){
+        /// Register a new unit string for a type
+        /** Stores a Units string. If T is a Fundamental unit, this overrides the text in all cases. If T is a Compound unit, this overrides the text only for that exact type, and takes precedence over the Fundamental unit text.
+         * @param newUnits The new unit string (likely a string literal)
+        */
+        if constexpr(T::isFundamentalType()){
           unitNames[T::whichFundamentalType()] = newUnits;
         }else{
           customUnitStrings[std::type_index(typeid(T))] = newUnits;
         }
     }
-    //Convenience function to set based on an instance
     template<typename T>
-    inline void registerUnitsForTypeOf(const T & theType, std::string newUnits){
-        if constexpr (T::isFundamentalType()){
-          unitNames[T::whichFundamentalType()] = newUnits;
-        }else{
-          customUnitStrings[std::type_index(typeid(theType))] = newUnits;
-        }
+    inline constexpr void registerUnitsForTypeOf(const T & theType, std::string_view newUnits){
+        /// Register a new unit string for a type
+        /**
+         * Uses an instance rather than requiring user specify the template parameter but NOTE this applies to ALL instances, not just the passed one.
+         * @param theType An instance of the type to be registered
+         * @param newUnits The new unit string (likely a string literal)
+        */
+        registerUnits<T>(newUnits);
     }
 };
 /** @brief The basic Unit Checked wrapper type
@@ -247,7 +253,7 @@ class UnitCheckedTypeFull{
     }///<Stringify using stream operator
 
     static std::string units(){
-      std::string theUnits = make_unit_str();
+      const std::string theUnits = make_unit_str();
       if(UnitChecked::customUnitStrings.count(std::type_index(typeid(UnitCheckedTypeFull)))>0)
         return UnitChecked::customUnitStrings[std::type_index(typeid(UnitCheckedTypeFull))];
       return theUnits;

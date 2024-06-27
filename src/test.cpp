@@ -630,10 +630,12 @@ void last_bits(){
 #endif
 
   Force f{1.0};
+  Voltage v{0.1};
   //If we want to have different names for our units, we can manipulate the _strings used for display_
   //Fundamental types can be changed, and will print this way for ALL compounds
-  std::cout<<"Length is Fundamental? "<<l.isFundamentalType()<<" or "<<Length::isFundamentalType()<<std::endl;
+  std::cout<<"Length is Fundamental (checking 2 ways)? "<<l.isFundamentalType()<<" or "<<Length::isFundamentalType()<<std::endl;
   std::cout<<"Force is not? "<<f.isFundamentalType()<<" or "<<Force::isFundamentalType()<<std::endl;
+  std::cout<<"Voltage is also not? "<<v.isFundamentalType()<<" or "<<Voltage::isFundamentalType()<<std::endl;
 
   UnitChecked::registerUnits<Length>("mic");
   std::cout<<"Units can be customised: Length will now show as "<<l<<l.units()<<" and in compounds such as Force as "<<f.units()<<std::endl;
@@ -651,6 +653,21 @@ void last_bits(){
   std::cout<<"Similarly ALL forces will now show as "<<f2<<f2.units()<<std::endl;
   auto fl = f*l;
   std::cout<<"But compounded types will still show as "<<fl.units()<<std::endl;
+
+  //Using a string variable rather than a literal
+  std::string units = "lbs";
+  UnitChecked::registerUnits<Force>(units);
+  std::cout<<"Force will now show as "<<f<<f.units()<<std::endl;
+
+  UnitChecked::registerUnits<Pressure>("kPa");
+  Pressure p{1.0};
+  std::cout<<"And now Pressure will show as "<<p<<p.units()<<std::endl;
+
+
+  //Using the helper for SI common set
+  registerSIUnitStrings();
+  std::cout<<"And now we have some nice _printing_ for common SI units such as a Voltage like "<<v<<v.units()<<" and Pressure like "<<p<<p.units()<<std::endl;
+  std::cout<<"But remember this wont affect further compounds, such as Voltage/Length which is still "<<(v/l).units()<<std::endl;
 };
 
 void io_checks(){
@@ -796,13 +813,20 @@ void internal_checks(){
   UnitCheckedTypeFull<0, 0, 0, 0, 0, 1, 1, dblscalar> U5;
   UnitCheckedTypeFull<0, 0, 0, 0, 0, 0, 1, dblscalar> U6;
   assert(!U1.hasNoUnits() && !U2.hasNoUnits() && !U3.hasNoUnits() && !U4.hasNoUnits() && !U5.hasNoUnits() && !U6.hasNoUnits());
-  assert(!U1.isSameUnits(U2) && !U2.isSameUnits(U3) && !U3.isSameUnits(U4) && !U4.isSameUnits(U5));
+  assert(!allOne.isSameUnits(U1) && !U1.isSameUnits(U2) && !U2.isSameUnits(U3) && !U3.isSameUnits(U4) && !U4.isSameUnits(U5));
   std::cout<<U1.hasNoUnits()<<" "<<U2.hasNoUnits()<<" "<<U3.hasNoUnits()<<" "<<U4.hasNoUnits()<<" "<<U5.hasNoUnits()<<" "<<U6.hasNoUnits()<<std::endl;
   std::cout<<U1.isSameUnits(U2)<<" "<<U2.isSameUnits(U3)<<" "<<U3.isSameUnits(U4)<<" "<<U4.isSameUnits(U5)<<" "<<U5.isSameUnits(U6)<<std::endl;
-  std::cout<<"Internal checks OK\n";
 
   //Ditto for isFundamentalType
-  assert(!U1.isFundamentalType() && !U2.isFundamentalType() && !U3.isFundamentalType() && !U4.isFundamentalType() && !U5.isFundamentalType() && U6.isFundamentalType());
+  assert(!allOne.isFundamentalType() && !U1.isFundamentalType() && !U2.isFundamentalType() && !U3.isFundamentalType() && !U4.isFundamentalType() && !U5.isFundamentalType() && U6.isFundamentalType());
+  // Cases with some exponents not unity, esp cases where they sum to zero
+  UnitCheckedTypeFull<1, -1, 1, -1, 1, -1, 0, dblscalar> U7;
+  UnitCheckedTypeFull<0, 2, 2, 2, -2, -2, -2, dblscalar> U8;
+  UnitCheckedTypeFull<1, 2, 3, 4, 5, 6, 7, dblscalar> U9;
+  UnitCheckedTypeFull<1, 2, 0, 3, -3, -2, -1, dblscalar> U10;
+  UnitCheckedTypeFull<0, 0, 0, 2, 0, 0, 0, dblscalar> U11;
+  UnitCheckedTypeFull<0, -1, 0, 0, 0, 0, 0, dblscalar> U12;
+  assert(!U7.isFundamentalType() && !U8.isFundamentalType() && !U9.isFundamentalType() && !U10.isFundamentalType() && !U11.isFundamentalType() && !U12.isFundamentalType());
   // And check we get the right index from whichFundamentalType
   assert(l.whichFundamentalType() == 1 && (U1/U2).whichFundamentalType() == 0 && (U2/U3).whichFundamentalType() == 2 && (U3/U4).whichFundamentalType() == 3 && (U4/U5).whichFundamentalType() == 4 && (U5/U6).whichFundamentalType() == 5 && U6.whichFundamentalType() == 6);
 
@@ -823,6 +847,8 @@ void internal_checks(){
   auto el3 = t.getElement(1, 2);
   assert(t.isSameUnits(el3) && !t.isSameType(el3));
   assert(el3.unsafeGet() == t.unsafeGet(1, 2));
+
+  std::cout<<"Internal checks OK\n";
 }
 
 
