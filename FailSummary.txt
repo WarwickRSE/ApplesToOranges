@@ -28,3 +28,18 @@ Failure 5:
     NOTE: this is only a warning in GCC
         "error: non-constant-expression cannot be narrowed from type 'double' to 'float' in initializer list" [Clang]
         "warning: narrowing conversion of ‘tmp2’ from ‘double’ to ‘float’" [GCC]
+
+Failure 6:
+    Issues with references and misuse of constness, r-values etc
+    a. Trying to get a non-const reference to a temporary, which is a const ref
+        error: static_assert failed due to requirement '!STScalarRef<double, true>::is_const_v' "Error: Trying to remove const from a reference!"
+        error: static assertion failed: Error: Trying to remove const from a reference!
+    b. Ditto, but for a normal type, so compiler detects this
+        error: non-const lvalue reference to type 'double' cannot bind to a temporary of type 'double'
+        cannot bind non-const lvalue reference of type 'double&' to an rvalue of type 'double'
+    c. Trying to write to a const-ref type
+         error: static_assert failed due to requirement '!true' "Cannot assign to const reference"
+         error: static assertion failed: Cannot assign to const reference
+    d. Using a (const)-ref-to-rvalue after the line it is created
+        shows as an assertion error on the value, depending on optimisation
+        NOTE: we are allowed to use the _reference_ object, but NOT the value it references.

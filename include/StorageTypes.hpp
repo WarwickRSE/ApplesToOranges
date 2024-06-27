@@ -59,10 +59,13 @@ class STScalar{
           return *this;
         }///<Copy assignment
 
-        constexpr T& get(){
+        constexpr T& get()&{
             return val;
         }///<Get the value (by reference)
-        constexpr T get()const{
+        constexpr const T& get()const&{
+            return val;
+        }///<Get the value (by const reference)
+        constexpr T get()const&&{
             return val;
         }///<Get the value (by copy)
 
@@ -164,6 +167,73 @@ std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
   return is;
 };
 
+/// A special scalar reference type
+/* This is needed for the LHS of reference assignments etc, but mostly
+silently converts to a scalar in other operations
+*/
+template <typename T, bool is_const=false>
+class STScalarRef{
+  public:
+    typedef typename std::conditional<is_const, const T, T>::type T_qual;
+    static constexpr bool is_const_v = is_const;
+    T_qual &val;
+    STScalarRef(T_qual &val_in):val(val_in){}
+    STScalarRef(const STScalarRef &a) = default;
+
+    STScalarRef operator=(const STScalarRef &a){
+      static_assert(!is_const, "Cannot assign to const reference");
+      if constexpr(!is_const){
+        val=a.val;
+      }
+      return *this;
+    }
+    template<typename U>
+    STScalarRef operator=(const U &a){
+      static_assert(!is_const, "Cannot assign to const reference");
+      if constexpr(!is_const){
+        val=a.get();
+      }
+      return *this;
+    }
+    operator STScalar<T>()const{
+      return STScalar<T>(val);
+    }
+};
+///Stream output for Scalar refs
+template <typename T, bool c>
+std::ostream& operator<<(std::ostream& os, const STScalarRef<T, c> & val_in){
+  os <<val_in.val;
+  return os;
+};
+
+namespace STUtils{
+///Generic function to "strip reference" from a type - no-op for most Storage types
+template<typename ST>
+ST StripReference(const ST& a){
+  return a;
+}
+///Specialisation for STScalarRef decaying to STScalar
+template<typename T>
+STScalar<T> StripReference(const STScalarRef<T> &a){
+  return STScalar<T>(a);
+}
+
+template<typename T>
+struct is_ref{
+  static constexpr bool value = false;
+  static constexpr bool is_const = false;
+  static constexpr bool combo = value && is_const; // Shorthand for both
+};
+
+template<typename T, bool c>
+struct is_ref<STScalarRef<T,c> >{
+  static constexpr bool value = true;
+  static constexpr bool is_const = c;
+  static constexpr bool combo = value && is_const;
+};
+};
+
+
 //Forward declare for use in outer product
 template <typename T, int dim>
 class STTensor;
@@ -256,17 +326,28 @@ class STVector{
             return val[i];
         }
         /// Get by reference
-        constexpr T& get(size_t i){
+        constexpr T& get(size_t i)&{
+            return val[i];
+        }
+        /// Get by const reference
+        constexpr const T& get(size_t i)const&{
             return val[i];
         }
         /// Get by copy
-        constexpr T get(size_t i)const{
+        constexpr T get(size_t i)const&&{
             return val[i];
         }
 
         /// Get element (as a valid StorageType)
         constexpr auto getElement(size_t i)const{
-            return STScalar<T>{val[i]};
+            return STScalar<T>(val[i]);
+        }
+        /// Get reference to element (as a valid reference StorageType)
+        constexpr STScalarRef<T, false> getElementRef(size_t i){
+            return STScalarRef<T, false>(val[i]);
+        }
+        constexpr STScalarRef<T, true> getElementRef(size_t i)const{
+            return STScalarRef<T, true>(val[i]);
         }
 
         /// Identity entity
@@ -607,11 +688,15 @@ class STTensor{
             return val[i];
         }
         /// 2-D access (0<=i,j<dim) by reference
-        constexpr T& get(size_t i, size_t j){
+        constexpr T& get(size_t i, size_t j)&{
+            return val[i*dim+j];
+        }
+        /// 2-D access (0<=i,j<dim) by reference
+        constexpr const T& get(size_t i, size_t j)const&{
             return val[i*dim+j];
         }
         /// 2-D access (0<=i,j<dim) by copy
-        constexpr T get(size_t i, size_t j)const{
+        constexpr T get(size_t i, size_t j)const&&{
             return val[i*dim+j];
         }
 
@@ -626,6 +711,10 @@ class STTensor{
               out[j]=val[i*dim+j];
             }
             return out;
+        }
+        ///Get reference to an element
+        constexpr STScalarRef<T> getElementRef(size_t i, size_t j){
+            return STScalarRef<T>(val[i*dim+j]);
         }
 
         /// Identity entity (i.e. diagonal ones)
