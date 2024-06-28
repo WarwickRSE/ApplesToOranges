@@ -886,12 +886,20 @@ void internal_checks(){
   std::cout<<"And now we have modified t using a reference-to-element\n "<<t<<std::endl;
   assert(t.get(1, 2) == 1.7);
 
+  //Get const ref - this works fine and we can access it
+  const auto y=x;
+  auto el8 = y.getElementRef(0);
+  std::cout<<"Accesing an element via const-ref obj "<<el8<<std::endl;
+  assert(el8 == Length{1.5});
+
 #ifdef FAIL_DEMO
-  //Can't do this - no reference to a temporary (rvalue)
-  auto el7 = (x + x).getElementRef(0);
+  //Can't do this - no non-const reference to a temporary (rvalue)
+  UnitCheckedType<1, 0, 0, STScalarRef<double, false> > el7 = (x + x).getElementRef(0);
+
+  el8 = Length{1.0};// el8 is constref, can't write
 
   //Disallow reference access to r-values with get too
-  double & el8 = (v+v).get(0);
+  double & el7a = (v+v).get(0);
 #endif
 
   std::cout<<"Internal checks OK\n";

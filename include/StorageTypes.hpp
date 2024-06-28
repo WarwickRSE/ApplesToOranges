@@ -172,25 +172,39 @@ std::istream& operator>>(std::istream& is, STScalar<T>& val_in){
 /* This is needed for the LHS of reference assignments etc, but mostly
 silently converts to a scalar in other operations
 */
-template <typename T>
+template <typename T, bool is_const=false>
 class STScalarRef{
   public:
-    T &val;
-    STScalarRef(T &val_in):val(val_in){}
+    typedef typename std::conditional<is_const, const T, T>::type T_qual;
+    static constexpr bool is_const_v = is_const;
+    T_qual &val;
+    STScalarRef(T_qual &val_in):val(val_in){}
     STScalarRef(const STScalarRef &a) = default;
 
     STScalarRef operator=(const STScalarRef &a){
-      val=a.val;
+      static_assert(!is_const, "Cannot assign to const reference");
+      if constexpr(!is_const){
+        val=a.val;
+      }
       return *this;
     }
     template<typename U>
     STScalarRef operator=(const U &a){
-      val=a.get();
+      static_assert(!is_const, "Cannot assign to const reference");
+      if constexpr(!is_const){
+        val=a.get();
+      }
       return *this;
     }
     operator STScalar<T>()const{
       return STScalar<T>(val);
     }
+};
+///Stream output for Scalar refs
+template <typename T, bool c>
+std::ostream& operator<<(std::ostream& os, const STScalarRef<T, c> & val_in){
+  os <<val_in.val;
+  return os;
 };
 
 ///Generic function to "strip reference" from a type - no-op for most Storage types
@@ -314,8 +328,11 @@ class STVector{
             return STScalar<T>(val[i]);
         }
         /// Get reference to element (as a valid reference StorageType)
-        constexpr STScalarRef<T> getElementRef(size_t i){
-            return STScalarRef<T>(val[i]);
+        constexpr STScalarRef<T, false> getElementRef(size_t i){
+            return STScalarRef<T, false>(val[i]);
+        }
+        constexpr STScalarRef<T, true> getElementRef(size_t i)const{
+            return STScalarRef<T, true>(val[i]);
         }
 
         /// Identity entity

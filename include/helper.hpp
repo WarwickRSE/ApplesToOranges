@@ -27,14 +27,24 @@ struct extract_value_type<X<T, dim_>>
 };
 
 template<typename T, typename T2>
-struct extract_modified_type
+struct ST_modify_template_type
 {
     typedef T2 modified_type;
 };
-template<template<typename> class X, typename ST, typename STm>
-struct extract_modified_type<X<ST>, STm>
+template<template<typename> class X, typename ST ,typename STm>
+struct ST_modify_template_type<X<ST>, STm>
 {
     typedef X<STm> modified_type;
+};
+template<typename T>
+struct ST_add_const
+{
+    typedef T modified_type;
+};
+template<template<typename, bool> class X, typename ST, bool cc>
+struct ST_add_const<X<ST, cc>>
+{
+    typedef X<ST, true> modified_type; //Bool param always true
 };
 
 #endif

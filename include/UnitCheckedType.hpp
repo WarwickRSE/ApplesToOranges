@@ -122,6 +122,15 @@ class UnitCheckedTypeFull{
     constexpr explicit UnitCheckedTypeFull(Tl x):val(x){}///<Prospective single element constructor
 
     constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull& src):val(src.val){}///<Copy constructor
+    ///Copy constructor fake to make a nicer error message if we try and remove the const-ness from a ref
+    //We will get two errors due to not handling val construction, but this is a bit nicer
+    template <typename STm, typename=std::enable_if_t<!std::is_same_v<ST, STm> > >
+    constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD, STm> & in){
+      if constexpr(STm::is_const_v && !ST::is_const_v){
+        static_assert(!STm::is_const_v, "Error: Trying to remove const from a reference!");
+      }
+    }
+
     constexpr UnitCheckedTypeFull(const ST& src):val(src){}///<Constructor from storage type value
     constexpr UnitCheckedTypeFull& operator=(const UnitCheckedTypeFull& src){
         val=src.val;
@@ -240,7 +249,13 @@ class UnitCheckedTypeFull{
     /// Reference value access, preserving units. NOTE: only valid for l-values ("real" variables, not temporaries)
     template <typename... Args>
     auto getElementRef(Args ... args_in)&{
-        using STm = typename extract_modified_type<ST, ReturnTypeElementRef<ST, Args...> >::modified_type;
+        using STm = ReturnTypeElementRef<ST, Args...>;
+        UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
+        return tval;
+    }
+    template <typename... Args>
+    auto getElementRef(Args ... args_in)const&{
+        using STm = typename ST_add_const<ReturnTypeElementRef<ST, Args...> >::modified_type;
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;
     }
