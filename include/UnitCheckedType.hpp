@@ -123,9 +123,9 @@ class UnitCheckedTypeFull{
 
     constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull& src):val(src.val){}///<Copy constructor
     ///Copy constructor fake to make a nicer error message if we try and remove the const-ness from a ref
-    //We will get two errors due to not handling val construction, but this is a bit nicer
+    //NOTE: actually setting val like this is _WRONG_ but with the assert this code will never compile, so we do it to squelch a confusing warning
     template <typename STm, typename=std::enable_if_t<!std::is_same_v<ST, STm> > >
-    constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD, STm> & in){
+    constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD, STm> & in):val(src.val){
       if constexpr(STm::is_const_v && !ST::is_const_v){
         static_assert(!STm::is_const_v, "Error: Trying to remove const from a reference!");
       }
