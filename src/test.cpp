@@ -276,7 +276,7 @@ void debug_checks(){
 #ifdef DEBUG
   // Debug check making sure that we can instantiate a type without any methods, and thus do not force any methods to be defined
   const UnitCheckedType<0, 0, 0, STDummy> dummy;
-  assert(dummy.get()==0);
+  std::cout<<&dummy<<std::endl; //Use dummy to make sure it must exist
 
   std::cout<<"Done"<<std::endl;
   std::cout<<"___________________________________________________________"<<std::endl;
