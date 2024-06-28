@@ -890,7 +890,7 @@ void internal_checks(){
   const auto y=x;
   auto el8 = y.getElementRef(0);
   assert(el8.isConstRef());
-  std::cout<<"Accesing an element via const-ref obj "<<el8<<std::endl;
+  std::cout<<"Accesing an element via const-ref obj "<<el8<<" ( "<<el8.isConstRef()<<" )"<<std::endl;
   assert(el8 == Length{1.5});
 
   // Getting a const ref to a temporary
