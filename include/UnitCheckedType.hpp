@@ -231,8 +231,9 @@ class UnitCheckedTypeFull{
         tval.set(val.getElement(args_in...));
         return tval;
     }
+    /// Reference value access, preserving units. NOTE: only valid for l-values ("real" variables, not temporaries)
     template <typename... Args>
-    auto getElementRef(Args ... args_in){
+    auto getElementRef(Args ... args_in)&{
         using STm = typename extract_modified_type<ST, ReturnTypeElementRef<ST, Args...> >::modified_type;
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;

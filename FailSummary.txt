@@ -28,3 +28,8 @@ Failure 5:
     NOTE: this is only a warning in GCC
         "error: non-constant-expression cannot be narrowed from type 'double' to 'float' in initializer list" [Clang]
         "warning: narrowing conversion of ‘tmp2’ from ‘double’ to ‘float’" [GCC]
+
+Failure 6:
+    Trying to get a reference to a temporary (Line ...)
+         error: no matching member function for call to 'getElementRef' [with explanation: candidate function template not viable: expects an lvalue for object argument]
+          error: passing 'UnitCheckedTypeFull< ...type trimmed...>' as 'this' argument discards qualifiers

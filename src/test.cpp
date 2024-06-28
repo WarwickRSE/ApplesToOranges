@@ -886,6 +886,11 @@ void internal_checks(){
   std::cout<<"And now we have modified t using a reference-to-element\n "<<t<<std::endl;
   assert(t.get(1, 2) == 1.7);
 
+#ifdef FAIL_DEMO
+  //Can't do this - no reference to a temporary (rvalue)
+  auto el7 = (x + x).getElementRef(0);
+#endif
+
   std::cout<<"Internal checks OK\n";
 }
 
