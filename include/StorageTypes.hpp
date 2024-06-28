@@ -218,6 +218,19 @@ STScalar<T> STStripReference(const STScalarRef<T> &a){
   return STScalar<T>(a);
 }
 
+template<typename T>
+struct ST_is_ref{
+  static constexpr bool value = false;
+  static constexpr bool is_const = false;
+};
+
+template<typename T, bool c>
+struct ST_is_ref<STScalarRef<T,c> >{
+  static constexpr bool value = true;
+  static constexpr bool is_const = c;
+};
+
+
 
 //Forward declare for use in outer product
 template <typename T, int dim>

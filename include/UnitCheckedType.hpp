@@ -126,7 +126,8 @@ class UnitCheckedTypeFull{
     //NOTE: actually setting val like this is _WRONG_ but with the assert this code will never compile, so we do it to squelch a confusing warning
     template <typename STm, typename=std::enable_if_t<!std::is_same_v<ST, STm> > >
     constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD, STm> & src):val(src.val){
-      if constexpr(STm::is_const_v && !ST::is_const_v){
+      //If STm is a const ref, and ST is a non-const ref, cannot convert
+      if constexpr(ST_is_ref<STm>::value && ST_is_ref<STm>::is_const &&  ST_is_ref<ST>::value && !ST_is_ref<ST>::is_const){
         static_assert(!STm::is_const_v, "Error: Trying to remove const from a reference!");
       }
     }
