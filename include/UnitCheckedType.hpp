@@ -127,7 +127,7 @@ class UnitCheckedTypeFull{
     template <typename STm, typename=std::enable_if_t<!std::is_same_v<ST, STm> > >
     constexpr UnitCheckedTypeFull(const UnitCheckedTypeFull<L,M,T,K,A,MO,CD, STm> & src):val(src.val){
       //If STm is a const ref, and ST is a non-const ref, cannot convert
-      if constexpr(ST_is_ref<STm>::value && ST_is_ref<STm>::is_const &&  ST_is_ref<ST>::value && !ST_is_ref<ST>::is_const){
+      if constexpr(STUtils::is_ref<STm>::value && STUtils::is_ref<STm>::is_const &&  STUtils::is_ref<ST>::value && !STUtils::is_ref<ST>::is_const){
         static_assert(!STm::is_const_v, "Error: Trying to remove const from a reference!");
       }
     }
@@ -256,7 +256,7 @@ class UnitCheckedTypeFull{
     }
     template <typename... Args>
     auto getElementRef(Args ... args_in)const&{
-        using STm = typename ST_add_const<ReturnTypeElementRef<ST, Args...> >::modified_type;
+        using STm = typename STUtils::add_const<ReturnTypeElementRef<ST, Args...> >::modified_type;
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;
     }
@@ -387,7 +387,7 @@ class UnitCheckedTypeFull{
     template<typename Q, typename...Args>
     using ReturnTypeElementRef = decltype(std::declval<Q>().getElementRef(std::declval<Args>()...));
     template<typename Q=ST>
-    using ReturnTypeStripRef = decltype(STStripReference(std::declval<Q>()));
+    using ReturnTypeStripRef = decltype(STUtils::StripReference(std::declval<Q>()));
     template<typename Ts>
     using ReturnTypeMultiply = decltype(operator*(std::declval<ST>(), std::declval<Ts>()));
     template<typename Ts>
@@ -432,7 +432,7 @@ class UnitCheckedTypeFull{
         //Case where StripRef has an effect - implies it's a ref...
         if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
           UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > tval;
-          tval.val = STStripReference(lhs.val) + other.val;
+          tval.val = STUtils::StripReference(lhs.val) + other.val;
           return tval;
         }else{
           UnitCheckedTypeFull tval;
@@ -449,7 +449,7 @@ class UnitCheckedTypeFull{
     friend UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > operator-(const UnitCheckedTypeFull & lhs, const UnitCheckedTypeFull<L,M,T,K,A,MO,CD,U> & other){
         if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
           UnitCheckedTypeFull<L,M,T,K,A,MO,CD, ReturnTypeStripRef<> > tval;
-          tval.val = STStripReference(lhs.val) - other.val;
+          tval.val = STUtils::StripReference(lhs.val) - other.val;
           return tval;
         }else{
           UnitCheckedTypeFull tval;
@@ -461,7 +461,7 @@ class UnitCheckedTypeFull{
     auto operator*(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
       if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
         UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<ReturnTypeStripRef<STi> > > tval;
-        tval.val = STStripReference(val)*other.val;
+        tval.val = STUtils::StripReference(val)*other.val;
         return tval;
       }else{
         UnitCheckedTypeFull<L+Li, M+Mi, T+Ti, K+Ki, A+Ai, MO+MOi, CD+CDi, ReturnTypeMultiply<STi> > tval;
@@ -473,7 +473,7 @@ class UnitCheckedTypeFull{
     auto operator/(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> &other)const{
       if constexpr(!std::is_same_v<ST, ReturnTypeStripRef<> >){
         UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeMultiply<ReturnTypeStripRef<STi> > > tval;
-        tval.val = STStripReference(val)/other.val;
+        tval.val = STUtils::StripReference(val)/other.val;
         return tval;
       }else{
         UnitCheckedTypeFull<L-Li, M-Mi, T-Ti, K-Ki, A-Ai, MO-MOi, CD-CDi, ReturnTypeDivide<STi> > tval;

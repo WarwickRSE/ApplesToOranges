@@ -207,29 +207,32 @@ std::ostream& operator<<(std::ostream& os, const STScalarRef<T, c> & val_in){
   return os;
 };
 
+namespace STUtils{
 ///Generic function to "strip reference" from a type - no-op for most Storage types
 template<typename ST>
-ST STStripReference(const ST& a){
+ST StripReference(const ST& a){
   return a;
 }
 ///Specialisation for STScalarRef decaying to STScalar
 template<typename T>
-STScalar<T> STStripReference(const STScalarRef<T> &a){
+STScalar<T> StripReference(const STScalarRef<T> &a){
   return STScalar<T>(a);
 }
 
 template<typename T>
-struct ST_is_ref{
+struct is_ref{
   static constexpr bool value = false;
   static constexpr bool is_const = false;
+  static constexpr bool combo = value && is_const; // Shorthand for both
 };
 
 template<typename T, bool c>
-struct ST_is_ref<STScalarRef<T,c> >{
+struct is_ref<STScalarRef<T,c> >{
   static constexpr bool value = true;
   static constexpr bool is_const = c;
+  static constexpr bool combo = value && is_const;
 };
-
+};
 
 
 //Forward declare for use in outer product

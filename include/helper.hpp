@@ -26,25 +26,27 @@ struct extract_value_type<X<T, dim_>>
     static const int dim = dim_;
 };
 
+namespace STUtils{
 template<typename T, typename T2>
-struct ST_modify_template_type
+struct modify_template_type
 {
     typedef T2 modified_type;
 };
 template<template<typename> class X, typename ST ,typename STm>
-struct ST_modify_template_type<X<ST>, STm>
+struct modify_template_type<X<ST>, STm>
 {
     typedef X<STm> modified_type;
 };
 template<typename T>
-struct ST_add_const
+struct add_const
 {
     typedef T modified_type;
 };
 template<template<typename, bool> class X, typename ST, bool cc>
-struct ST_add_const<X<ST, cc>>
+struct add_const<X<ST, cc>>
 {
     typedef X<ST, true> modified_type; //Bool param always true
+};
 };
 
 #endif
