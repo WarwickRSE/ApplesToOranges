@@ -60,10 +60,13 @@ class STScalar{
           return *this;
         }///<Copy assignment
 
-        constexpr T& get(){
+        constexpr T& get()&{
             return val;
         }///<Get the value (by reference)
-        constexpr T get()const{
+        constexpr const T& get()const&{
+            return val;
+        }///<Get the value (by const reference)
+        constexpr T get()const&&{
             return val;
         }///<Get the value (by copy)
 
@@ -294,11 +297,15 @@ class STVector{
             return val[i];
         }
         /// Get by reference
-        constexpr T& get(size_t i){
+        constexpr T& get(size_t i)&{
+            return val[i];
+        }
+        /// Get by const reference
+        constexpr const T& get(size_t i)const&{
             return val[i];
         }
         /// Get by copy
-        constexpr T get(size_t i)const{
+        constexpr T get(size_t i)const&&{
             return val[i];
         }
 
@@ -649,11 +656,15 @@ class STTensor{
             return val[i];
         }
         /// 2-D access (0<=i,j<dim) by reference
-        constexpr T& get(size_t i, size_t j){
+        constexpr T& get(size_t i, size_t j)&{
+            return val[i*dim+j];
+        }
+        /// 2-D access (0<=i,j<dim) by reference
+        constexpr const T& get(size_t i, size_t j)const&{
             return val[i*dim+j];
         }
         /// 2-D access (0<=i,j<dim) by copy
-        constexpr T get(size_t i, size_t j)const{
+        constexpr T get(size_t i, size_t j)const&&{
             return val[i*dim+j];
         }
 

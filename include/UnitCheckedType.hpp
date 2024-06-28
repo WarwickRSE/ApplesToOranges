@@ -197,13 +197,19 @@ class UnitCheckedTypeFull{
 
     /// Value access for Unitless type
     template <typename... Args>
-    auto& get(Args ... args_in){
+    auto& get(Args ... args_in)&{
+      static_assert(hasNoUnits());
+      return val.get(args_in...);
+    }
+    /// Value access for Unitless type (const ref version)
+    template <typename... Args>
+    constexpr const auto & get(Args ... args_in)const&{
       static_assert(hasNoUnits());
       return val.get(args_in...);
     }
     /// Value access for Unitless type (const version)
     template <typename... Args>
-    constexpr auto get(Args ... args_in)const{
+    constexpr auto get(Args ... args_in)const&&{
       static_assert(hasNoUnits());
       return val.get(args_in...);
     }

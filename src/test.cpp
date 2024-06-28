@@ -889,6 +889,9 @@ void internal_checks(){
 #ifdef FAIL_DEMO
   //Can't do this - no reference to a temporary (rvalue)
   auto el7 = (x + x).getElementRef(0);
+
+  //Disallow reference access to r-values with get too
+  double & el8 = (v+v).get(0);
 #endif
 
   std::cout<<"Internal checks OK\n";
