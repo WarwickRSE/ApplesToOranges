@@ -372,6 +372,8 @@ class UnitCheckedTypeFull{
     constexpr bool isSameType(const UnitCheckedTypeFull<Li, Mi, Ti, Ki, Ai, MOi, CDi, STi> & other)const{
         return isSameUnits(other) && isSameRank(other);
     }///<Compare Units and StorageType
+
+    static constexpr bool isConstRef(){return ST::is_const_v;}///<Check if the storage type is a const_ref
 ///@}
 
 /** @name Return typedefs

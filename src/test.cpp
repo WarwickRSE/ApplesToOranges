@@ -889,14 +889,21 @@ void internal_checks(){
   //Get const ref - this works fine and we can access it
   const auto y=x;
   auto el8 = y.getElementRef(0);
+  assert(el8.isConstRef());
   std::cout<<"Accesing an element via const-ref obj "<<el8<<std::endl;
   assert(el8 == Length{1.5});
 
 #ifdef FAIL_DEMO
-  //Can't do this - no non-const reference to a temporary (rvalue)
-  UnitCheckedType<1, 0, 0, STScalarRef<double, false> > el7 = (x + x).getElementRef(0);
 
   el8 = Length{1.0};// el8 is constref, can't write
+
+  //Can't do this - no non-const reference to a temporary (rvalue)
+  // Note if we use auto we get a const reference, which is correct - see below
+  UnitCheckedType<1, 0, 0, STScalarRef<double, false> > el7 = (x + x).getElementRef(0);
+
+  auto el7b = (x + x).getElementRef(0);
+  assert(el7b.isConstRef());
+  el7b = Length{1.0}; // el7b is constref, can't write
 
   //Disallow reference access to r-values with get too
   double & el7a = (v+v).get(0);
