@@ -730,7 +730,8 @@ void internal_checks(){
   std::cout<<"Checking if Time is numeric (storage type) "<<is_unitchecked_numeric_v<Time><<std::endl;
   static_assert(is_unitchecked_numeric_v<Time>);
 
-  UnitCheckedType<0, 0, 0, std::string> uct;
+  class blank{}; // A type which is not numeric
+  UnitCheckedType<0, 0, 0, STScalar<blank> > uct;
   std::cout<<"Checking a non-numeric storage type "<<is_unitchecked_numeric_v<decltype(uct)><<std::endl;
   static_assert(!is_unitchecked_numeric_v<decltype(uct)>);
 
