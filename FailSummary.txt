@@ -33,3 +33,6 @@ Failure 6:
     Trying to get a reference to a temporary (Line ...)
          error: no matching member function for call to 'getElementRef' [with explanation: candidate function template not viable: expects an lvalue for object argument]
           error: passing 'UnitCheckedTypeFull< ...type trimmed...>' as 'this' argument discards qualifiers
+    Or trying to capture reference when RHS is an r-value thus gives a value
+        error: non-const lvalue reference to type 'double' cannot bind to a temporary of type 'double'
+        cannot bind non-const lvalue reference of type 'double&' to an rvalue of type 'double'
