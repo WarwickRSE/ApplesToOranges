@@ -1,3 +1,9 @@
+v 2.1.2 -> v2.2
+* Customisable unit output strings (for fundamental and compound)
+* Element-wise getters (by copy and by reference) retaining units
+* More developer debug tests and warnings
+* Developer docs
+
 v 2.1.1 -> v2.1.2
 * Add missing equality operators on tensors
 * BUGFIX - stream reading was not opposite of writing
