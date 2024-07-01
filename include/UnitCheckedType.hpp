@@ -254,6 +254,7 @@ class UnitCheckedTypeFull{
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;
     }
+    ///Reference value access, preseving units (const l-value version)
     template <typename... Args>
     auto getElementRef(Args ... args_in)const&{
         using STm = typename STUtils::add_const<ReturnTypeElementRef<ST, Args...> >::modified_type;
@@ -292,7 +293,7 @@ class UnitCheckedTypeFull{
       if(UnitChecked::customUnitStrings.count(std::type_index(typeid(UnitCheckedTypeFull)))>0)
         return UnitChecked::customUnitStrings[std::type_index(typeid(UnitCheckedTypeFull))];
       return theUnits;
-    }
+    }///<Get the units string for this type - custom is one is registered, otherwise the standard construction
 
     static std::string make_unit_str(){
       using namespace UnitChecked;
