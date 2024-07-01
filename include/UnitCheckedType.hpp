@@ -219,7 +219,7 @@ class UnitCheckedTypeFull{
     }
     /// Value access for Unitless type (const version)
     template <typename... Args>
-    constexpr auto get(Args ... args_in)const&&{
+    constexpr auto get(Args ... args_in)&&{
       static_assert(hasNoUnits());
       return val.get(args_in...);
     }
@@ -254,9 +254,16 @@ class UnitCheckedTypeFull{
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;
     }
-    ///Reference value access, preseving units (const l-value version)
+    ///Reference value access, preserving units (const l-value version)
     template <typename... Args>
     auto getElementRef(Args ... args_in)const&{
+        using STm = typename STUtils::add_const<ReturnTypeElementRef<ST, Args...> >::modified_type;
+        UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
+        return tval;
+    }
+    ///Supplying an r-value version returning a const-ref. Note ths uses of this are limited
+    template <typename... Args>
+    auto getElementRef(Args ... args_in)const&&{
         using STm = typename STUtils::add_const<ReturnTypeElementRef<ST, Args...> >::modified_type;
         UnitCheckedTypeFull<L, M, T, K, A, MO, CD, STm> tval(val.getElementRef(args_in...));
         return tval;
