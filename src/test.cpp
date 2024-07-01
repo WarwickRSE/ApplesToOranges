@@ -896,14 +896,13 @@ void internal_checks(){
   // Getting a const ref to a temporary
   auto el7b = (x + x).getElementRef(0);
   assert(el7b.isConstRef());
+  // NOTE: does not mean we can do anything useful with el7b like this, not even read it, but is the same behaviour as regular types
 
   //Turn ref back into value (a copy)
   Length el4b = el4;
   assert(el4b == Length{2.0});
   Length el9 = el8;
   assert(el9 == Length{1.5});
-  Length el10 = el7b;
-  assert(el10 == Length{3.0});
 
 #ifdef FAIL_DEMO
 
@@ -914,6 +913,9 @@ void internal_checks(){
   UnitCheckedType<1, 0, 0, STScalarRef<double, false> > el7 = (x + x).getElementRef(0);
 
   el7b = Length{1.0}; // el7b is constref, can't write
+
+  Length el10 = el7b; //Capturing reference is OK, using the value is not
+  assert(el10 == Length{3.0}); // Might "work", depending on optimiser, but is UNDEFINED behaviour
 
   //Disallow reference access to r-values with get too
   double & el7a = (v+v).get(0);
