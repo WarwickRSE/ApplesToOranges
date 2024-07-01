@@ -791,11 +791,6 @@ void internal_checks(){
     }
   }
 
-#ifdef FAIL
-  Position x2{l}; // \todo Should this be disallowed? No - one length is not OK
-  //UCTensor t33{s, s, s}; // Works, so that we can allow single nest with correct total number
-  UCTensor t4{v}; // \todo Ditto - too small allowed?
-#endif
 
   // This line is just for coverage purposes, we already checked this works
   // but it seems we have to forcibly use it to trigger the coverage checker
