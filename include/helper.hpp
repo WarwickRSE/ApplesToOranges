@@ -2,9 +2,12 @@
 #define HELPER_H
 
 // Template magic from https://stackoverflow.com/questions/11056714/c-type-traits-to-extract-template-parameter-class to extract T from X<T>
-// Template sequence to extract the underlying value and integer parameter from a templated class. This is overloaded for the patterns in StorageTypes
+// Several variations made here
 
-/// Generic template for any class T: will match any T and extract T as value_type and dim of 0
+///Specific helpers for template extraction and modification of classes of the form we use later
+namespace STUtils{
+
+/// Default to extract values a class is templated on - will match any T and extract T as value_type and dim of 0
 template<typename T>
 struct extract_value_type
 {
@@ -26,22 +29,25 @@ struct extract_value_type<X<T, dim_>>
     static const int dim = dim_;
 };
 
-namespace STUtils{
+///Default for re-templating on another type
 template<typename T, typename T2>
 struct modify_template_type
 {
     typedef T2 modified_type;
 };
+///Overload to re-template X<ST> to X<STm>
 template<template<typename> class X, typename ST ,typename STm>
 struct modify_template_type<X<ST>, STm>
 {
     typedef X<STm> modified_type;
 };
+///Default for adding const to a type (no-op)
 template<typename T>
 struct add_const
 {
     typedef T modified_type;
 };
+///Overload to add const via X<ST, cc> -> X<ST, true>
 template<template<typename, bool> class X, typename ST, bool cc>
 struct add_const<X<ST, cc>>
 {

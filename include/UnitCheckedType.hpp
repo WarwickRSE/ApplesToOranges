@@ -153,7 +153,7 @@ class UnitCheckedTypeFull{
     // or the storage itself (although only one element will be read)
     // OR a unitchecked type of SAME units but any storage type (deferring to storage type for validity checks)
     /// Helper typedef for the (probably numeric) type contained in the storage type
-    typedef typename extract_value_type<ST>::value_type ST_t;
+    typedef typename STUtils::extract_value_type<ST>::value_type ST_t;
 
     // Use one-element constructor above for init from single ST value, so exclude that specific case here
 /**@{
@@ -701,7 +701,7 @@ struct is_unitchecked{
 template <SF L, SF M, SF T, SF K, SF A, SF MO, SF CD, typename ST>
 struct is_unitchecked<UnitCheckedTypeFull<L, M, T, K, A, MO, CD, ST> >{
     static constexpr bool value = true;
-    typedef typename extract_value_type<ST>::value_type core_type;
+    typedef typename STUtils::extract_value_type<ST>::value_type core_type;
     static constexpr bool numeric = std::is_arithmetic_v<core_type>;
 };
 
