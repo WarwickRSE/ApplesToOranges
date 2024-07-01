@@ -174,11 +174,11 @@ silently converts to a scalar in other operations
 template <typename T, bool is_const=false>
 class STScalarRef{
   public:
-    typedef typename std::conditional<is_const, const T, T>::type T_qual;
-    static constexpr bool is_const_v = is_const;
-    T_qual &val;
-    STScalarRef(T_qual &val_in):val(val_in){}
-    STScalarRef(const STScalarRef &a) = default;
+    typedef typename std::conditional<is_const, const T, T>::type T_qual; ///< Apply const to type if needed
+    static constexpr bool is_const_v = is_const; ///<Store const-ref status
+    T_qual &val;///<The reference to the value
+    STScalarRef(T_qual &val_in):val(val_in){}///<Default constructor
+    STScalarRef(const STScalarRef &a) = default;///<Default copy constructor
 
     STScalarRef operator=(const STScalarRef &a){
       static_assert(!is_const, "Cannot assign to const reference");
@@ -186,7 +186,7 @@ class STScalarRef{
         val=a.val;
       }
       return *this;
-    }
+    }///<Copy assignment from another ref
     template<typename U>
     STScalarRef operator=(const U &a){
       static_assert(!is_const, "Cannot assign to const reference");
@@ -194,10 +194,10 @@ class STScalarRef{
         val=a.get();
       }
       return *this;
-    }
+    }///<Copy assignment from other values (assumes .get() method)
     operator STScalar<T>()const{
       return STScalar<T>(val);
-    }
+    }///< Implicit conversion back to scalar
 };
 ///Stream output for Scalar refs
 template <typename T, bool c>
@@ -218,13 +218,15 @@ STScalar<T> StripReference(const STScalarRef<T> &a){
   return STScalar<T>(a);
 }
 
+///Default for identifying whether a type is a reference
 template<typename T>
 struct is_ref{
-  static constexpr bool value = false;
-  static constexpr bool is_const = false;
-  static constexpr bool combo = value && is_const; // Shorthand for both
+  static constexpr bool value = false;///<Whether value is a reference
+  static constexpr bool is_const = false;///<Whether value is a const reference
+  static constexpr bool combo = value && is_const; //< Shorthand for both properties
 };
 
+///Specialisation of is_ref for STScalarRef
 template<typename T, bool c>
 struct is_ref<STScalarRef<T,c> >{
   static constexpr bool value = true;
@@ -346,6 +348,7 @@ class STVector{
         constexpr STScalarRef<T, false> getElementRef(size_t i){
             return STScalarRef<T, false>(val[i]);
         }
+        /// Get reference to element (as a valid const-reference StorageType)
         constexpr STScalarRef<T, true> getElementRef(size_t i)const{
             return STScalarRef<T, true>(val[i]);
         }

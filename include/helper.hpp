@@ -11,17 +11,17 @@ namespace STUtils{
 template<typename T>
 struct extract_value_type
 {
-    typedef T value_type;
-    static const int dim = 0;
+    typedef T value_type;///<The type of the value
+    static const int dim = 0;///<The dimension or rank of the value
 };
-/// Overload for classes of the form X<T> - will extract T as value_type and dim of 0
+/// Overload for extract_value_type for classes of the form X<T> - will extract T as value_type and dim of 0
 template<template<typename> class X, typename T>
 struct extract_value_type<X<T>>
 {
     typedef T value_type;
     static const int dim = 0;
 };
-/// Overload for classes of the form X<T, int> - will extract T as value_type and second param as dim
+/// Overload for extract_value_type classes of the form X<T, int> - will extract T as value_type and second param as dim
 template<template<typename,int> class X, typename T, int dim_>
 struct extract_value_type<X<T, dim_>>
 {
@@ -33,9 +33,9 @@ struct extract_value_type<X<T, dim_>>
 template<typename T, typename T2>
 struct modify_template_type
 {
-    typedef T2 modified_type;
+    typedef T2 modified_type;///<The type with template parameter replaced
 };
-///Overload to re-template X<ST> to X<STm>
+///Overload for modify_template_type to re-template X<ST> to X<STm>
 template<template<typename> class X, typename ST ,typename STm>
 struct modify_template_type<X<ST>, STm>
 {
@@ -45,13 +45,13 @@ struct modify_template_type<X<ST>, STm>
 template<typename T>
 struct add_const
 {
-    typedef T modified_type;
+    typedef T modified_type;///<The type with const added
 };
-///Overload to add const via X<ST, cc> -> X<ST, true>
+///Overload for add_const to add const via X<ST, cc> -> X<ST, true>
 template<template<typename, bool> class X, typename ST, bool cc>
 struct add_const<X<ST, cc>>
 {
-    typedef X<ST, true> modified_type; //Bool param always true
+    typedef X<ST, true> modified_type; //Bool param always true for constness
 };
 };
 
